@@ -1,0 +1,27 @@
+
+.details-sec{
+    width: 100%;
+    height: 200px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+ 
+ }
+ 
+ 
+
+ .details-sec.aboutus{
+    background-image: url("../assets/global/aboutus.svg");
+ }
+
+ .details-sec.refund{
+    background-image: url("../assets/global/refund.svg");
+ }
+
+ .details-sec.contactus{
+    background-image: url("../assets/global/contactus.svg");
+ }
+
+
+ 

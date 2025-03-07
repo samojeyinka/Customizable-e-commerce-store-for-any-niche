@@ -1,0 +1,249 @@
+<?php
+require_once "../../../config/config.php";
+session_start();
+
+// If user is already logged in, redirect to dashboard
+if(isset($_SESSION['user_id'])) {
+    header("Location: " . DOMAIN . "/user/orders.php");
+    exit();
+}
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "victosah";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if($conn->connect_error){
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$error = '';
+
+if(isset($_POST['login'])) {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    
+    // Validate required fields
+    if(empty($email) || empty($password)) {
+        $error = "All fields are required";
+    } else {
+        // Check if user exists and is verified
+        $sql = "SELECT id, email, password, status FROM users WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            
+            // Verify password
+            if(password_verify($password, $user['password'])) {
+                // Check if account is verified
+                if($user['status'] == 'active') {
+                    // Set session variables
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user_email'] = $user['email'];
+                    $_SESSION['user_status'] = $user['status'];
+                    
+                    // Store last login time
+                    $update_sql = "UPDATE users SET last_login = NOW() WHERE id = ?";
+                    $update_stmt = $conn->prepare($update_sql);
+                    $update_stmt->bind_param("i", $user['id']);
+                    $update_stmt->execute();
+                    
+                    // Redirect to dashboard
+                    header("Location: " . DOMAIN . "/user/orders.php");
+                    exit();
+                } else {
+                    // $error = "Please verify your account first. <a href='verify.php' class='text-[#1A237E]'>Verify now</a>";
+                    $error = "Please verify your account first. <a href='" . DOMAIN . "/verify.php' class='text-[#1A237E]'>Verify now</a>";
+                }
+            } else {
+                $error = "Invalid email or password";
+            }
+        } else {
+            $error = "Invalid email or password";
+        }
+    }
+}
+
+
+// This code goes at the top of your signin.php page
+// if (!isset($_SESSION)) {
+//     session_start();
+// }
+
+// Check if there's a login error stored in session
+$error = '';
+if(isset($_SESSION['login_error'])) {
+    $error = $_SESSION['login_error'];
+    // Clear the error after displaying it
+    unset($_SESSION['login_error']);
+}
+?>
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VICTOSAH - Sign In</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+</head>    <link rel="stylesheet" href="../../../style.css" />
+    <link rel="stylesheet" href="../../../styles/faq.css" />
+    <link rel="stylesheet" href="../../../styles/modal.css">
+    <link rel="stylesheet" href="../../../styles/tabs.css">
+    <link rel="stylesheet" href="../../../styles/inputs.css">
+<body>
+<?php
+        include(__DIR__ . '/../../header.php');
+        include(__DIR__ . '/../../options.php');
+        ?>
+
+
+        <div class="w-full bg-[#FEFEFE]">
+    <div class="md:w-[50%] mx-auto p-4 bg-white border border-[1px] border-[#EFEFEF] my-5 rounded-md">
+    <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Welcome Back!</h3>
+        
+        <!-- Then in your form HTML, add this where you want to display the error -->
+<?php if(!empty($error)): ?>
+<section id="dangeralert" class="flex flex-col items-center w-full bg-[#FDECEC] shadow-lg mt-2 py-3 px-4 rounded relative overflow-hidden">
+    <div class="h-[100%] w-[5px] bg-[#EE3F3F] absolute left-0 top-0"></div>
+    <div class="flex items-center gap-2 mr-auto">
+        <img src="<?php echo DOMAIN; ?>/assets/global/canceldanger.svg" id="closedangeralert" alt="Cancel danger alert" class="w-[24px] cursor-pointer" />
+        <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
+            Login Error
+        </p>
+    </div>
+    <p class="text-[13px] md:text-[14px] text-start w-full font-Satoshi font-regular text-[#7F7F7F] mt-2 ml-[3rem] pr-3">
+        <?php echo $error; ?>
+    </p>
+</section>
+<?php endif; ?>
+    
+    
+    <!-- <?php if(!empty($error)): ?>
+            <div class="bg-red-100 border border-red-200 text-red-800 px-4 py-3 rounded-md mb-4">
+                <?php echo $error; ?>
+            </div>
+        <?php endif; ?>
+         -->
+        <form action="" method="POST" class="flex flex-col gap-4 pt-4">
+            <div class="flex flex-col gap-1">
+                <label
+                    for="email"
+                    class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                    Email
+                </label>
+                <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    placeholder="Enter your email address"
+                    class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
+            </div>
+            
+            <div class="flex flex-col gap-1">
+                <label
+                    for="password"
+                    class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                    Password
+                </label>
+                
+                <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        placeholder="Enter your password"
+                        class="w-full font-['Open Sans'] bg-transparent outline-none font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
+                    <img src="<?php echo DOMAIN; ?>/assets/global/eye.svg" class="w-[24px] cursor-pointer toggle-password" data-target="password" />
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" name="remember" id="remember" class="w-4 h-4" />
+                    <label for="remember" class="font-['Open Sans'] text-[14px] text-[#2C2C2C]">Remember me</label>
+                </div>
+                <a href="forgot-password.php" class="font-['Open Sans'] text-[14px] text-[#1A237E]">Forgot password?</a>
+            </div>
+            
+            <input type="hidden" name="login" value="1">
+            
+            <button type="submit" name="login" class="w-full py-[8px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">
+                Sign In
+            </button>
+        </form>
+        
+        <p class="text-center font-['Open Sans'] text-[17px] md:text-[18px] font-regular text-[#7A7A7A] py-3">
+            Or
+        </p>
+        
+        <div class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
+            <img src="<?php echo DOMAIN; ?>/assets/global/google.svg" class="w-[20px]" />
+            <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#262626] py-3">
+                Sign in with Google
+            </p>
+        </div>
+        
+        <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#7A7A7A] mt-4">
+            Don't have an account? <a href="index.php" class="text-[#1A237E]">Create an account</a>
+        </p>
+    </div>
+    </div>
+
+    <?php
+       
+         include(__DIR__ . '/../../footer.php');
+         ?>
+ 
+    
+
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/inputs.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/accordion.js"></script>
+    <script>
+// Wait for the DOM to be fully loaded before attaching event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the close button and alert elements
+    const closeAlert = document.getElementById('closedangeralert');
+    const dangerAlert = document.getElementById('dangeralert');
+    
+    // Check if both elements exist before adding the event listener
+    if (closeAlert && dangerAlert) {
+        closeAlert.addEventListener('click', function() {
+            dangerAlert.style.display = 'none';
+        });
+    }
+    
+    // Toggle password visibility (keep your existing code)
+    const toggleBtns = document.querySelectorAll('.toggle-password');
+    
+    toggleBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const passwordInput = document.getElementById(targetId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.src = '<?php echo DOMAIN; ?>/assets/global/eye-off.svg';
+            } else {
+                passwordInput.type = 'password';
+                this.src = '<?php echo DOMAIN; ?>/assets/global/eye.svg';
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

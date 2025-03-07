@@ -1,0 +1,22 @@
+.tab {
+    overflow: hidden;
+    background-color: #ffffff;
+  }
+  
+
+  .tab button{
+    cursor: pointer;
+  }
+
+  .tab button.active {
+    color: #1A237E;
+    text-decoration: underline;
+  }
+  
+  /* Style the tab content */
+  .tabcontent {
+    padding-top: 1.5rem;
+    display: none;
+    
+  }
+  

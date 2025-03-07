@@ -1,0 +1,260 @@
+body {
+    overflow-x: hidden;
+}
+
+
+
+
+.carousel {
+    position: relative;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.carousel-inner {
+    display: flex;
+    width: 400%;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-item {
+    width: 100vw;
+    height: 510px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+}
+
+.slide1 {
+    background-image: url("../assets/home/first.png");
+    background-position: center;
+    background-size: cover;
+}
+
+
+.slide2 {
+    background-image: url("../assets/home/second.png");
+    background-position: center;
+    background-size: cover;
+}
+
+.slide3 {
+    background-image: url("../assets/home/third.png");
+    background-position: center;
+    background-size: cover;
+}
+
+.slide4 {
+    background-image: url("../assets/home/fourth.png");
+    background-position: center;
+    background-size: cover;
+}
+
+
+
+.controls {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+}
+
+.controls button {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    display: none;
+}
+
+.indicators {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+}
+
+.indicators div {
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.indicators .active {
+    width: 61px;
+    height: 12px;
+    background: #484F98;
+    border-radius: 12px;
+
+}
+
+
+@media screen and (max-width:765px) {
+    .carousel-item {
+        height: 500px;
+    }
+
+}
+
+
+
+.sidemenu-content {
+    display: none;
+    position: absolute;
+    top: 70px;
+    right: 10px;
+    min-width: 160px;
+    z-index: 1;
+}
+
+.dropdown-menu {
+    display: none;
+    position: fixed;
+    top: 125px;
+    right: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+}
+
+.sidemenu-content .menulink {
+    padding: 10px 16px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.dropdown a:hover {
+    background-color: #ddd;
+}
+
+.showdd,
+.showmm {
+    display: block;
+}
+
+
+
+.modal.logout,
+.modal.regsuccess,
+.modal.password-request-verify,
+.modal.password-request-mail,
+.modal.password-request-np,
+.modal.passwordresetsuccess {
+    padding-top: 8rem;
+
+}
+
+.cbox p,
+.cbox span {
+
+    position: absolute;
+    bottom: 15px;
+    left: 25px;
+
+}
+
+.cbox span {
+    display: none;
+}
+
+
+.cbox:hover p {
+    bottom: 35px;
+}
+
+.cbox.cbox2:hover p,
+.cbox.cbox3:hover p {
+    bottom: 75px;
+}
+
+.cbox2 span,
+.cbox3 span {
+    left: 10px;
+}
+
+.cbox:hover span {
+    display: inherit;
+}
+
+
+.custom-dropdown {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.arrow-down {
+    margin-left: 5px;
+    font-size: 14px;
+    transition: transform 0.3s ease;
+    color: gray;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    background: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    width: fit-content;
+    z-index: 10;
+    text-wrap: nowrap;
+    border: 1px solid #E1E1E1;
+}
+
+.dropdown-content div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.open .arrow-down {
+    transform: rotate(180deg);
+}
+
+.open .dropdown-content {
+    display: block;
+}
+
+
+.reviews-container {
+
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    scroll-behavior: smooth;
+    padding: 10px 0;
+    cursor: grab;
+}
+
+.reviews-wrapper {
+    display: inline-flex;
+    gap: 15px;
+    padding: 10px;
+}
+
+.review {
+    min-width: 388px;
+    max-width: 388px;
+    text-wrap: wrap;
+    user-select: none;
+}
+
+
+.reviews-container::-webkit-scrollbar {
+    display: none;
+}
+

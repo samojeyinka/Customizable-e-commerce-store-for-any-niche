@@ -1,0 +1,1303 @@
+<!-- connect file -->
+<?php
+include('../../config/connect.php');
+
+
+// Process category deletion if requested
+if (isset($_GET['delete_category'])) {
+    $category_id = $_GET['delete_category'];
+
+    // Get image filename before deleting
+    $select_image = "SELECT category_image FROM categories WHERE category_id = '$category_id'";
+    $image_result = mysqli_query($con, $select_image);
+    if ($image_result && mysqli_num_rows($image_result) > 0) {
+        $row = mysqli_fetch_assoc($image_result);
+        if (!empty($row['category_image'])) {
+            $image_path = "../../assets/categories/" . $row['category_image'];
+            if (file_exists($image_path)) {
+                unlink($image_path); // Delete the image file
+            }
+        }
+    }
+
+    // Delete category
+    $delete_query = "DELETE FROM categories WHERE category_id = '$category_id'";
+    $result_delete = mysqli_query($con, $delete_query);
+    if ($result_delete) {
+        echo "<script>alert('Category deleted successfully!');</script>";
+        echo "<script>window.location.href='products.php';</script>";
+    } else {
+        echo "<script>alert('Error deleting category: " . mysqli_error($con) . "');</script>";
+    }
+}
+
+// Process category update if requested
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['cat_title']) && isset($_POST['edit_id'])) {
+    $category_title = $_POST['cat_title'];
+    $category_id = $_POST['edit_id'];
+
+    // Check if another category with the same name exists
+    $select_query = "SELECT * FROM categories WHERE category_title='$category_title' AND category_id != '$category_id'";
+    $result_select = mysqli_query($con, $select_query);
+
+    if (!$result_select) {
+        echo "<script>alert('Error checking category: " . mysqli_error($con) . "');</script>";
+    } else {
+        $number = mysqli_num_rows($result_select);
+
+        if ($number > 0) {
+            echo "<script>alert('Category name already exists');</script>";
+        } else {
+            // Handle image upload
+            $category_image = "";
+            $update_image = false;
+
+            if (isset($_FILES['edit_cat_image']) && $_FILES['edit_cat_image']['error'] == 0) {
+                $upload_dir = "../../assets/categories/";
+
+                // Create directory if it doesn't exist
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+
+                // Get file info
+                $file_name = basename($_FILES["edit_cat_image"]["name"]);
+                $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
+                // Generate a unique filename
+                $new_file_name = uniqid() . '_' . time() . '.' . $file_ext;
+                $target_file = $upload_dir . $new_file_name;
+
+                // Allowed file types
+                $allowed_types = array('jpg', 'jpeg', 'png', 'gif', 'svg');
+
+                // Validate file type
+                if (in_array($file_ext, $allowed_types)) {
+                    // Move uploaded file
+                    if (move_uploaded_file($_FILES["edit_cat_image"]["tmp_name"], $target_file)) {
+                        $category_image = $new_file_name;
+                        $update_image = true;
+
+                        // Delete old image if exists
+                        $select_image = "SELECT category_image FROM categories WHERE category_id = '$category_id'";
+                        $image_result = mysqli_query($con, $select_image);
+                        if ($image_result && mysqli_num_rows($image_result) > 0) {
+                            $row = mysqli_fetch_assoc($image_result);
+                            if (!empty($row['category_image'])) {
+                                $old_image_path = $upload_dir . $row['category_image'];
+                                if (file_exists($old_image_path)) {
+                                    unlink($old_image_path); // Delete the old image file
+                                }
+                            }
+                        }
+                    } else {
+                        echo "<script>alert('Sorry, there was an error uploading your file.');</script>";
+                    }
+                } else {
+                    echo "<script>alert('Sorry, only JPG, JPEG, PNG, GIF, and SVG files are allowed.');</script>";
+                }
+            }
+
+            // Update category
+            if ($update_image) {
+                $update_query = "UPDATE categories SET category_title='$category_title', category_image='$category_image' WHERE category_id='$category_id'";
+            } else {
+                $update_query = "UPDATE categories SET category_title='$category_title' WHERE category_id='$category_id'";
+            }
+
+            $result = mysqli_query($con, $update_query);
+
+            if ($result) {
+                echo "<script>alert('Category updated successfully');</script>";
+                echo "<script>window.location.href='products.php';</script>";
+            } else {
+                echo "<script>alert('Error updating category: " . mysqli_error($con) . "');</script>";
+            }
+        }
+    }
+}
+
+// Process brand deletion if requested
+if (isset($_GET['delete_brand'])) {
+    $brand_id = $_GET['delete_brand'];
+
+    // Get image filename before deleting
+    $select_image = "SELECT brand_image FROM brands WHERE brand_id = '$brand_id'";
+    $image_result = mysqli_query($con, $select_image);
+    if ($image_result && mysqli_num_rows($image_result) > 0) {
+        $row = mysqli_fetch_assoc($image_result);
+        if (!empty($row['brand_image'])) {
+            $image_path = "../../assets/brands/" . $row['brand_image'];
+            if (file_exists($image_path)) {
+                unlink($image_path); // Delete the image file
+            }
+        }
+    }
+
+    // Delete brand
+    $delete_query = "DELETE FROM brands WHERE brand_id = '$brand_id'";
+    $result_delete = mysqli_query($con, $delete_query);
+    if ($result_delete) {
+        echo "<script>alert('Brand deleted successfully!');</script>";
+        echo "<script>window.location.href='products.php';</script>";
+    } else {
+        echo "<script>alert('Error deleting brand: " . mysqli_error($con) . "');</script>";
+    }
+}
+// Process brand update if requested
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isset($_POST['edit_id'])) {
+    $brand_title = $_POST['brand_title'];
+    $brand_id = $_POST['edit_id'];
+
+    // Check if another brand with the same name exists
+    $select_query = "SELECT * FROM brands WHERE brand_title='$brand_title' AND brand_id != '$brand_id'";
+    $result_select = mysqli_query($con, $select_query);
+
+    if (!$result_select) {
+        echo "<script>alert('Error checking brand: " . mysqli_error($con) . "');</script>";
+    } else {
+        $number = mysqli_num_rows($result_select);
+
+        if ($number > 0) {
+            echo "<script>alert('Brand name already exists');</script>";
+        } else {
+            // Handle image upload
+            $brand_image = "";
+            $update_image = false;
+
+            if (isset($_FILES['edit_brand_image']) && $_FILES['edit_brand_image']['error'] == 0) {
+                $upload_dir = "../../assets/brands/";
+
+                // Create directory if it doesn't exist
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+
+                // Get file info
+                $file_name = basename($_FILES["edit_brand_image"]["name"]);
+                $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
+                // Generate a unique filename
+                $new_file_name = uniqid() . '_' . time() . '.' . $file_ext;
+                $target_file = $upload_dir . $new_file_name;
+
+                // Allowed file types
+                $allowed_types = array('jpg', 'jpeg', 'png', 'gif', 'svg');
+
+                // Validate file type
+                if (in_array($file_ext, $allowed_types)) {
+                    // Move uploaded file
+                    if (move_uploaded_file($_FILES["edit_brand_image"]["tmp_name"], $target_file)) {
+                        $brand_image = $new_file_name;
+                        $update_image = true;
+
+                        // Delete old image if exists
+                        $select_image = "SELECT brand_image FROM brands WHERE brand_id = '$brand_id'";
+                        $image_result = mysqli_query($con, $select_image);
+                        if ($image_result && mysqli_num_rows($image_result) > 0) {
+                            $row = mysqli_fetch_assoc($image_result);
+                            if (!empty($row['brand_image'])) {
+                                $old_image_path = $upload_dir . $row['brand_image'];
+                                if (file_exists($old_image_path)) {
+                                    unlink($old_image_path); // Delete the old image file
+                                }
+                            }
+                        }
+                    } else {
+                        echo "<script>alert('Sorry, there was an error uploading your file.');</script>";
+                    }
+                } else {
+                    echo "<script>alert('Sorry, only JPG, JPEG, PNG, GIF, and SVG files are allowed.');</script>";
+                }
+            }
+
+            // Update brand (note: we don't update date_added to preserve creation date)
+            if ($update_image) {
+                $update_query = "UPDATE brands SET brand_title='$brand_title', brand_image='$brand_image' WHERE brand_id='$brand_id'";
+            } else {
+                $update_query = "UPDATE brands SET brand_title='$brand_title' WHERE brand_id='$brand_id'";
+            }
+
+            $result = mysqli_query($con, $update_query);
+
+            if ($result) {
+                echo "<script>alert('Brand updated successfully');</script>";
+                echo "<script>window.location.href='products.php';</script>";
+            } else {
+                echo "<script>alert('Error updating brand: " . mysqli_error($con) . "');</script>";
+            }
+        }
+    }
+}
+
+
+?>
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="../styles/overlay.css">
+    <link rel="stylesheet" href="../styles/dropdown.css" />
+    <link rel="stylesheet" href="../styles/graph.css" />
+    <link rel="stylesheet" href="../styles/dash.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <title>Document</title>
+
+    <style>
+        .categoryLists,
+        .editCategory,
+        .createBrand {
+            padding-top: 5%;
+        }
+
+
+
+        .createCategory .modal-content,
+        .createBrand .modal-content {
+            width: 40%;
+
+        }
+
+
+        .categoryLists .modal-content,
+        .editCategory .modal-content {
+            width: 50%;
+        }
+
+        @media screen and (max-width:765px) {
+
+            .createCategory .modal-content,
+            .categoryLists .modal-content,
+            .editCategory .modal-content,
+            .createBrand .modal-content {
+                width: 90%;
+            }
+        }
+    </style>
+
+</head>
+
+
+<body class="relative">
+
+
+    <!-- ========================  The header  starts ======================== -->
+    <header class="w-full bg-[#FFFFFF] z-100 flex items-center justify-center p-3 border-b-[1px] border-[#F8F8F8] fixed top-0 left-0">
+        <nav class="w-full md:w-[98%] lg-w-[95%] flex items-center justify-between">
+
+            <div class="flex items-center gap-5 md:gap-8 lg:gap-10">
+                <a href="./index.php" class="flex items-center gap-1 md:gap-2">
+                    <img src="../assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
+                    <h1 class="hidden md:block text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                </a>
+
+                <img onclick="toggleNav()" src="../assets/home/menu.svg" alt="Search" class="w-[28px] cursor-pointer" />
+                <h1 class="hidden md:block  text-[16px] md:text-[20px] font-Onest font-semibold">Products</h1>
+            </div>
+
+
+            <div class="flex items-center gap-0">
+                <div class="flex items-center gap-2 border-[1px] border-[#F3F3F3] rounded-[25px] p-2">
+                    <img src="../assets/global/search-normal.svg" alt="Search" class="w-[18px]" />
+                    <input type="text" placeholder="Search name, Order ID..." class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
+                </div>
+
+            </div>
+            <div class="flex items-center gap-6 md:bg-[#F3F3F3] rounded-[4px] py-1 px-4">
+
+                <span class="cursor-pointer relative" onclick="openNotification()">
+                    <img src="../assets/global/bell.svg" class="w-[18px] md:w-[20px]" alt="bag" />
+                    <div class="w-[8px] h-[8px] bg-[#1A237E] rounded-full absolute top-[-.1rem] left-3"></div>
+                </span>
+
+
+                <a href="./settings/profile.php" class="flex items-center gap-2 cursor-pointer">
+                    <div class="w-[40px] h-[40px] md:w-[44px] md:h-[44px] rounded-[50%]">
+                        <img src="../assets/home/user.svg" alt="Profile Picture" class="w-full h-full" />
+                    </div>
+
+                    <div class="hidden md:block  flex flex-col gap-0">
+                        <p class="text-[15px] md:text-[16px] font-Onest font-medium text-[#262626]">John Paul</p>
+                        <p class="text-[14px] md:text-[16px] font-Onest font-regular text-[#5B5B5B]">johnpaul111@gmail.com</p>
+
+                    </div>
+                </a>
+
+
+            </div>
+        </nav>
+
+
+        ​
+        <!-- The dropdowns -->
+
+
+        <div id="notification" class="p-3 notification-content shadow-md bg-white rounded-[4px]">
+
+            <div class="flex flex-col gap-2">
+
+                <div class="flex items-center justify-between">
+
+                    <div class="flex items-center gap-1">
+                        <h1 class="text-[18px] md:text-[20px] font-['Open Sans'] font-medium">Notificatons</h1>
+                        <div class="flex items-center justify-center bg-[#1A237E] w-[20px] h-[20px] rounded-[50%]">
+                            <h1 class="text-white text-[11px] md:text-[12px] font-['Open Sans'] font-medium">9</h1>
+                        </div>
+                    </div>
+
+                    <a href="./notifications.php" class="text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[#1A237E]">See all</a>
+
+
+                </div>
+
+                <div class="flex flex-col gap-2 h-[78vh] md:h-[75vh] overflow-y-auto">
+                    <div class="flex flex-col gap-2">
+
+
+                        <div class="w-full flex flex-col gap-2 rounded-[4px] bg-[#EEEEEE] p-2">
+                            <div class="flex items-center justify-between">
+                                <h1 class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#262626]">New Order Places today</h1>
+                                <div class="relative flex items-center gap-2">
+                                    <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]">Jan 25. 2025 09:38am</span>
+                                    <img src="../assets/user/action.svg" class="cursor-pointer" onclick="openNotimenu(this)" />
+                                    <!-- The small menu  starts -->
+                                    <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
+                                        <div class="flex flex-col gap-3">
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Mark as unread</a>
+                                        </div>
+                                    </div>
+                                    <!-- The small menu  ends -->
+
+                                </div>
+                            </div>
+                            <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]"><span class="underline">Order #4567</span> has been placed by Juliet August.</span>
+                        </div>
+
+                        <div class="w-full flex flex-col gap-2 rounded-[4px] bg-[#EEEEEE] p-2">
+                            <div class="flex items-center justify-between">
+                                <h1 class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#262626]">New Order Places today</h1>
+                                <div class="relative flex items-center gap-2">
+                                    <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]">Jan 25. 2025 09:38am</span>
+                                    <img src="../assets/user/action.svg" class="cursor-pointer" onclick="openNotimenu(this)" />
+                                    <!-- The small menu  starts -->
+                                    <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
+                                        <div class="flex flex-col gap-3">
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Mark as unread</a>
+                                        </div>
+                                    </div>
+                                    <!-- The small menu  ends -->
+
+                                </div>
+                            </div>
+                            <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]"><span class="underline">Order #4567</span> has been placed by Juliet August.</span>
+                        </div>
+
+                        <div class="w-full flex flex-col gap-2 rounded-[4px] bg-white p-2">
+                            <div class="flex items-center justify-between">
+                                <h1 class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#262626]">New Order Places today</h1>
+                                <div class="relative flex items-center gap-2">
+                                    <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]">Jan 25. 2025 09:38am</span>
+                                    <img src="../assets/user/action.svg" class="cursor-pointer" onclick="openNotimenu(this)" />
+                                    <!-- The small menu  starts -->
+                                    <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
+                                        <div class="flex flex-col gap-3">
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Mark as unread</a>
+                                        </div>
+                                    </div>
+                                    <!-- The small menu  ends -->
+
+                                </div>
+                            </div>
+                            <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]"><span class="underline">Order #4567</span> has been placed by Juliet August.</span>
+                        </div>
+
+                        <div class="w-full flex flex-col gap-2 rounded-[4px] bg-[#EEEEEE] p-2">
+                            <div class="flex items-center justify-between">
+                                <h1 class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#262626]">New Order Places today</h1>
+                                <div class="relative flex items-center gap-2">
+                                    <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]">Jan 25. 2025 09:38am</span>
+                                    <img src="../assets/user/action.svg" class="cursor-pointer" onclick="openNotimenu(this)" />
+                                    <!-- The small menu  starts -->
+                                    <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
+                                        <div class="flex flex-col gap-3">
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Mark as unread</a>
+                                        </div>
+                                    </div>
+                                    <!-- The small menu  ends -->
+
+                                </div>
+                            </div>
+                            <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]"><span class="underline">Order #4567</span> has been placed by Juliet August.</span>
+                        </div>
+
+                        <div class="w-full flex flex-col gap-2 rounded-[4px] bg-[#EEEEEE] p-2">
+                            <div class="flex items-center justify-between">
+                                <h1 class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#262626]">New Order Places today</h1>
+                                <div class="relative flex items-center gap-2">
+                                    <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]">Jan 25. 2025 09:38am</span>
+                                    <img src="../assets/user/action.svg" class="cursor-pointer" onclick="openNotimenu(this)" />
+                                    <!-- The small menu  starts -->
+                                    <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
+                                        <div class="flex flex-col gap-3">
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Mark as unread</a>
+                                        </div>
+                                    </div>
+                                    <!-- The small menu  ends -->
+
+                                </div>
+                            </div>
+                            <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]"><span class="underline">Order #4567</span> has been placed by Juliet August.</span>
+                        </div>
+
+                        <div class="w-full flex flex-col gap-2 rounded-[4px] bg-[#EEEEEE] p-2">
+                            <div class="flex items-center justify-between">
+                                <h1 class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#262626]">New Order Places today</h1>
+                                <div class="relative flex items-center gap-2">
+                                    <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]">Jan 25. 2025 09:38am</span>
+                                    <img src="../assets/user/action.svg" class="cursor-pointer" onclick="openNotimenu(this)" />
+                                    <!-- The small menu  starts -->
+                                    <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
+                                        <div class="flex flex-col gap-3">
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Mark as unread</a>
+                                        </div>
+                                    </div>
+                                    <!-- The small menu  ends -->
+
+                                </div>
+                            </div>
+                            <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]"><span class="underline">Order #4567</span> has been placed by Juliet August.</span>
+                        </div>
+
+
+
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </header>
+    <!-- ========================  The header  ends ======================== -->
+
+    <div id="mySidenav" class="sidenav p-2 hidden md:flex flex-col justify-between gap-2">
+
+        <div class="flex flex-col gap-2">
+            <a href="./overview.php" class="nav-link active flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/category.svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/category2.svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Overview</span></a>
+            <a href="./products.php" class="nav-link  flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/book (1).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/book.svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Products</span></a>
+            <a href="./orders.php" class="nav-link  flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/bag-happy (2).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/bag-happy (1).svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Orders</span></a>
+            <a href="./users.php" class="nav-link  flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/profile (2).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/profile (1).svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Users</span></a>
+            <a href="./page3.php" class="nav-link  flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/receipt-minus (1).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/receipt-minus.svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Transactions</span></a>
+        </div>
+
+        <div class="flex flex-col gap-2 mb-7">
+            <a href="./settings/options.php" class="nav-link  flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/setting-2 (1).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/setting-2.svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Settings</span></a>
+            <span class="cursor-pointer logout-text flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/logout.svg" class="nonactiveicon w-[20px] h-[20px]" /><span class="text-[#D93939]">Logout</span></span>
+        </div>
+    </div>
+
+
+    <div id="main" class="md:p-4 flex flex-col gap-3 bg-[#FAFAFA]">
+
+        <div class="w-full flex flex-col md:flex-row justify-between md:items-center">
+            <div class="w-full md:w-[fit-content] rounded-[16px] bg-white mx-auto md:mx-0 p-2">
+                <h1 class="md:hidden  text-[18px] font-Onest font-semibold mb-3 md:mb-0">Products</h1>
+
+                <div id="myBtn" class="w-full md:w-[274px] border-[1px] border-[#F3F3F3] cursor-pointer rounded-[8px] p-2 flex justify-between items-center">
+                    <h1 class="text-[16px] font-Onest font-regular">Product Overview</h1>
+                    <img src="../assets/dash/Vector 6905.svg" />
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row md:items-center gap-3">
+                <div class="flex  items-center gap-3">
+                    <button id="openCategory" class="ml-4 md:ml-0 w-[fit-content] text-[#1A237E] shrink-0 flex items-center gap-2 px-4 py-2 border-[1px] border-[#1A237E] rounded-lg cursor-pointer">
+                        Add Category
+                    </button>
+                    <button id="openBrand" class="ml-4 md:ml-0 w-[fit-content] text-[#1A237E] shrink-0 flex items-center gap-2 px-4 py-2 border-[1px] border-[#1A237E] rounded-lg cursor-pointer">
+                        Add Tag
+                    </button>
+                </div>
+                <a href="./new-product.php" class="ml-4 md:ml-0 w-[fit-content] shrink-0 flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
+                    <img src="../assets/dash/icon (1).svg" />
+                    Add New Product
+                </a>
+            </div>
+        </div>
+
+
+
+        <div class="w-full rounded-[16px] bg-white mx-auto p-3">
+            <div id="myBtn" class="w-full flex flex-col md:flex-row md:items-center gap-3 md:gap-5 justify-between">
+                <div class="flex items-center gap-0">
+                    <div class="w-full flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[24px] p-2">
+                        <img src="../assets/dash/search-normal (1).svg" alt="Search" class="w-[18px]" />
+                        <input type="text" placeholder="Search" class="w-full md:w-[250px] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
+                    </div>
+
+                </div>
+
+                <div class="w-full flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[#2c2c2c] text-[14px] md:text-[16px] font-Onest font-medium">Filer by:</span>
+                        <img src="../assets/dash/filter-horizontal.svg" class="md:hidden" />
+
+                        <div class="hidden md:flex items-center gap-2 md:gap-3 lg:gap-4">
+                            <div class="custom-dropdown">
+                                <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
+                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Category</span>
+                                    <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                                </div>
+                                <div class="dropdown-content">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
+                                            <div onclick="selectOption(this)">Duvet</div>
+                                            <div onclick="selectOption(this)">Pillows</div>
+                                            <div onclick="selectOption(this)">Lights</div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="custom-dropdown">
+                                <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
+                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Date</span>
+                                    <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                                </div>
+                                <div class="dropdown-content">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
+                                            <div onclick="selectOption(this)">Today</div>
+                                            <div onclick="selectOption(this)">Last 7 days</div>
+                                            <div onclick="selectOption(this)">Last 28 days</div>
+                                            <div onclick="selectOption(this)">Custom date</div>
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="custom-dropdown">
+                                <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
+                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Status</span>
+                                    <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                                </div>
+                                <div class="dropdown-content">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
+                                            <div onclick="selectOption(this)">In Stock</div>
+                                            <div onclick="selectOption(this)">Out of Stock</div>
+                                            <div onclick="selectOption(this)">Low Stock</div>
+
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="flex items-center gap-1">
+                        <img src="../assets/dash/Path.svg" />
+                        <span class="text-[#262626] text-[14px] font-Onest font-regular">Clear filter</span>
+                    </div>
+
+                    <button class="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
+                        <img src="../assets/dash/send-square.svg" />
+                        Export as
+                    </button>
+
+                </div>
+            </div>
+
+            <div class=" overflow-x-auto mt-3">
+                <table cols="" class="w-full shrink-0">
+                    <thead class="w-full bg-[#E7E7E7] text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
+                        <thead class="w-full bg-[#E7E7E7] text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
+                            <th class="text-nowrap p-2 flex items-center gap-2">
+                                <input type="checkbox" />
+                                <span class="text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Product</span>
+                            </th>
+                            <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">SKU</th>
+                            <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Quantity</th>
+                            <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Category</th>
+                            <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Amount</th>
+                            <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Status</th>
+                            <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Date</th>
+                            <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">
+                                <img src="../assets/dash/column.svg" class="min-w-[24px] min-h-[24px]" />
+                            </th>
+                        </thead>
+
+                        <tbody>
+    <?php
+    // Fetch products with their main image, category, and stock status
+    $query = "
+        SELECT 
+            p.product_id,
+            p.product_name,
+            p.sku,
+            p.date_added,
+            c.category_title,
+            i.image_path AS main_image,
+            (SELECT SUM(quantity) FROM product_variants WHERE product_id = p.product_id) AS total_quantity,
+            (SELECT MIN(original_price) FROM product_variants WHERE product_id = p.product_id) AS min_price
+        FROM 
+            products p
+        LEFT JOIN 
+            categories c ON p.category_id = c.category_id
+        LEFT JOIN 
+            product_images i ON p.product_id = i.product_id AND i.is_main = 1
+        ORDER BY 
+            p.date_added DESC
+    ";
+
+    $result = mysqli_query($con, $query);
+
+    // Process product deletion if requested
+    if (isset($_GET['delete_product']) && is_numeric($_GET['delete_product'])) {
+        $product_id = $_GET['delete_product'];
+        
+        // Start transaction
+        mysqli_begin_transaction($con);
+        try {
+            // Delete variants
+            $delete_variants = "DELETE FROM product_variants WHERE product_id = ?";
+            $stmt = mysqli_prepare($con, $delete_variants);
+            mysqli_stmt_bind_param($stmt, "i", $product_id);
+            mysqli_stmt_execute($stmt);
+            
+            // Get images to delete files
+            $get_images = "SELECT image_path FROM product_images WHERE product_id = ?";
+            $stmt = mysqli_prepare($con, $get_images);
+            mysqli_stmt_bind_param($stmt, "i", $product_id);
+            mysqli_stmt_execute($stmt);
+            $image_result = mysqli_stmt_get_result($stmt);
+            
+            // Delete actual image files
+            while ($image = mysqli_fetch_assoc($image_result)) {
+                $image_path = "../../assets/products/" . $image['image_path'];
+                if (file_exists($image_path)) {
+                    unlink($image_path);
+                }
+            }
+            
+            // Delete images from database
+            $delete_images = "DELETE FROM product_images WHERE product_id = ?";
+            $stmt = mysqli_prepare($con, $delete_images);
+            mysqli_stmt_bind_param($stmt, "i", $product_id);
+            mysqli_stmt_execute($stmt);
+            
+            // Delete the product
+            $delete_product = "DELETE FROM products WHERE product_id = ?";
+            $stmt = mysqli_prepare($con, $delete_product);
+            mysqli_stmt_bind_param($stmt, "i", $product_id);
+            mysqli_stmt_execute($stmt);
+            
+            // Commit the transaction
+            mysqli_commit($con);
+            
+            echo "<script>alert('Product deleted successfully!'); window.location.href='products.php';</script>";
+        } catch (Exception $e) {
+            // Rollback the transaction if something failed
+            mysqli_rollback($con);
+            echo "<script>alert('Error deleting product: " . mysqli_error($con) . "');</script>";
+        }
+    }
+
+    // Check if we have products
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($product = mysqli_fetch_assoc($result)) {
+            // Determine stock status
+            $stock_status = "available";
+            $status_class = "bg-[#D51E5E]";
+            $status_text = "In Stock";
+            
+            if ($product['total_quantity'] <= 0) {
+                $stock_status = "outOfStock";
+                $status_class = "bg-[#262626]";
+                $status_text = "Out of Stock";
+            } elseif ($product['total_quantity'] < 10) { // Assuming less than 10 is low stock
+                $stock_status = "lowStock";
+                $status_class = "bg-[#E8B006]";
+                $status_text = "Low Stock";
+            }
+            
+            // Format the date
+            $date_added = new DateTime($product['date_added']);
+            $formatted_date = $date_added->format('d/m/Y h:i a');
+    ?>
+    <tr>
+        <td class="flex items-center gap-[10px] p-3">
+            <input type="checkbox" class="border-[#E1E1E1]" value="<?php echo $product['product_id']; ?>" />
+            <div class="flex items-center gap-2">
+                <div class="w-[68px] h-[46px] rounded-[4px] overflow-hidden">
+                    <?php if (!empty($product['main_image']) && file_exists("../../assets/products/" . $product['main_image'])): ?>
+                        <img src="../../assets/products/<?php echo $product['main_image']; ?>" class="w-full h-full object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
+                    <?php else: ?>
+                        <img src="../assets/dash/product.svg" class="w-full h-full" alt="Default Product" />
+                    <?php endif; ?>
+                </div>
+                <div class="flex flex-col gap-[4px]">
+                    <span class="text-[#262626] text-[13px] md:text-[14px] font-regular font-['Open Sans']"><?php echo htmlspecialchars($product['product_name']); ?></span>
+                </div>
+            </div>
+        </td>
+        <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo htmlspecialchars($product['sku']); ?></td>
+        <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo number_format($product['total_quantity']); ?></td>
+        <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo htmlspecialchars($product['category_title']); ?></td>
+        <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">₦<?php echo number_format($product['min_price']); ?></td>
+
+        <td>
+            <button type="button" class="py-1 px-4 <?php echo $status_class; ?> text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px] <?php if ($stock_status !== 'available') echo 'text-nowrap'; ?>">
+                <?php echo $status_text; ?>
+            </button>
+        </td>
+
+        <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-nowrap"><?php echo $formatted_date; ?></td>
+
+        <td class="relative">
+            <img src="../assets/user/action.svg" class="w-[20px] cursor-pointer" onclick="openOrdermenu(this)" />
+
+            <!-- Order Menu (specific to this row) -->
+            <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
+                <div class="flex flex-col gap-3">
+                    <a href="../products/show.php?id=<?php echo $product['product_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                    <a href="./reviews.php?product_id=<?php echo $product['product_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Review</a>
+                    <a href="./edit-product.php?id=<?php echo $product['product_id']; ?>" class="text-[16px] font-medium text-[#262626]">Edit</a>
+                    <a href="javascript:void(0);" onclick="confirmDelete(<?php echo $product['product_id']; ?>, '<?php echo addslashes($product['product_name']); ?>')" class="text-[16px] font-medium text-[#D93939]">Delete</a>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <?php
+        }
+    } else {
+        // No products found
+        echo '<tr><td colspan="8" class="text-center py-4 text-gray-500">No products found</td></tr>';
+    }
+    ?>
+</tbody>
+
+<script>
+    function confirmDelete(productId, productName) {
+        if (confirm('Are you sure you want to delete "' + productName + '"? This action cannot be undone.')) {
+            window.location.href = 'products.php?delete_product=' + productId;
+        }
+    }
+</script>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="w-[90%] md:w-full py-2 mx-auto flex flex-col gap-2 md:flex-row md:items-center justify-between">
+            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">Showing 10 results from 10,000</span>
+            <div class="w-full md:w-[fit-content] ml-auto flex items-center justify-between gap-5">
+                <div class="flex items-center gap-2 cursor-pointer">
+                    <img src="../assets/products/prev.svg" class="w-[6px] h-[11px]" />
+                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Prev</span>
+                </div>
+
+                <div class="w-full flex items-center justify-between md:gap-6">
+
+                    <span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#1A237E]">1</span>
+                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">2</span>
+                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">3</span>
+                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">4</span>
+                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">5</span>
+                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">...</span>
+                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">10</span>
+
+
+                </div>
+
+                <div class="flex items-center gap-2 cursor-pointer">
+                    <img src="../assets/products/next.svg" class="w-[6px] h-[11px]" />
+                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Next</span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+
+
+    <!-- The modals starts -->
+    <div id="myModal" class="modal reg">
+        <!-- Modal content -->
+        <div class="modal-content overflow-hidden p-4">
+            <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Product Overview</h1>
+            <img src="../assets/global/close-circle.svg" alt="close" id="closeauth" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+
+            <div class="grid grid-cols-1 md:grid-cols-2  p-2 gap-4 mt-2">
+                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                        <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
+                    </div>
+
+                    <div class="flex flex-col gap-[1px]">
+                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Products</span>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">500</h2>
+                            <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">Listed items</p>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <img src="../assets/dash/decrease.svg" class="w-[20px] h-[20px]" />
+                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#D93939]">+12%</span> from last 28 days</p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                        <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
+                    </div>
+
+                    <div class="flex flex-col gap-[1px]">
+                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Out-of-Stock Products</span>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">52</h2>
+                            <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">items need restocking</p>
+                        </div>
+
+                        <div class="flex items-center gap-1">
+                            <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
+                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#39D959]">+12%</span> from last 28 days</p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                        <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
+                    </div>
+
+                    <div class="flex flex-col gap-[1px]">
+                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">In-Stock Products</span>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">450</h2>
+                            <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">available for purchase</p>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <img src="../assets/dash/decrease.svg" class="w-[20px] h-[20px]" />
+                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#D93939]">+12%</span> from last 28 days</p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                        <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
+                    </div>
+
+                    <div class="flex flex-col gap-[1px]">
+                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Low Stock Warnings</span>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">2</h2>
+                            <p class="text-[#1A237E] text-[14px] text-[15px] font-regular font-['Open Sans']">products have less than 5 items left</p>
+                        </div>
+
+                        <div class="flex items-center gap-1">
+                            <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
+                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#39D959]">+12%</span> from last 28 days</p>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            ​
+        </div>
+
+    </div>
+
+    <?php
+    include('../../includes/admin/create_category.php');
+    include('../../includes/admin/categories.php');
+    include('../../includes/admin/brands.php');
+    include('../../includes/admin/create_brand.php');
+    ?>
+
+
+
+
+    <!-- Edit Category Modal -->
+    <div id="editCategory" class="modal editCategory">
+        <!-- Modal content -->
+        <div class="modal-content overflow-hidden p-4">
+            <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Edit Category</h1>
+            <img src="../assets/global/close-circle.svg" alt="close" id="closeEC" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+
+            <form method="post" enctype="multipart/form-data">
+                <div class="flex flex-col gap-4">
+                    <!-- Category Name -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-[#2c2c2c] font-['Open Sans] text-[16px] font-medium">Category Name</label>
+                        <input type="text" id="edit_cat_title" name="cat_title" placeholder="Enter category name" required class="p-2 placeholder:text-[#D9D9D9] border-[#E1E1E1] border-[1px] outline-none font-[#2c2c2c] font-['Open Sans] text-[16px]" />
+                        <input type="hidden" id="edit_cat_id" name="edit_id" value="">
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-[#2c2c2c] font-['Open Sans] text-[16px] font-medium">Category Image</label>
+                        <div class="flex flex-col gap-2">
+                            <div class="w-full h-[120px] border-[1px] border-dashed border-[#E1E1E1] rounded-lg flex items-center justify-center relative">
+                                <input type="file" name="edit_cat_image" id="edit_cat_image" accept="image/*" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" onchange="previewEditImage(this)" />
+                                <div id="edit-upload-placeholder" class="flex flex-col items-center justify-center gap-2">
+                                    <img src="../../assets/global/folder-2.svg" alt="upload" class="w-[24px] h-[24px]" />
+                                    <span class="text-[14px] text-[#9A9A9A] font-['Open Sans']">Click to upload or drag and drop</span>
+                                    <span class="text-[12px] text-[#9A9A9A] font-['Open Sans']">SVG, PNG, JPG or GIF (max. 2MB)</span>
+                                </div>
+                                <div id="edit-image-preview" class="hidden w-full h-full">
+                                    <img id="edit-preview-img" src="#" alt="Preview" class="w-full h-full object-contain" />
+                                </div>
+                            </div>
+                            <p class="text-[12px] text-[#9A9A9A] font-['Open Sans']">Leave empty to keep the current image</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full text-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
+                        Update
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Edit Brand Modal -->
+    <div id="editBrand" class="modal editBrand">
+        <!-- Modal content -->
+        <div class="modal-content overflow-hidden p-4">
+            <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Edit Brand</h1>
+            <img src="../assets/global/close-circle.svg" alt="close" id="closeEB" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+
+            <form method="post" enctype="multipart/form-data">
+                <div class="flex flex-col gap-4">
+                    <!-- Brand Name -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-[#2c2c2c] font-['Open Sans] text-[16px] font-medium">Brand Name</label>
+                        <input type="text" id="edit_brand_title" name="brand_title" placeholder="Enter brand name" required class="p-2 placeholder:text-[#D9D9D9] border-[#E1E1E1] border-[1px] outline-none font-[#2c2c2c] font-['Open Sans] text-[16px]" />
+                        <input type="hidden" id="edit_brand_id" name="edit_id" value="">
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-[#2c2c2c] font-['Open Sans] text-[16px] font-medium">Brand Image</label>
+                        <div class="flex flex-col gap-2">
+                            <div class="w-full h-[120px] border-[1px] border-dashed border-[#E1E1E1] rounded-lg flex items-center justify-center relative">
+                                <input type="file" name="edit_brand_image" id="edit_brand_image" accept="image/*" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" onchange="previewEditBrandImage(this)" />
+                                <div id="edit-brand-upload-placeholder" class="flex flex-col items-center justify-center gap-2">
+                                    <img src="../../assets/global/folder-2.svg" alt="upload" class="w-[24px] h-[24px]" />
+                                    <span class="text-[14px] text-[#9A9A9A] font-['Open Sans']">Click to upload or drag and drop</span>
+                                    <span class="text-[12px] text-[#9A9A9A] font-['Open Sans']">SVG, PNG, JPG or GIF (max. 2MB)</span>
+                                </div>
+                                <div id="edit-brand-image-preview" class="hidden w-full h-full">
+                                    <img id="edit-brand-preview-img" src="#" alt="Preview" class="w-full h-full object-contain" />
+                                </div>
+                            </div>
+                            <p class="text-[12px] text-[#9A9A9A] font-['Open Sans']">Leave empty to keep the current image</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full text-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
+                        Update
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- The modals ends -->
+
+
+
+
+
+
+    <script type="text/javascript" src="../functions/drop-select.js"></script>
+    <script type="text/javascript" src="../functions/order.js"></script>
+    <script type="text/javascript" src="../functions/dash.js"></script>
+    <script type="text/javascript" src="../functions/tab.js"></script>
+    <script type="text/javascript" src="../functions/overlay.js"></script>
+    <script type="text/javascript" src="../functions/ordermenu.js"></script>
+    <script type="text/javascript" src="../functions/nav.js"></script>
+    <script>
+        var categoryLists = document.getElementById("categoryLists");
+        var openCategoriesLists = document.getElementById("openCategoriesLists");
+        var closeCategoriesLists = document.getElementById("closeCategoriesLists");
+
+
+        openCategoriesLists.onclick = function() {
+            categoryLists.style.display = "block";
+            createCategory.style.display = "none";
+        }
+
+
+        closeCategoriesLists.onclick = function() {
+            categoryLists.style.display = "none";
+
+        }
+
+
+        var editModal = document.getElementById("editCategory");
+
+        closeEC.onclick = function() {
+            editModal.style.display = "none";
+
+        }
+
+
+        // Function to open edit category modal
+        function openEditCategory(categoryId, categoryTitle) {
+            var editModal = document.getElementById("editCategory");
+            var titleInput = document.getElementById("edit_cat_title");
+            var idInput = document.getElementById("edit_cat_id");
+
+            // Set the values
+            titleInput.value = categoryTitle;
+            idInput.value = categoryId;
+
+            // Show the modal
+            editModal.style.display = "block";
+            categoryLists.style.display = "none";
+
+            // Close any open dropdown menus
+            var dropdowns = document.getElementsByClassName("ordermenu-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].style.display = "none";
+            }
+        }
+
+
+
+        // Image preview functionality for edit form
+        function previewEditImage(input) {
+            const uploadPlaceholder = document.getElementById('edit-upload-placeholder');
+            const imagePreview = document.getElementById('edit-image-preview');
+            const previewImg = document.getElementById('edit-preview-img');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    uploadPlaceholder.classList.add('hidden');
+                    imagePreview.classList.remove('hidden');
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Function to reset edit form
+        function resetEditForm() {
+            const form = document.querySelector('#editCategory form');
+            const uploadPlaceholder = document.getElementById('edit-upload-placeholder');
+            const imagePreview = document.getElementById('edit-image-preview');
+
+            form.reset();
+            uploadPlaceholder.classList.remove('hidden');
+            imagePreview.classList.add('hidden');
+        }
+
+
+
+
+        //brand 
+
+        var createBrand = document.getElementById("createBrand");
+        var openBrand = document.getElementById("openBrand");
+        var closeCB = document.getElementById("closeCB");
+
+
+
+
+        openBrand.onclick = function() {
+            createBrand.style.display = "block";
+        }
+
+
+        closeCB.onclick = function() {
+            createBrand.style.display = "none";
+        }
+
+
+
+
+        // for brands
+
+
+
+        //brands      
+        var openBrandsLists = document.getElementById("openBrandsLists");
+        var brandLists = document.getElementById("brandLists");
+        var closeBrandLists = document.getElementById("closeBrandLists");
+
+
+        openBrandsLists.onclick = function() {
+            brandLists.style.display = "block";
+            createBrand.style.display = "none";
+        }
+
+
+        closeBrandLists.onclick = function() {
+            brandLists.style.display = "none";
+
+        }
+
+
+
+        // Modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up Open Brand Modal button
+            var openBrandBtn = document.getElementById("openBrand");
+            var createBrandModal = document.getElementById("createBrand");
+
+            if (openBrandBtn && createBrandModal) {
+                openBrandBtn.onclick = function() {
+                    createBrandModal.style.display = "block";
+
+                }
+            }
+
+            // Edit Brand Modal
+            var editBrandModal = document.getElementById("editBrand");
+            var closeEditBtn = document.getElementById("closeEB");
+
+            // Close Edit Modal
+            if (closeEditBtn) {
+                closeEditBtn.onclick = function() {
+                    editBrandModal.style.display = "none";
+
+                }
+            }
+
+            // Close when clicking outside
+            window.onclick = function(event) {
+                if (event.target == editBrandModal) {
+                    editBrandModal.style.display = "none";
+                    resetEditBrandForm();
+                }
+                if (event.target == createBrandModal) {
+                    createBrandModal.style.display = "none";
+                }
+            }
+        });
+
+        // Image preview functionality for edit form
+        function previewEditBrandImage(input) {
+            const uploadPlaceholder = document.getElementById('edit-brand-upload-placeholder');
+            const imagePreview = document.getElementById('edit-brand-image-preview');
+            const previewImg = document.getElementById('edit-brand-preview-img');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    uploadPlaceholder.classList.add('hidden');
+                    imagePreview.classList.remove('hidden');
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Function to reset edit form
+        function resetEditBrandForm() {
+            const form = document.querySelector('#editBrand form');
+            const uploadPlaceholder = document.getElementById('edit-brand-upload-placeholder');
+            const imagePreview = document.getElementById('edit-brand-image-preview');
+
+            form.reset();
+            uploadPlaceholder.classList.remove('hidden');
+            imagePreview.classList.add('hidden');
+        }
+
+        // Function to open edit brand modal with image
+        function openEditBrand(brandId, brandTitle, brandImage) {
+            var editModal = document.getElementById("editBrand");
+            var titleInput = document.getElementById("edit_brand_title");
+            var idInput = document.getElementById("edit_brand_id");
+            var uploadPlaceholder = document.getElementById('edit-brand-upload-placeholder');
+            var imagePreview = document.getElementById('edit-brand-image-preview');
+            var previewImg = document.getElementById('edit-brand-preview-img');
+            var brandLists = document.getElementById("brandLists");
+
+            // Set the values
+            titleInput.value = brandTitle;
+            idInput.value = brandId;
+
+            // Show existing image if available
+            if (brandImage && brandImage !== '') {
+                previewImg.src = '../../assets/brands/' + brandImage;
+                uploadPlaceholder.classList.add('hidden');
+                imagePreview.classList.remove('hidden');
+            } else {
+                uploadPlaceholder.classList.remove('hidden');
+                imagePreview.classList.add('hidden');
+            }
+
+            // Show the modal
+            editModal.style.display = "block";
+            brandLists.style.display = "none";
+
+            // Close any open dropdown menus
+            var dropdowns = document.getElementsByClassName("ordermenu-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].style.display = "none";
+            }
+        }
+
+
+
+    function confirmDelete(productId, productName) {
+        if (confirm('Are you sure you want to delete "' + productName + '"? This action cannot be undone.')) {
+            window.location.href = 'products.php?delete_product=' + productId;
+        }
+    }
+    </script>
+
+
+</body>
+
+</html>
