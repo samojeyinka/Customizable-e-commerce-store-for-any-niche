@@ -200,6 +200,17 @@ $total = $subtotal + $shipping_fee;
 
 }
 
+
+// Add this PHP code at the top of your checkout.php file to generate the necessary data
+$paystack_data = [
+    'key' => 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41', // Replace with your public key
+    'user_email' => $user['email'] ?? '',
+    'amount' => $total,
+    'first_name' => $profile['first_name'] ?? '',
+    'last_name' => $profile['last_name'] ?? '',
+    'order_ref' => 'ORDER-' . time() . rand(1000, 9999)
+];
+
 ?>
 
 
@@ -220,6 +231,10 @@ $total = $subtotal + $shipping_fee;
     <link rel="stylesheet" href="../styles/tabs.css">
     <link rel="stylesheet" href="../styles/styles.css">
     <link rel="stylesheet" href="../styles/faq.css" />
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="./paystack-checkout.js"></script>
+
+
 </head>
 
 <body>
@@ -594,7 +609,7 @@ $total = $subtotal + $shipping_fee;
                         </section>
                     </div>
 
-                    <div class="mt-4">
+                    <!-- <div class="mt-4">
                         <label class="font-['Open Sans'] text-[13px] md:text-[15px] font-regular text-[#5B5B5B]">
                             By proceeding with your purchase you agree to our Terms and Conditions and Privacy Policy
                         </label>
@@ -605,7 +620,48 @@ $total = $subtotal + $shipping_fee;
                             class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
                             Continue to Pay
                         </button>
-                    </div>
+                    </div> -->
+
+
+                    <!-- Payment Method Section -->
+<div class="w-full border-[1px] border-[#E1E1E1] rounded-[8px] p-4 flex flex-col gap-2 mt-4">
+    <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
+        Payment Method
+    </p>
+
+    <div class="flex flex-col gap-3 pt-2">
+        <!-- Payment method will be handled by Paystack -->
+        <input type="hidden" id="email-address" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" />
+        <input type="hidden" id="amount" name="amount" value="<?php echo $total; ?>" />
+        <input type="hidden" id="first-name" name="first_name" value="<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>" />
+        <input type="hidden" id="last-name" name="last_name" value="<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>" />
+        <input type="hidden" id="order-ref" name="order_ref" value="ORDER-<?php echo time().rand(1000, 9999); ?>" />
+        
+        <div class="payment-method-info bg-gray-50 p-3 rounded-md">
+            <p class="text-[14px] md:text-[15px] text-[#5B5B5B] font-['Open Sans']">
+                Payment will be processed securely via Paystack. You will be able to pay using:
+            </p>
+            <div class="flex flex-wrap gap-2 mt-2">
+                <img src="../assets/payment/visa.svg" alt="Visa" class="h-6" />
+                <img src="../assets/payment/mastercard.svg" alt="Mastercard" class="h-6" />
+                <img src="../assets/payment/verve.svg" alt="Verve" class="h-6" />
+                <img src="../assets/payment/bank.svg" alt="Bank Transfer" class="h-6" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <label class="font-['Open Sans'] text-[13px] md:text-[15px] font-regular text-[#5B5B5B]">
+        By proceeding with your purchase you agree to our Terms and Conditions and Privacy Policy
+    </label>
+    <button 
+        type="button" 
+        id="pay-button"
+        class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+        Pay Now ₦<?php echo number_format($total); ?>
+    </button>
+</div>
                 </form>
             </div>
 
@@ -730,114 +786,11 @@ $total = $subtotal + $shipping_fee;
         </div>
     </div>
 
-    <!-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get elements
-            const deliveryRadios = document.querySelectorAll('.delivery-method-radio');
-            const deliverySection = document.getElementById('delivery-section');
-            const pickupSection = document.getElementById('pickup-section');
-            const billingSection = document.getElementById('billing-section');
-            const billingCheckbox = document.getElementById('billing_same');
-            const deliveryStatusSection = document.getElementById('delivery-status');
-            
-            // Define shipping fee for express delivery
-            const expressShippingFee = 2000;
-            
-            // Initialize total
-            let subtotal = <?php echo $subtotal; ?>;
-            let total = subtotal;
-            
-            // Function to update totals
-            function updateTotals(shippingFee) {
-                // Update shipping fee displays
-                document.getElementById('mobile-shipping').textContent = shippingFee.toLocaleString();
-                document.getElementById('desktop-shipping').textContent = shippingFee.toLocaleString();
-                document.getElementById('delivery-fee').textContent = shippingFee.toLocaleString();
-                
-                // Calculate new total
-                total = subtotal + shippingFee;
-                
-                // Update total displays
-                document.getElementById('mobile-total').textContent = total.toLocaleString();
-                document.getElementById('desktop-total').textContent = total.toLocaleString();
-            }
-            
-            // Handle delivery method change
-            deliveryRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    if (this.value === 'express') {
-                        deliverySection.classList.remove('hidden');
-                        pickupSection.classList.add('hidden');
-                        deliveryStatusSection.classList.remove('hidden');
-                        updateTotals(expressShippingFee);
-                    } else {
-                        deliverySection.classList.add('hidden');
-                        pickupSection.classList.remove('hidden');
-                        deliveryStatusSection.classList.add('hidden');
-                        updateTotals(0);
-                    }
-                });
-            });
-            
-            // Handle billing checkbox
-            if (billingCheckbox) {
-                billingCheckbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        billingSection.classList.add('opacity-50');
-                        
-                        // Disable billing inputs
-                        const inputs = billingSection.querySelectorAll('input');
-                        inputs.forEach(input => {
-                            input.disabled = true;
-                        });
-                    } else {
-                        billingSection.classList.remove('opacity-50');
-                        
-                        // Enable billing inputs
-                        const inputs = billingSection.querySelectorAll('input');
-                        inputs.forEach(input => {
-                            input.disabled = false;
-                        });
-                    }
-                });
-                
-                // Trigger change event on load
-                billingCheckbox.dispatchEvent(new Event('change'));
-            }
-            
-            // Check if there's a buy-now item in session storage
-            const buyNowData = sessionStorage.getItem('checkoutData');
-            if (buyNowData) {
-                try {
-                    const productData = JSON.parse(buyNowData);
-                    console.log('Buy Now Product:', productData);
-                    
-                    // You can use this data to populate the checkout form if needed
-                    // This is already handled server-side in this implementation
-                    
-                    // Clear the session storage data once used
-                    // sessionStorage.removeItem('checkoutData');
-                } catch (e) {
-                    console.error('Error parsing buy now data:', e);
-                }
-            }
-            
-            // Initialize the page based on current delivery method
-            const currentMethod = document.querySelector('.delivery-method-radio:checked').value;
-            if (currentMethod === 'express') {
-                deliverySection.classList.remove('hidden');
-                pickupSection.classList.add('hidden');
-                deliveryStatusSection.classList.remove('hidden');
-                updateTotals(expressShippingFee);
-            } else {
-                deliverySection.classList.add('hidden');
-                pickupSection.classList.remove('hidden');
-                deliveryStatusSection.classList.add('hidden');
-                updateTotals(0);
-            }
-        });
-    </script> -->
 
+
+    <!-- Add Paystack script as external file -->
+
+<!-- Add your external JS file with nonce if needed -->
 
     <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -962,6 +915,154 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTotals(false);
     }
 });
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const payButton = document.getElementById('pay-button');
+    
+    if (payButton) {
+        payButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Use paystackData passed from PHP
+            const email = '<?php echo htmlspecialchars($user['email']); ?>';
+            const amount = <?php echo $total; ?>;
+            const firstName = '<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>';
+            const lastName = '<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>';
+            const ref = 'ORDER-' + Date.now() + Math.floor(Math.random() * 10000);
+            
+            let handler = PaystackPop.setup({
+                key: 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41',
+                email: email,
+                amount: amount * 100, // Convert to kobo
+                currency: "NGN",
+                ref: ref,
+                metadata: {
+                    custom_fields: [
+                        {
+                            display_name: "First Name",
+                            variable_name: "first_name",
+                            value: firstName
+                        },
+                        {
+                            display_name: "Last Name",
+                            variable_name: "last_name",
+                            value: lastName
+                        }
+                    ]
+                },
+                onClose: function() {
+                    console.log('Payment window closed');
+                },
+                callback: function(response) {
+                    console.log('Payment complete! Reference:', response.reference);
+                    processOrder(response.reference, response.transaction);
+                }
+            });
+            
+            handler.openIframe();
+        });
+    }
+    
+    function processOrder(paymentRef, transactionId) {
+        // Create comprehensive FormData
+        const formData = new FormData();
+        
+        // Payment details
+        formData.append('payment_reference', paymentRef);
+        formData.append('transaction_id', transactionId);
+        
+        // Collect delivery method
+        const deliveryMethod = document.querySelector('input[name="delivery_method"]:checked').value;
+        formData.append('delivery_method', deliveryMethod);
+        
+        // Basic order details
+        formData.append('email', document.getElementById('email').value);
+        formData.append('note', document.getElementById('note').value || '');
+        
+        // Pickup or delivery specifics
+        if (deliveryMethod === 'pickup') {
+            formData.append('pickup_location', 
+                document.querySelector('input[name="pickup_location"]:checked').value
+            );
+        } else {
+            // Shipping fields collection
+            const shippingFields = [
+                'country', 'first_name', 'last_name', 'phone', 
+                'address', 'state', 'city', 'zip_code'
+            ];
+            
+            shippingFields.forEach(field => {
+                const element = document.getElementById(field);
+                formData.append(field, element ? element.value : '');
+            });
+            
+            // Billing details handling
+            const billingCheckbox = document.getElementById('billing_same');
+            formData.append('billing_same', billingCheckbox && billingCheckbox.checked ? '1' : '0');
+            
+            // If billing is different
+            if (!billingCheckbox.checked) {
+                const billingFields = [
+                    'billing_country', 'billing_first_name', 'billing_last_name', 
+                    'billing_phone', 'billing_address', 'billing_state', 
+                    'billing_city', 'billing_zip_code'
+                ];
+                
+                billingFields.forEach(field => {
+                    const element = document.getElementById(field);
+                    formData.append(field, element ? element.value : '');
+                });
+            }
+        }
+        
+        // Enhanced fetch with comprehensive error handling
+        fetch('process-order.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            // Log response details for debugging
+            console.log('Response Status:', response.status);
+            
+            // Try to parse response as JSON
+            return response.json().then(data => {
+                if (!response.ok) {
+                    // Throw error with message from server
+                    throw new Error(data.message || 'Order processing failed');
+                }
+                return data;
+            });
+        })
+        .then(data => {
+            console.log('Order processed successfully:', data);
+            
+            // Show success modal
+            const successModal = document.getElementById('paysuccess');
+            if (successModal) {
+                successModal.style.display = 'block';
+            }
+            
+            // Redirect to order success page
+            setTimeout(() => {
+                window.location.href = 'order-success.php?ref=' + paymentRef;
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Order Processing Error:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
+            
+            // User-friendly error notification
+            alert('Order Processing Failed: ' + error.message);
+        });
+    }
+});
+
 </script>
 </body>
 </html>
