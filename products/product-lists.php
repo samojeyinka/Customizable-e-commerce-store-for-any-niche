@@ -28,7 +28,7 @@
                     <div class="actionstab absolute w-[fit-content] right-2 top-4">
                         <div class="flex flex-col gap-2 md:gap-4">
                             <!-- <img src="../assets/products/h1.svg" class="w-[25px] md:w-[35px] cursor-pointer add-to-favourite" />-->
-                              <img src="<?php echo DOMAIN; ?>/assets/products/<?php echo isset($favorites[$product['product_id']]) ? 'addedtofav.svg' : 'addtofav.svg'; ?>" 
+                              <img src="<?php echo DOMAIN; ?>/assets/products/<?php echo isset($favorites[$product['product_id']]) ? 'addtofav.svg' : 'addedtofav.svg'; ?>" 
              class="w-[25px] md:w-[35px] cursor-pointer add-to-favourite <?php echo isset($favorites[$product['product_id']]) ? 'favorite-active' : ''; ?>" 
              data-product-id="<?php echo $product['product_id']; ?>" />
        
@@ -335,14 +335,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.action === 'added' || data.action === 'exists') {
                         // Update icon to show favorited state
                         this.classList.add('favorite-active');
-                        this.src = '<?php echo DOMAIN; ?>/assets/products/addedtofav.svg'; // Replace with your filled heart icon
+                        this.src = '<?php echo DOMAIN; ?>/assets/products/addtofav.svg'; // Replace with your filled heart icon
                         
                         // Show toast notification
                         showToast('Product added to favorites!', 'success');
                     } else if (data.action === 'removed') {
                         // Update icon to show unfavorited state
                         this.classList.remove('favorite-active');
-                        this.src = '<?php echo DOMAIN; ?>/assets/products/addtofav.svg'; // Replace with your empty heart icon
+                        this.src = '<?php echo DOMAIN; ?>/assets/products/addedtofav.svg'; // Replace with your empty heart icon
                         
                         // Show toast notification
                         showToast('Product removed from favorites!', 'warning');
