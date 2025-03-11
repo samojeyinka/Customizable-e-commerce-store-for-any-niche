@@ -462,6 +462,9 @@ $paystack_data = [
                                         <input type="checkbox" name="billing_same" id="billing_same" checked />
                                         <label for="billing_same" class="font-['Open Sans'] text-[13px] md:text-[15px] font-regular text-[#5B5B5B] cursor-pointer">Use same address for billing</label>
                                     </div>
+
+                          
+
                                 </div>
                             </div>
                         </div>
@@ -587,7 +590,21 @@ $paystack_data = [
                                         class="w-full font-regular outline-none text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] text-[14px] md:text-[16px] rounded-[8px]" />
                                 </div>
                             </div>
+
+                            
                         </div>
+
+                        <div class="flex justify-end mt-3">
+    <button 
+        type="button" 
+        id="update-profile-btn"
+        class="py-2 px-4 bg-gray-100 hover:bg-gray-200 text-[#1A237E] text-[14px] font-['Open Sans'] flex items-center gap-1 cursor-pointer rounded-[4px] border border-[#E1E1E1]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>
+        Save Address to Profile
+    </button>
+</div>
                     </div>
 
                     <div id="delivery-status" class="mt-4 hidden">
@@ -609,6 +626,8 @@ $paystack_data = [
                         </section>
                     </div>
 
+         
+
                     <!-- <div class="mt-4">
                         <label class="font-['Open Sans'] text-[13px] md:text-[15px] font-regular text-[#5B5B5B]">
                             By proceeding with your purchase you agree to our Terms and Conditions and Privacy Policy
@@ -625,9 +644,9 @@ $paystack_data = [
 
                     <!-- Payment Method Section -->
 <div class="w-full border-[1px] border-[#E1E1E1] rounded-[8px] p-4 flex flex-col gap-2 mt-4">
-    <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
-        Payment Method
-    </p>
+   
+
+    
 
     <div class="flex flex-col gap-3 pt-2">
         <!-- Payment method will be handled by Paystack -->
@@ -636,18 +655,7 @@ $paystack_data = [
         <input type="hidden" id="first-name" name="first_name" value="<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>" />
         <input type="hidden" id="last-name" name="last_name" value="<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>" />
         <input type="hidden" id="order-ref" name="order_ref" value="ORDER-<?php echo time().rand(1000, 9999); ?>" />
-        
-        <div class="payment-method-info bg-gray-50 p-3 rounded-md">
-            <p class="text-[14px] md:text-[15px] text-[#5B5B5B] font-['Open Sans']">
-                Payment will be processed securely via Paystack. You will be able to pay using:
-            </p>
-            <div class="flex flex-wrap gap-2 mt-2">
-                <img src="../assets/payment/visa.svg" alt="Visa" class="h-6" />
-                <img src="../assets/payment/mastercard.svg" alt="Mastercard" class="h-6" />
-                <img src="../assets/payment/verve.svg" alt="Verve" class="h-6" />
-                <img src="../assets/payment/bank.svg" alt="Bank Transfer" class="h-6" />
-            </div>
-        </div>
+    
     </div>
 </div>
 
@@ -1059,6 +1067,76 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // User-friendly error notification
             alert('Order Processing Failed: ' + error.message);
+        });
+    }
+});
+
+
+
+// Profile update functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const updateProfileBtn = document.getElementById('update-profile-btn');
+    
+    if (updateProfileBtn) {
+        updateProfileBtn.addEventListener('click', function() {
+            // Collect all form data
+            const formData = new FormData();
+            
+            // Collect delivery method
+            const deliveryMethod = document.querySelector('input[name="delivery_method"]:checked').value;
+            formData.append('delivery_method', deliveryMethod);
+            
+            // Only proceed if express delivery is selected (has address fields)
+            if (deliveryMethod === 'express') {
+                // Shipping details
+                const shippingFields = [
+                    'country', 'first_name', 'last_name', 'phone', 
+                    'address', 'state', 'city', 'zip_code'
+                ];
+                
+                shippingFields.forEach(field => {
+                    const element = document.getElementById(field);
+                    formData.append(field, element ? element.value : '');
+                });
+                
+                // Billing same as shipping checkbox
+                const billingCheckbox = document.getElementById('billing_same');
+                formData.append('billing_same', billingCheckbox && billingCheckbox.checked ? '1' : '0');
+                
+                // Billing details
+                const billingFields = [
+                    'billing_country', 'billing_first_name', 'billing_last_name', 
+                    'billing_phone', 'billing_address', 'billing_state', 
+                    'billing_city', 'billing_zip_code'
+                ];
+                
+                billingFields.forEach(field => {
+                    const element = document.getElementById(field);
+                    formData.append(field, element ? element.value : '');
+                });
+                
+                // Send the profile update request
+                fetch('../user/update-checkout-profile.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Show success message
+                        alert('Address information saved to your profile!');
+                    } else {
+                        // Show error message
+                        alert(data.message || 'Failed to update profile. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Profile Update Error:', error);
+                    alert('An error occurred while updating your profile.');
+                });
+            } else {
+                alert('Please select Express Delivery to save a delivery address to your profile.');
+            }
         });
     }
 });

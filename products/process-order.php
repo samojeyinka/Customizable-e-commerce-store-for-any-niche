@@ -243,6 +243,35 @@ try {
     ]);
     exit;
 
+        // In your process-order.php, after successful order creation
+if (isset($_POST['update_profile']) && $_POST['update_profile'] == '1') {
+    // Update the user's profile with the shipping/billing details from this order
+    $update_profile_query = "UPDATE profiles SET 
+        first_name = ?, last_name = ?, phone = ?, country = ?, 
+        address = ?, state = ?, city = ?, zip_code = ?,
+        billing_first_name = ?, billing_last_name = ?, billing_country = ?,
+        billing_address = ?, billing_state = ?, billing_city = ?, 
+        billing_zip_code = ?, billing_phone = ?
+        WHERE user_id = ?";
+        
+    $stmt = mysqli_prepare($con, $update_profile_query);
+    mysqli_stmt_bind_param($stmt, "ssssssssssssssssi", 
+        $_POST['first_name'], $_POST['last_name'], $_POST['phone'], $_POST['country'],
+        $_POST['address'], $_POST['state'], $_POST['city'], $_POST['zip_code'],
+        $_POST['billing_first_name'] ?? $_POST['first_name'], 
+        $_POST['billing_last_name'] ?? $_POST['last_name'],
+        $_POST['billing_country'] ?? $_POST['country'],
+        $_POST['billing_address'] ?? $_POST['address'], 
+        $_POST['billing_state'] ?? $_POST['state'],
+        $_POST['billing_city'] ?? $_POST['city'], 
+        $_POST['billing_zip_code'] ?? $_POST['zip_code'],
+        $_POST['billing_phone'] ?? $_POST['phone'],
+        $user_id
+    );
+    mysqli_stmt_execute($stmt);
+    logOrderError("User profile updated with order details");
+}
+
 } catch (Exception $e) {
     // Rollback transaction
     if (isset($con) && mysqli_ping($con)) {

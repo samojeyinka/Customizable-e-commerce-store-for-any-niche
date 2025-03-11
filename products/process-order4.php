@@ -226,6 +226,10 @@ WHERE c.user_id = $user_id";
     ]);
     exit;
 
+
+
+
+
 } catch (Exception $e) {
     // Rollback transaction
     if (isset($con) && mysqli_ping($con)) {

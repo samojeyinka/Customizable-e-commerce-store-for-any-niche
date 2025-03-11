@@ -1,18 +1,104 @@
 <?php
 // Include authentication utility
 require_once '../includes/auth/auth.php';
+require_once __DIR__ . "/../config/config.php";
 
 // Authentication check
 requireAuth();
 
 // Get user data
 $user = getCurrentUser();
+$user_id = $user['id']; // Assuming this returns an array with the user ID
 
 // Handle logout
 if(isset($_GET['logout'])) {
     logout();
 }
 
+// Database connection
+$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+if (!$conn) {
+    die(mysqli_error($conn));
+}
+
+// Get the orders for the current user
+// Let's debug the column names first by showing all columns
+$debug_sql = "SHOW COLUMNS FROM orders";
+$debug_result = $conn->query($debug_sql);
+$available_columns = [];
+if ($debug_result) {
+    while ($row = $debug_result->fetch_assoc()) {
+        $available_columns[] = $row['Field'];
+    }
+}
+
+// Now construct the SQL with the correct column names
+// Check if 'created_at' exists instead of 'created'
+$date_column = in_array('created_at', $available_columns) ? 'created_at' : 
+              (in_array('date_added', $available_columns) ? 'date_added' : 
+              (in_array('created', $available_columns) ? 'created' : 'id'));
+
+$sql = "SELECT o.id, o.order_total, o.delivery_method, o.pickup_location, 
+               o.payment_reference, o.order_status, o.$date_column as order_date
+        FROM orders o
+        WHERE o.user_id = ?
+        ORDER BY o.$date_column DESC";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$orders = $result->fetch_all(MYSQLI_ASSOC);
+
+// Function to get order items for a specific order
+function getOrderItems($conn, $order_id) {
+    $sql = "SELECT oi.id, oi.product_id, oi.variant_id, oi.quantity, oi.price,
+                  p.product_name, pv.size, pv.texture,
+                  (SELECT image_path FROM product_images WHERE product_id = p.product_id AND is_main = 1 LIMIT 1) as image_path
+           FROM order_items oi
+           JOIN products p ON oi.product_id = p.product_id
+           JOIN product_variants pv ON oi.variant_id = pv.variant_id
+           WHERE oi.order_id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $order_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+// Function to get variant details
+function getVariantDetails($conn, $variant_id) {
+    $sql = "SELECT size, texture
+            FROM product_variants
+            WHERE variant_id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $variant_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
+// Function to get product color
+function getProductColor($conn, $product_id) {
+    $sql = "SELECT colors
+            FROM products
+            WHERE product_id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $product = $result->fetch_assoc();
+    return $product ? $product['colors'] : 'N/A';
+}
+
+// Get filter status from query parameter
+$status_filter = isset($_GET['status']) ? $_GET['status'] : 'all';
+
+// Handle search
+$search_query = isset($_GET['search']) ? $_GET['search'] : '';
 ?>
 
 
@@ -27,19 +113,18 @@ if(isset($_GET['logout'])) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../styles/modal.css">
-    <link rel="stylesheet" href="../styles/tabs.css">
-    <link rel="stylesheet" href="../styles/styles.css">
+    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css">
+    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
+    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
+    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/styles.css">
+    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
 
     <style>
         .ordermenu-content {
             display: none;
             position: absolute;
             top: 70%;
-            /* Positions it directly below the opener */
             right:-50%;
-            /* Aligns it with the left edge of the opener */
             min-width: 160px;
             min-height: 10rem;
             z-index: 5;
@@ -55,729 +140,22 @@ if(isset($_GET['logout'])) {
         }
 
         @media screen and (max-width:768px){
-
             .ordermenu-content {
-
-            top: 100%;
-            right:0%;
-        }
-
+                top: 100%;
+                right:0%;
+            }
         }
     </style>
 </head>
 
 <body>
     <main class="bg-[#FEFEFE]">
-        <!-- ========================  The header  starts ======================== -->
-        <header class="w-full bg-[#E8E9F2] flex items-center justify-center p-3">
 
+    <?php
+    include(__DIR__ . '/../includes/header.php');
+    include(__DIR__ . '/../includes/options.php');
+        ?>
 
-            <nav class="w-[90%] flex items-center justify-between">
-                <a href="../index.php" class="flex items-center gap-1 md:gap-2">
-                    <img src="../assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-                    <h1 class="text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
-                </a>
-                <div class="hidden md:flex items-center gap-0">
-                    <div class="flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#B8BBD7] rounded-l-[4px] p-2">
-                        <img src="../assets/global/search.svg" alt="Search" class="w-[24px]" />
-                        <input type="text" placeholder="What are you shopping for?" class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
-                    </div>
-                    <button type="submit" class="py-2 px-4 bg-[#1A237E] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
-                </div>
-                <div class="flex items-center gap-6">
-                    <a href="./products/cart.php">
-                        <img src="../assets/global/bag.svg" class="w-[22px] md:w-[24px]" alt="bag" />
-                    </a>
-                    <a href="./favourites.php">
-                        <img src="../assets/global/lovely.svg" class="w-[22px] md:w-[24px]" alt="bag" />
-                    </a>
-
-                    <a onclick="openSidemenu()" class="flex items-center gap-1 cursor-pointer">
-                        <img src="../assets/global/profile.svg" class="w-[22px] md:w-[24px]" alt="bag" />
-                        <img src="../assets/products/down2.svg" class="w-[12px]" alt="bag" />
-                    </a>
-
-                </div>
-            </nav>
-
-
-            ​
-            <!-- The dropdowns -->
-
-
-            <div id="sidemenu" class="sidemenu-content border-[1px] border-[#E1E1E1] bg-white">
-                <div class="relative">
-                    <p class="menulink text-[16px] font-regular text-[#262626] font-['Open Sans']" id="myBtn">Sign In</p>
-                    <p class="menulink text-[16px] font-regular text-[#262626] font-['Open Sans']" id="myBtn">Create an Account</p>
-
-                    <a href="./profile.php" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#262626] font-['Open Sans']">
-                        <img src="../assets/global/user.svg" class="" />
-                        <span>My Profile</span>
-
-                    </a>
-
-                    <a href="./orders.php" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#262626] font-['Open Sans']">
-                        <img src="../assets/global/invoice.svg" class="" />
-                        <span>My Orders</span>
-
-                    </a>
-                    <a id="logooutBtn" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#EE3F3F] font-['Open Sans']">
-                        <img src="../assets/global/logout.svg" class="" />
-                        <span>Log Out</span>
-
-                    </a>
-
-                    <div class="w-[2rem] h-[2rem] border-l-[1px] border-t-[1px] border-[#E1E1E1] bg-white absolute top-[-16px] right-[66px] rotate-[45deg] z-1"></div>
-                </div>
-            </div>
-
-
-
-            ​
-            <!-- The Modal -->
-            <div id="myModal" class="modal reg">
-                <!-- Modal content -->
-                <div class="modal-content overflow-hidden p-4">
-
-                    <img src="../assets/global/close-circle.svg" alt="close" id="closeauth" class="w-[26px] md:w-[32px] cursor-pointer absolute right-4" />
-
-                    <div class="w-[fit-content] flex items-center mx-auto gap-10 tab">
-                        <button class="tablinks text-[16px] font-['Open Sans'] font-medium" onclick="openTab(event, 'SignUp')" id="defaultOpen">Create an account</button>
-                        <button class="tablinks text-[16px] font-['Open Sans'] font-medium" onclick="openTab(event, 'SignIn')">Sign In</button>
-                    </div>
-
-                    <div id="SignUp" class="tabcontent">
-                        <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Welcome to Victosah Solution</h3>
-
-                        <form class="flex flex-col gap-4 pt-4">
-                            <div class="flex flex-col gap-1">
-                                <label
-                                    htmlFor="firstname"
-                                    class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                                    Email
-                                </label>
-                                <input
-                                    type="email"
-                                    placeholder="Enter your email address"
-                                    class="w-full  font-['Open Sans'] bg-transparent outline-none  border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
-                            </div>
-
-                            <div class="flex flex-col gap-1">
-                                <label
-                                    htmlFor="firstname"
-                                    class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                                    Password
-                                </label>
-
-                                <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-                                    <input
-                                        type="password"
-                                        placeholder="Enter your password"
-                                        class="w-full  font-['Open Sans'] bg-transparent outline-none   font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                                    <img src="../assets/global/eye.svg" class="w-[24px] cursor-pointer" />
-                                </div>
-                            </div>
-
-                            <div class="flex flex-col gap-1">
-                                <label
-                                    htmlFor="firstname"
-                                    class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                                    Confirm Password
-                                </label>
-
-                                <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-                                    <input
-                                        type="password"
-                                        placeholder="Confirm your password"
-                                        class="w-full  font-['Open Sans'] bg-transparent outline-none   font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                                    <img src="../assets/global/eye-slash.svg" class="w-[24px] cursor-pointer" />
-                                </div>
-                            </div>
-                            <p class='text-[14px] font-["Open Sans] text-[#EE3F3F] font-regular underline cursor-pointer'>Password doesn’t match</p>
-                            <span class="w-full py-[8px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center" id="rvBtn">Create an account</span>
-
-                        </form>
-
-                        <p class="text-center font-['Open Sans'] text-[17px] md:text-[18px] font-regular text-[#7A7A7A] py-3">
-                            Or
-                        </p>
-
-                        <div class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-                            <img src="../assets/global/google.svg" class="w-[20px]" />
-                            <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#262626] py-3">
-                                Create an account with Google
-                            </p>
-                        </div>
-
-
-                    </div>
-
-                    <div id="SignIn" class="tabcontent">
-                        <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Welcome Back!</h3>
-
-                        <section id="dangeralert" class="flex flex-col items-center w-full bg-[#FDECEC] shadow-lg mt-2 py-3 px-4 rounded relative overflow-hidden">
-                            <div class="h-[100%] w-[5px] bg-[#EE3F3F] absolute left-0 top-0"></div>
-                            <div class="flex items-center gap-2 mr-auto">
-                                <img src="../assets/global/canceldanger.svg" id="closedangeralert" alt="Cancel danger alert" class="w-[24px] cursor-pointer" />
-                                <p class="text-[16px] md:text-[17px]  text-[#2C2C2C] w-full font-Satoshi font-medium">
-                                    Incorrect details
-                                </p>
-                            </div>
-                            <p class="text-[13px] md:text-[14px] text-start w-full font-Satoshi font-regular text-[#7F7F7F] mt-2 ml-[3rem] pr-3 ">
-                                Your email or password is incorrect. Try again
-                            </p>
-                        </section>
-
-                        <form class="flex flex-col gap-4 pt-4">
-                            <div class="flex flex-col gap-1">
-                                <label
-                                    htmlFor="firstname"
-                                    class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                                    Email
-                                </label>
-                                <input
-                                    type="email"
-                                    placeholder="Enter your email address"
-                                    class="w-full  font-['Open Sans'] bg-transparent outline-none  border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
-                            </div>
-
-                            <div class="flex flex-col gap-1">
-                                <label
-                                    htmlFor="firstname"
-                                    class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                                    Password
-                                </label>
-
-                                <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-                                    <input
-                                        type="password"
-                                        placeholder="Enter your password"
-                                        class="w-full  font-['Open Sans'] bg-transparent outline-none   font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                                    <img src="./assets/global/eye.svg" class="w-[24px] cursor-pointer" />
-                                </div>
-                            </div>
-
-                            <p id="openPassordRqMail" class='text-[14px] font-["Open Sans] text-[#1A237E] font-regular  cursor-pointer'>Forgot Password?</p>
-
-                            <a href="../user/profile.php" class="w-full py-[8px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Sign In</a>
-
-                        </form>
-
-                        <p class="text-center font-['Open Sans'] text-[17px] md:text-[18px] font-regular text-[#7A7A7A] py-3">
-                            Or
-                        </p>
-
-                        <div class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-                            <img src="../assets/global/google.svg" class="w-[20px]" />
-                            <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#262626] py-3">
-                                Create an account with Google
-                            </p>
-                        </div>
-
-
-                    </div>
-
-
-                    ​
-                </div>
-
-            </div>
-
-
-            <div id="regVerify" class="modal verify">
-                <div class="modal-content overflow-hidden p-4">
-                    <img src="../assets/global/back.svg" alt="back" id="backtoreg" class="w-[26px] md:w-[32px] absolute left-4 cursor-pointer" />
-
-                    <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
-                        Let us verify it’s you
-                    </p>
-                    <p class="w-[75%] md:w-[57%] mx-auto text-[15px] text-center md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2">
-                        Enter the 4 digit code sent to golibe.f@gmail.com to create your account
-                    </p>
-
-
-
-                    <form class="w-full mt-[1rem] flex items-center flex-col">
-
-
-                        <div class="w-[fit-content] flex items-center gap-3 mx-auto">
-                            <input
-                                type="password"
-                                inputMode="numeric"
-                                class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
-                            <input
-                                type="password"
-                                inputMode="numeric"
-                                class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
-                            <input
-                                type="password"
-                                inputMode="numeric"
-                                class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
-                            <input
-                                type="password"
-                                inputMode="numeric"
-                                class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
-                        </div>
-
-
-                        <span
-
-                            id="regsuccessbtn"
-                            class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
-                            Verify me
-                        </span>
-                    </form>
-
-                    <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-center">
-                        Resend code in <span class="text-[#1A237E]">23sec</span>
-                    </p>
-                </div>
-            </div>
-
-
-            <div id="regSuccess" class="modal regsuccess">
-                <div class="modal-content overflow-hidden p-4 flex flex-col items-center">
-
-                    <img src="../assets/global/success.svg" class="mx-auto w-[120px]" />
-
-                    <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
-                        Account Creation Successful
-                    </p>
-                    <p class="w-[95%] md:w-[67%] mx-auto text-[15px] text-center md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2">
-                        Welcome aboard! Your account has been created successfully. Start exploring and enjoy shopping with us.
-                    </p>
-
-
-
-
-                    <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer"
-                        id="closeregsucces">
-                        Continue Shopping
-                    </span>
-                    </form>
-
-
-                </div>
-            </div>
-
-
-            <!-- The logout modal -->
-
-            <div id="logout" class="modal logout">
-                <div class="modal-content overflow-hidden px-5 py-10">
-                    <img src="../assets/global/close-circle.svg" alt="close" id="closelogout" class="w-[26px] md:w-[32px] cursor-pointer absolute top-10 right-4" />
-
-                    <p class="text-[#EE3F3F] font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
-                        Log Out
-                    </p>
-                    <p class="w-[95%] md:w-[67%] mx-auto text-[15px] text-center md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2">
-                        Come back soon! We’ll be here when you’re ready to shop again.
-                    </p>
-
-
-
-
-                    <button class="w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#EE3F3F] text-white rounded-[8px] mt-10 cursor-pointer"
-                        id="closelogout">
-                        Log Out
-                    </button>
-                    </form>
-
-
-                </div>
-            </div>
-
-
-            <!-- ========================  The Password reset moal  starts ======================== -->
-            <div id="passwordRequestMail" class="modal password-request-mail">
-                <div class="modal-content overflow-hidden p-4">
-                    <img src="../assets/global/back.svg" id="backtologin" alt="back" class="w-[26px] md:w-[32px] absolute left-4 cursor-pointer" />
-
-                    <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
-                        Forgot Password?
-                    </p>
-                    <p class="w-[75%] md:w-[57%] mx-auto text-[15px] text-center md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2">
-                        Enter the email you used in creating an account
-                    </p>
-
-
-
-                    <form class="w-full mt-[1rem] flex flex-col">
-
-
-                        <div class="flex flex-col gap-1">
-                            <label
-                                htmlFor="firstname"
-                                class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                placeholder="Enter your email address"
-                                class="w-full  font-['Open Sans'] bg-transparent outline-none  border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
-                        </div>
-
-
-                        <span
-                            id="openPassordRqV"
-                            class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
-                            Continue
-                        </span>
-                    </form>
-
-
-                </div>
-            </div>
-            <!-- ========================  The Password reset moal  ends ======================== -->
-
-
-
-            <!-- ========================  The Password reset moal  starts ======================== -->
-            <div id="passwordRequestverify" class="modal password-request-verify">
-                <div class="modal-content overflow-hidden p-4">
-                    <img src="../assets/global/back.svg" id="backtomail" alt="back" class="w-[26px] md:w-[32px] absolute left-4 cursor-pointer" />
-
-                    <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
-                        Let us verify it’s you
-                    </p>
-                    <p class="w-[75%] md:w-[57%] mx-auto text-[15px] text-center md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2">
-                        Enter the 4 digit code sent to golibe.f@gmail.com to create your account
-                    </p>
-
-
-
-                    <form class="w-full mt-[1rem] flex flex-col items-center">
-
-
-                        <div class="w-[fit-content] flex items-center gap-3 mx-auto">
-                            <input
-                                type="password"
-                                inputMode="numeric"
-                                class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
-                            <input
-                                type="password"
-                                inputMode="numeric"
-                                class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
-                            <input
-                                type="password"
-                                inputMode="numeric"
-                                class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
-                            <input
-                                type="password"
-                                inputMode="numeric"
-                                class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
-                        </div>
-
-
-                        <span
-                            id="openPasswordRequestNP"
-                            class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
-                            Verify me
-                        </span>
-                    </form>
-
-                    <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-center">
-                        Didn't get code? <span class="text-[#1A237E] font-medium cursor-pointer">Resend </span>
-                    </p>
-                </div>
-            </div>
-            <!-- ========================  The Password reset moal  ends ======================== -->
-
-
-
-            <!-- ========================  The Enter new pasword modal  starts ======================== -->
-            <div id="passwordRequestNP" class="modal password-request-np">
-                <div class="modal-content overflow-hidden p-4">
-                    <img src="./assets/global/back.svg" id="backtoprverify" alt="back" class="w-[26px] md:w-[32px] absolute left-4 cursor-pointer" />
-
-                    <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
-                        Reset Password
-                    </p>
-                    <p class="w-[75%] md:w-[57%] mx-auto text-[15px] text-center md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2">
-                        Enter your new password
-                    </p>
-
-
-
-                    <form class="w-full mt-[1rem] flex flex-col gap-4">
-
-
-                        <div class="flex flex-col gap-1">
-                            <label
-                                htmlFor="firstname"
-                                class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                                Password
-                            </label>
-
-                            <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-                                <input
-                                    type="password"
-                                    placeholder="Enter your password"
-                                    class="w-full  font-['Open Sans'] bg-transparent outline-none   font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                                <img src="./assets/global/eye.svg" class="w-[24px] cursor-pointer" />
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col gap-1">
-                            <label
-                                htmlFor="firstname"
-                                class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                                Confirm Password
-                            </label>
-
-                            <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-                                <input
-                                    type="password"
-                                    placeholder="Confirm your password"
-                                    class="w-full  font-['Open Sans'] bg-transparent outline-none   font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                                <img src="../assets/global/eye-slash.svg" class="w-[24px] cursor-pointer" />
-                            </div>
-                        </div>
-
-
-                        <span
-                            id="openpasswordresetsuccess"
-                            class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
-                            Reset Password
-                        </span>
-                    </form>
-
-
-                </div>
-            </div>
-            <!-- ========================  The The Enter new pasword modal   ends ======================== -->
-
-
-            <div id="passwordresetsuccess" class="modal passwordresetsuccess">
-                <div class="modal-content overflow-hidden p-4 flex flex-col items-center">
-
-                    <img src="../assets/global/success.svg" class="mx-auto w-[120px]" />
-
-                    <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
-                        Password Reset Successful
-                    </p>
-                    <p class="w-[95%] md:w-[67%] mx-auto text-[15px] text-center md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2">
-                        You have successfully reset your password
-                    </p>
-
-
-
-
-                    <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer"
-                        id="closeprsucces">
-                        Sign In
-                    </span>
-                    </form>
-
-
-                </div>
-            </div>
-
-        </header>
-        <!-- ========================  The header  ends ======================== -->
-
-
-
-        <!-- ========================  The options  starts ======================== -->
-        <section class="w-full  py-4 border-b-[1px] border-[#E1E1E1]">
-            <div class="w-[90%] mx-auto hidden  md:flex items-center justify-between">
-                <div class="flex items-center gap-10">
-
-                    <div class="custom-dropdown">
-
-                        <div class="flex items-center gap-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Duvets</span>
-                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div>
-                                    <div onclick="selectOption(this)">Option 1</div>
-                                    <div onclick="selectOption(this)">Option 2</div>
-                                    <div onclick="selectOption(this)">Option 3</div>
-                                </div>
-                                <div>
-                                    <div onclick="selectOption(this)">Option 4</div>
-                                    <div onclick="selectOption(this)">Option 5</div>
-                                    <div onclick="selectOption(this)">Option 6</div>
-                                </div>
-                                <div>
-                                    <div onclick="selectOption(this)">Option 7</div>
-                                    <div onclick="selectOption(this)">Option 8</div>
-                                    <div onclick="selectOption(this)">Option 9</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-
-                    <div class="custom-dropdown">
-
-                        <div class="flex items-center gap-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Bedsheets</span>
-                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div>
-                                    <div onclick="selectOption(this)">Option 1</div>
-                                    <div onclick="selectOption(this)">Option 2</div>
-                                    <div onclick="selectOption(this)">Option 3</div>
-                                </div>
-                                <div>
-                                    <div onclick="selectOption(this)">Option 4</div>
-                                    <div onclick="selectOption(this)">Option 5</div>
-                                    <div onclick="selectOption(this)">Option 6</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="custom-dropdown">
-
-                        <div class="flex items-center gap-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Foams</span>
-                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div>
-                                    <div onclick="selectOption(this)">Option 1</div>
-                                    <div onclick="selectOption(this)">Option 2</div>
-                                    <div onclick="selectOption(this)">Option 3</div>
-                                </div>
-                                <div>
-                                    <div onclick="selectOption(this)">Option 4</div>
-                                    <div onclick="selectOption(this)">Option 5</div>
-                                    <div onclick="selectOption(this)">Option 6</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="custom-dropdown">
-
-                        <div class="flex items-center gap-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Pillows</span>
-                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div>
-                                    <div onclick="selectOption(this)">Option 1</div>
-                                    <div onclick="selectOption(this)">Option 2</div>
-                                    <div onclick="selectOption(this)">Option 3</div>
-                                </div>
-                                <div>
-                                    <div onclick="selectOption(this)">Option 4</div>
-                                    <div onclick="selectOption(this)">Option 5</div>
-                                    <div onclick="selectOption(this)">Option 6</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="custom-dropdown">
-
-                        <div class="flex items-center gap-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Lightings</span>
-                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div>
-                                    <div onclick="selectOption(this)">Option 1</div>
-                                    <div onclick="selectOption(this)">Option 2</div>
-                                    <div onclick="selectOption(this)">Option 3</div>
-                                </div>
-                                <div>
-                                    <div onclick="selectOption(this)">Option 4</div>
-                                    <div onclick="selectOption(this)">Option 5</div>
-                                    <div onclick="selectOption(this)">Option 6</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-
-                <div class="flex items-center gap-2 cursor-pointer">
-                    <img src="../assets/home/truck-fast.svg" class='w-[24px] h-[24px]' />
-                    <a href="../user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans] text-[#1A237E] font-medium underline'>Track your order</a>
-                </div>
-
-            </div>
-
-            <div class="w-[90%] mx-auto flex items-center gap-10  md:hidden">
-                <img src="../assets/global/menu.svg" alt="menu" class="cursor-pointer w-[24px]" onclick="openMobileMenu()" />
-
-
-                <!-- The mobile nav starts -->
-                <div id="menuNav" class="dropdown-menu border-t-[1px] border-[#E1E1E1] bg-white">
-
-                    <div class="w-[92%] mx-auto">
-                        <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Duvets</button>
-                        <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
-                            <p>Duvet type</p>
-                            <p>Duvet type</p>
-                            <p>Duvet type</p>
-                            <p>Duvet type</p>
-                        </div>
-
-                        <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Bedsheets</button>
-                        <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                        </div>
-
-                        <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Foams</button>
-                        <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                        </div>
-
-                        <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Pillows</button>
-                        <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                        </div>
-
-                        <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Lightings</button>
-                        <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                            <p>Bedsheets type</p>
-                        </div>
-
-                        <div class="flex items-center gap-2 cursor-pointer pt-4">
-                            <img src="../assets/home/truck-fast.svg" class='w-[24px] h-[24px]' />
-                            <strong class='text-[13px] md:text-[14px] font-["Open Sans] text-[#1A237E] font-medium underline'>Track your order</strong>
-                        </div>
-
-                    </div>
-
-                </div>
-                <!-- The mobile nav ends -->
-
-
-                <div class="w-[100%]  flex items-center  items-center gap-0">
-                    <div class="w-full flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#B8BBD7] rounded-l-[4px] p-2">
-                        <img src="../assets/global/search.svg" alt="Search" class="w-[24px]" />
-                        <input type="text" placeholder="What are you shopping for?" class="w-full text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
-                    </div>
-                    <button type="submit" class="py-2 px-4 bg-[#1A237E] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
-                </div>
-            </div>
-        </section>
-        <!-- ========================  The options  ends ======================== -->
 
         <section class="w-full bg-[#FFFFFFF] py-1">
             <div class="w-[90%] mx-auto">
@@ -790,28 +168,27 @@ if(isset($_GET['logout'])) {
         </section>
 
         <div class="w-[90%] gap-3 mx-auto bg-[#FFFFFF] py-5 flex items-center flex-col-reverse md:flex-row justify-between">
-
-            <div class="w-full flex items-center gap-4">
-                <button type="submit" class="py-1 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">All</button>
-                <button type="submit" class="py-1 px-4 bg-[#F3F3F3] text-[#262626] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Ongoing</button>
-                <button type="submit" class="py-1 px-4 bg-[#F3F3F3] text-[#262626] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Delivered</button>
-
+            <div class="w-full flex items-center gap-4 overflow-x-auto">
+                <a href="?status=all" class="py-1 px-4 bg-[<?php echo $status_filter == 'all' ? '#1A237E' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'all' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">All</a>
+                <a href="?status=Processing" class="py-1 px-4 bg-[<?php echo $status_filter == 'Processing' ? '#1A237E' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Processing' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Processing</a>
+                <a href="?status=Shipped" class="py-1 px-4 bg-[<?php echo $status_filter == 'Shipped' ? '#1A237E' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Shipped' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Shipped</a>
+                <a href="?status=Delivered" class="py-1 px-4 bg-[<?php echo $status_filter == 'Delivered' ? '#1A237E' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Delivered' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Delivered</a>
+                <a href="?status=Cancelled" class="py-1 px-4 bg-[<?php echo $status_filter == 'Cancelled' ? '#1A237E' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Cancelled' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Cancelled</a>
             </div>
 
             <div class="w-full md:w-[80%] lg:w-[70%] flex items-center justify-between">
-                <div class="w-full flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#B8BBD7] rounded-l-[4px] p-2">
-
-                    <input type="text" placeholder="Search order ID" class="w-full lg:w-[18rem] text-[14px] border-[#B8BBD7] outline-none placeholder:text-[#B8BBD7]" />
-                </div>
-                <button type="submit" class="py-2 px-4 bg-[#E8E9F2] text-black text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px] border-[1px] border-[]">Search</button>
+                <form action="" method="GET" class="w-full flex">
+                    <div class="w-full flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#B8BBD7] rounded-l-[4px] p-2">
+                        <input type="text" name="search" placeholder="Search order ID" value="<?php echo htmlspecialchars($search_query); ?>" class="w-full lg:w-[18rem] text-[14px] border-[#B8BBD7] outline-none placeholder:text-[#B8BBD7]" />
+                    </div>
+                    <button type="submit" class="py-2 px-4 bg-[#E8E9F2] text-black text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px] border-[1px] border-[]">Search</button>
+                </form>
             </div>
-
         </div>
 
         <div class="w-full bg-[#FFFFFF] py-5">
+            <!-- Desktop View -->
             <div class="w-[90%] mx-auto hidden md:block">
-
-
                 <table cols="" class="w-full">
                     <thead class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
                         <th>Product</th>
@@ -824,510 +201,215 @@ if(isset($_GET['logout'])) {
                     </thead>
 
                     <tbody class="">
-                        <tr>
-                            <td class="py-3 flex gap-2">
+                        <?php
+                        // Filter orders based on status if needed
+                        $filtered_orders = $orders;
+                        if ($status_filter != 'all') {
+                            $filtered_orders = array_filter($orders, function($order) use ($status_filter) {
+                                return $order['order_status'] == $status_filter;
+                            });
+                        }
 
-                                <div class="w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden">
-                                    <img src="../assets/products/img1.svg" class="w-full h-full" />
-                                </div>
-                                <div class="flex flex-col gap-[2px]">
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Name: Bounce Pillow</p>
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Color: Blue</p>
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Size: King size (6 a 4 in)</p>
-                                </div>
+                        // Filter orders based on search query if provided
+                        if (!empty($search_query)) {
+                            $filtered_orders = array_filter($filtered_orders, function($order) use ($search_query) {
+                                return strpos($order['id'], $search_query) !== false;
+                            });
+                        }
 
-                            </td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000/1</td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">#12345</td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">PickUp</td>
-
-
-
-                            <td>
-                                <button type="submit" class="py-1 px-4 bg-[#E8B006] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px]">Ongoing</button>
-                            </td>
-
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Jan 12, 2025</td>
-
-                            <td class="relative">
-                                <img src="../assets/user/action.svg" class="w-[24px] ml-auto cursor-pointer" onclick="openOrdermenu(this)" />
-
-                                <!-- Order Menu (specific to this row) -->
-                                <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-                                    <div class="flex flex-col gap-3">
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
-                                        <a href="./orders.php" class="text-[16px] font-medium text-[#262626]">Track Order</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Leave a review</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Report an issue</a>
-                                    </div>
-                                </div>
-                            </td>
-
-
-                        </tr>
-
-                        <tr>
-                            <td class="py-3 flex gap-2">
-
-                                <div class="w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden">
-                                    <img src="../assets/products/img1.svg" class="w-full h-full" />
-                                </div>
-                                <div class="flex flex-col gap-[2px]">
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Name: Bounce Pillow</p>
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Color: Blue</p>
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Size: King size (6 a 4 in)</p>
-                                </div>
-
-                            </td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000/1</td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">#12345</td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">PickUp</td>
-
-
-
-                            <td>
-                                <button type="submit" class="py-1 px-4 bg-[#39D959] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px]">Delivered</button>
-                            </td>
-
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Jan 12, 2025</td>
-
-                            <td class="relative">
-                                <img src="../assets/user/action.svg" class="w-[24px] ml-auto cursor-pointer" onclick="openOrdermenu(this)" />
-
-                                <!-- Order Menu (specific to this row) -->
-                                <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-                                    <div class="flex flex-col gap-3">
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
-                                        <a href="./orders.php" class="text-[16px] font-medium text-[#262626]">Track Order</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Leave a review</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Report an issue</a>
-                                    </div>
-                                </div>
-                            </td>
-
-
-                        </tr>
-
-                      
-                        <tr>
-                            <td class="py-3 flex gap-2">
-
-                                <div class="w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden">
-                                    <img src="../assets/products/img1.svg" class="w-full h-full" />
-                                </div>
-                                <div class="flex flex-col gap-[2px]">
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Name: Bounce Pillow</p>
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Color: Blue</p>
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Size: King size (6 a 4 in)</p>
-                                </div>
-
-                            </td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000/1</td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">#12345</td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">PickUp</td>
-
-
-
-                            <td>
-                                <button type="submit" class="py-1 px-4 bg-[#39D959] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px]">Delivered</button>
-                            </td>
-
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Jan 12, 2025</td>
-
-                            <td class="relative">
-                                <img src="../assets/user/action.svg" class="w-[24px] ml-auto cursor-pointer" onclick="openOrdermenu(this)" />
-
-                                <!-- Order Menu (specific to this row) -->
-                                <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-                                    <div class="flex flex-col gap-3">
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
-                                        <a href="./orders.php" class="text-[16px] font-medium text-[#262626]">Track Order</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Leave a review</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Report an issue</a>
-                                    </div>
-                                </div>
-                            </td>
-
-
-                        </tr>
-
-
-                        <tr>
-                            <td class="py-3 flex gap-2">
-
-                                <div class="w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden">
-                                    <img src="../assets/products/img1.svg" class="w-full h-full" />
-                                </div>
-                                <div class="flex flex-col gap-[2px]">
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Name: Bounce Pillow</p>
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Color: Blue</p>
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Size: King size (6 a 4 in)</p>
-                                </div>
-
-                            </td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000/1</td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">#12345</td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">PickUp</td>
-
-
-
-                            <td>
-                                <button type="submit" class="py-1 px-4 bg-[#39D959] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px]">Delivered</button>
-                            </td>
-
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Jan 12, 2025</td>
-
-                            <td class="relative">
-                                <img src="../assets/user/action.svg" class="w-[24px] ml-auto cursor-pointer" onclick="openOrdermenu(this)" />
-
-                                <!-- Order Menu (specific to this row) -->
-                                <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-                                    <div class="flex flex-col gap-3">
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
-                                        <a href="./orders.php" class="text-[16px] font-medium text-[#262626]">Track Order</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Leave a review</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Report an issue</a>
-                                    </div>
-                                </div>
-                            </td>
-
-
-                        </tr>
-
+                        if (empty($filtered_orders)) {
+                            echo "<tr><td colspan='7' class='py-4 text-center'>No orders found</td></tr>";
+                        } else {
+                            foreach ($filtered_orders as $order) {
+                                $order_items = getOrderItems($conn, $order['id']);
+                                
+                                // Display first item of each order
+                                foreach ($order_items as $index => $item) {
+                                    $variant = getVariantDetails($conn, $item['variant_id']);
+                                    $color = getProductColor($conn, $item['product_id']);
+                                    
+                                    // Determine status color
+                                    $status_color = '';
+                                    $status_text = $order['order_status'];
+                                    
+                                    if ($status_text == 'Processing') {
+                                        $status_color = 'bg-[#E8B006]';
+                                    } elseif($status_text == 'Shipped'){
+                                        $status_color = 'bg-[#1A237E]';
+                                    }
+                                    
+                                    elseif ($status_text == 'Delivered') {
+                                        $status_color = 'bg-[#39D959]';
+                                    } else {
+                                        $status_color = 'bg-red-500';
+                                    }
+                                    
+                                    // Format date (assuming date is in a standard format)
+                                    $order_date = date('M d, Y', strtotime($order['order_date']));
+                                    
+                                    // Get image path or use placeholder
+                                    $image_path = isset($item['image_path']) ? "../assets/products/" . $item['image_path'] : "../assets/products/img1.svg";
+                                    
+                                    echo "
+                                    <tr>
+                                        <td class='py-3 flex gap-2'>
+                                            <div class='w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden'>
+                                                <img src='{$image_path}' class='w-full h-full object-cover' />
+                                            </div>
+                                            <div class='flex flex-col gap-[2px]'>
+                                                <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Name: {$item['product_name']}</p>
+                                                <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Color: {$color}</p>
+                                                <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Size: {$variant['size']}</p>
+                                            </div>
+                                        </td>
+                                        <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>₦" . number_format($item['price']) . "/{$item['quantity']}</td>
+                                        <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>#{$order['id']}</td>
+                                        <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order['delivery_method']}</td>
+                                        <td>
+                                            <button type='button' class='py-1 px-4 {$status_color} text-white text-[16px] font-[\"Open Sans\"] cursor-pointer rounded-[28px]'>{$status_text}</button>
+                                        </td>
+                                        <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order_date}</td>
+                                        <td class='relative'>
+                                            <img src='../assets/user/action.svg' class='w-[24px] ml-auto cursor-pointer' onclick='openOrdermenu(this)' />
+                                            <div class='ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]'>
+                                                <div class='flex flex-col gap-3'>
+                                                    <a href='../products/show.php?id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Re-Order</a>
+                                                    <a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Track Order</a>
+                                                    <a href='../products/review.php?id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>
+                                                    <a href='./report-issue.php?id={$order['id']}' class='text-[16px] font-medium text-[#E8B006]'>Report an issue</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>";
+                                    
+                                    // Only show the first item for each order in desktop view
+                                    break;
+                                }
+                            }
+                        }
+                        ?>
                     </tbody>
                 </table>
-
-
-
-
             </div>
 
-
-
-            <div class="w-[90%] mx-auto  md:hidden">
+            <!-- Mobile View -->
+            <div class="w-[90%] mx-auto md:hidden">
                 <div class="w-full flex flex-col gap-4">
+                    <?php
+                    // Same filtering as above
+                    $filtered_orders = $orders;
+                    if ($status_filter != 'all') {
+                        $filtered_orders = array_filter($orders, function($order) use ($status_filter) {
+                            return $order['order_status'] == $status_filter;
+                        });
+                    }
 
-                    <div class="border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2">
+                    if (!empty($search_query)) {
+                        $filtered_orders = array_filter($filtered_orders, function($order) use ($search_query) {
+                            return strpos($order['id'], $search_query) !== false;
+                        });
+                    }
 
-                        <div class="flex items-center justify-between relative">
-                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">January 12, 2025</p>
-                            <img src="../assets/user/action.svg" class="w-[24px] ml-auto cursor-pointer" onclick="openOrdermenu(this)"/>
-
-
-                            <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-                                    <div class="flex flex-col gap-3">
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
-                                        <a href="./orders.php" class="text-[16px] font-medium text-[#262626]">Track Order</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Leave a review</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Report an issue</a>
+                    if (empty($filtered_orders)) {
+                        echo "<p class='text-center py-4'>No orders found</p>";
+                    } else {
+                        foreach ($filtered_orders as $order) {
+                            $order_items = getOrderItems($conn, $order['id']);
+                            
+                            // Get first item for the order
+                            if (!empty($order_items)) {
+                                $item = $order_items[0];
+                                $variant = getVariantDetails($conn, $item['variant_id']);
+                                $color = getProductColor($conn, $item['product_id']);
+                                
+                                // Determine status color
+                                $status_color = '';
+                                $status_text = $order['order_status'];
+                                
+                                if ($status_text == 'Processing') {
+                                    $status_color = 'bg-[#E8B006]';
+                                } elseif($status_text == 'Shipped'){
+                                    $status_color = 'bg-[#1A237E]';
+                                }
+                                
+                                elseif ($status_text == 'Delivered') {
+                                    $status_color = 'bg-[#39D959]';
+                                } else {
+                                    $status_color = 'bg-red-500';
+                                }
+                                
+                                
+                                // Format date
+                                $order_date = date('M d, Y', strtotime($order['order_date']));
+                                
+                                // Get image path or use placeholder
+                                $image_path = isset($item['image_path']) ? "../assets/products/" . $item['image_path'] : "../assets/products/img1.svg";
+                                
+                                echo "
+                                <div class='border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2'>
+                                    <div class='flex items-center justify-between relative'>
+                                        <p class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order_date}</p>
+                                        <img src='../assets/user/action.svg' class='w-[24px] ml-auto cursor-pointer' onclick='openOrdermenu(this)'/>
+                                        
+                                        <div class='ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]'>
+                                            <div class='flex flex-col gap-3'>
+                                                <a href='../products/show.php?id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Re-Order</a>
+                                                <a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Track Order</a>
+                                                <a href='../products/review.php?id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>
+                                                <a href='./report-issue.php?id={$order['id']}' class='text-[16px] font-medium text-[#E8B006]'>Report an issue</a>
+                                            </div>
+                                        </div>
                                     </div>
-                        </div>
-                        </div>
-
-                        <div class="w-full h-[1px] bg-[#E1E1E1]"></div>
-
-                        <div class="flex items-center justify-between">
-                            <button type="submit" class="max-w-[87px] py-[6px] px-3 bg-[#E8B006] text-white text-[14px] font-['Open Sans'] cursor-pointer rounded-[28px]">Ongoing</button>
-                            <div class="flex flex-col gap-[2px] text-right">
-                                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Pickup</p>
-                                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Order ID:</b> #12345</p>
-
-                            </div>
-                        </div>
-
-                        <div class="w-full h-[1px] bg-[#E1E1E1]"></div>
-
-                        <div class="flex justify-between">
-                            <div class="flex flex-col gap-2">
-
-                                <div class="flex gap-2">
-
-                                    <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
-                                        <img src="../assets/products/img1.svg" class="w-full h-full object-cover" />
+                                    
+                                    <div class='w-full h-[1px] bg-[#E1E1E1]'></div>
+                                    
+                                    <div class='flex items-center justify-between'>
+                                        <button type='button' class='max-w-[87px] py-[6px] px-3 {$status_color} text-white text-[14px] font-[\"Open Sans\"] cursor-pointer rounded-[28px]'>{$status_text}</button>
+                                        <div class='flex flex-col gap-[2px] text-right'>
+                                            <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>" . ucfirst($order['delivery_method']) . "</p>
+                                            <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Order ID:</b> #{$order['id']}</p>
+                                        </div>
                                     </div>
-                                    <div class="flex flex-col gap-[2px]">
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Bounce Pillow</p>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> Blue</p>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> King size (6 a 4 in)</p>
+                                    
+                                    <div class='w-full h-[1px] bg-[#E1E1E1]'></div>
+                                    
+                                    <div class='flex justify-between'>
+                                        <div class='flex flex-col gap-2'>
+                                            <div class='flex gap-2'>
+                                                <div class='w-[80px] h-[80px] rounded-[4px] overflow-hidden'>
+                                                    <img src='{$image_path}' class='w-full h-full object-cover' />
+                                                </div>
+                                                <div class='flex flex-col gap-[2px]'>
+                                                    <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Name:</b> {$item['product_name']}</p>
+                                                    <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Color:</b> {$color}</p>
+                                                    <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Size:</b> {$variant['size']}</p>
+                                                </div>
+                                            </div>
+                                            <a href='./track-order.php?id={$order['id']}' class='text-[14px] font-[\"Open Sans\"] text-[#1A237E] font-regular underline cursor-pointer'>Track your order</a>
+                                        </div>
+                                        <p class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>₦" . number_format($item['price']) . "</p>
                                     </div>
-
-                                </div>
-
-                                <p class='text-[14px] font-["Open Sans] text-[#1A237E] font-regular underline cursor-pointer'>Track your order</p>
-                            </div>
-
-                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
-                        </div>
-
-
-
-                    </div>
-
-                    <div class="border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2">
-
-                        <div class="flex items-center justify-between relative">
-                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">January 12, 2025</p>
-                            <img src="../assets/user/action.svg" class="w-[24px] ml-auto cursor-pointer" onclick="openOrdermenu(this)"/>
-                        
-                            <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-                                    <div class="flex flex-col gap-3">
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
-                                        <a href="./orders.php" class="text-[16px] font-medium text-[#262626]">Track Order</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Leave a review</a>
-                                        <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Report an issue</a>
-                                    </div>
-                        </div> 
-                        </div>
-
-                        <div class="w-full h-[1px] bg-[#E1E1E1]"></div>
-
-                        <div class="flex items-center justify-between">
-                            <button type="submit" class="max-w-[87px] py-[6px] px-3 bg-[#39D959] text-white text-[14px] font-['Open Sans'] cursor-pointer rounded-[28px]">Delivered</button>
-                            <div class="flex flex-col gap-[2px] text-right">
-                                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Express Delivery</p>
-                                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Order ID:</b> #12345</p>
-
-                            </div>
-                        </div>
-
-                        <div class="w-full h-[1px] bg-[#E1E1E1]"></div>
-
-                        <div class="flex justify-between">
-                            <div class="flex flex-col gap-2">
-
-                                <div class="flex gap-2">
-
-                                    <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
-                                        <img src="../assets/products/img1.svg" class="w-full h-full object-cover" />
-                                    </div>
-                                    <div class="flex flex-col gap-[2px]">
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Bounce Pillow</p>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> Blue</p>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> King size (6 a 4 in)</p>
-                                    </div>
-
-                                </div>
-
-                                <p class='text-[14px] font-["Open Sans] text-[#1A237E] font-regular underline cursor-pointer'>Track your order</p>
-                            </div>
-
-                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
-                        </div>
-
-
-
-                    </div>
-
-                    <div class="border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2">
-
-<div class="flex items-center justify-between relative">
-    <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">January 12, 2025</p>
-    <img src="../assets/user/action.svg" class="w-[24px] ml-auto cursor-pointer" onclick="openOrdermenu(this)"/>
-
-    <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-            <div class="flex flex-col gap-3">
-                <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
-                <a href="./orders.php" class="text-[16px] font-medium text-[#262626]">Track Order</a>
-                <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Leave a review</a>
-                <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Report an issue</a>
-            </div>
-</div> 
-</div>
-
-<div class="w-full h-[1px] bg-[#E1E1E1]"></div>
-
-<div class="flex items-center justify-between">
-    <button type="submit" class="max-w-[87px] py-[6px] px-3 bg-[#39D959] text-white text-[14px] font-['Open Sans'] cursor-pointer rounded-[28px]">Delivered</button>
-    <div class="flex flex-col gap-[2px] text-right">
-        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Express Delivery</p>
-        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Order ID:</b> #12345</p>
-
-    </div>
-</div>
-
-<div class="w-full h-[1px] bg-[#E1E1E1]"></div>
-
-<div class="flex justify-between">
-    <div class="flex flex-col gap-2">
-
-        <div class="flex gap-2">
-
-            <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
-                <img src="../assets/products/img1.svg" class="w-full h-full object-cover" />
-            </div>
-            <div class="flex flex-col gap-[2px]">
-                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Bounce Pillow</p>
-                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> Blue</p>
-                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> King size (6 a 4 in)</p>
-            </div>
-
-        </div>
-
-        <p class='text-[14px] font-["Open Sans] text-[#1A237E] font-regular underline cursor-pointer'>Track your order</p>
-    </div>
-
-    <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
-</div>
-
-
-
-</div>
-
-
-<div class="border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2">
-
-<div class="flex items-center justify-between relative">
-    <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">January 12, 2025</p>
-    <img src="../assets/user/action.svg" class="w-[24px] ml-auto cursor-pointer" onclick="openOrdermenu(this)"/>
-
-    <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-            <div class="flex flex-col gap-3">
-                <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
-                <a href="./orders.php" class="text-[16px] font-medium text-[#262626]">Track Order</a>
-                <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Leave a review</a>
-                <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Report an issue</a>
-            </div>
-</div> 
-</div>
-
-<div class="w-full h-[1px] bg-[#E1E1E1]"></div>
-
-<div class="flex items-center justify-between">
-    <button type="submit" class="max-w-[87px] py-[6px] px-3 bg-[#39D959] text-white text-[14px] font-['Open Sans'] cursor-pointer rounded-[28px]">Delivered</button>
-    <div class="flex flex-col gap-[2px] text-right">
-        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Express Delivery</p>
-        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Order ID:</b> #12345</p>
-
-    </div>
-</div>
-
-<div class="w-full h-[1px] bg-[#E1E1E1]"></div>
-
-<div class="flex justify-between">
-    <div class="flex flex-col gap-2">
-
-        <div class="flex gap-2">
-
-            <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
-                <img src="../assets/products/img1.svg" class="w-full h-full object-cover" />
-            </div>
-            <div class="flex flex-col gap-[2px]">
-                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Bounce Pillow</p>
-                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> Blue</p>
-                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> King size (6 a 4 in)</p>
-            </div>
-
-        </div>
-
-        <p class='text-[14px] font-["Open Sans] text-[#1A237E] font-regular underline cursor-pointer'>Track your order</p>
-    </div>
-
-    <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
-</div>
-
-
-
-</div>
-
-                 
-
-
+                                </div>";
+                            }
+                        }
+                    }
+                    ?>
                 </div>
             </div>
         </div>
-
-
-        <footer class="w-full bg-[#E8E9F2] py-7">
-            <div class="w-[90%] flex gap-4 flex-col md:flex-row justify-between mx-auto">
-                <div class="flex flex-col gap-3">
-                    <div class="flex items-center gap-1">
-                        <img src="../assets/global/logo.svg" class="w-[50px] h-[48.15px]" />
-                        <h1 class="text-[20px] text-[24px] font-Onest font-semibold">VICTOSAH</h1>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/global/location.svg" class="w-[24px] h-[24px]" />
-                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">Location</p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/global/call.svg" class="w-[24px] h-[24px]" />
-                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">09090909090</p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/global/mail.svg" class="w-[24px] h-[24px]" />
-                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">supportvictosah@gmail.com</p>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="flex flex-col gap-2">
-                    <h1 class="text-[#262626] text-[20px] md:text-[24px] font-['Montserrat'] font-medium">Quick Links</h1>
-                    <ul class="flex flex-col gap-2">
-                        <li class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium"><a href="../details/about-us.php" class="text-[#777777]">About Us</a></li>
-                        <li class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium"><a href="../user/orders.php" class="text-[#777777]">Track Your Order</a></li>
-                        <li class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium"><a href="../details//refund-and-return-policy.php" class="text-[#777777]">Return Policy</a></li>
-                        <li class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium"><a href="../details/contact-us.php" class="text-[#777777]">Contact Us</a></li>
-
-                    </ul>
-                </div>
-
-                <div class="flex flex-col gap-2">
-                    <h1 class="text-[#262626] text-[20px] md:text-[24px] font-['Montserrat'] font-medium">Get on the List</h1>
-                    <p class="text-[#777777] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Sign up to know when we have new products</p>
-
-                    <div class="flex items-center gap-2 mt-2">
-                        <div class="flex items-center gap-2 border-[1px]  border-[#B8BBD7] rounded-[4px] p-1">
-
-                            <input type="text" placeholder="Enter your email address" class="lg:w-[12rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
-                        </div>
-                        <button type="submit" class="py-1 px-4 bg-[#1A237E] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]">Subscribe</button>
-                    </div>
-                </div>
-
-            </div>
-            <div class="w-[90%] flex flex-col py-4 mx-auto">
-                <div class="flex flex-col gap-2">
-                    <h1 class="text-[#262626] text-[20px] md:text-[24px] font-['Montserrat'] font-medium">Connect with us on:</h1>
-                    <div class="flex items-center gap-7">
-                        <a href="#"><img src="../assets/global/e1.svg" alt="Search" class="w-[13.83px]" /></a>
-                        <a href="#"><img src="../assets/global/e2.svg" alt="Search" class="w-[21.83px]" /></a>
-                        <a href="#"><img src="../assets/global/e3.svg" alt="Search" class="w-[21.83px]" /></a>
-                        <a href="#"><img src="../assets/global/e4.svg" alt="Search" class="w-[21.83px]" /></a>
-                        <a href="#"><img src="../assets/global/e5.svg" alt="Search" class="w-[17.83px]" /></a>
-                        <a href="#"><img src="../assets/global/e6.svg" alt="Search" class="w-[30.22px]" /></a>
-                    </div>
-                </div>
-                <div class="flex md:items-center flex-col gap-3 md:gap-0 md:flex-row justify-between mt-10">
-                    <div class="flex items-center gap-[4rem]">
-                        <p class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#777777]">Terms & Conditions</p>
-                        <p class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#777777]">Privacy Policy</p>
-                    </div>
-                    <p class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#777777]">© 2025 Victosah Solutions | All Rights Reserved</p>
-
-                </div>
-            </div>
-        </footer>
-
-
-
-
+        <?php
+        include(__DIR__ . '/../includes/footer.php');
+        ?>
     </main>
 
-    <script src="../functions/modals.js"></script>
-    <script src="../functions/modals2.js"></script>
-    <script src="../functions/functions.js"></script>
-    <script src="../functions/tabs.js"></script>
-    <script type="text/javascript" src="../functions/accordion.js"></script>
-    <script type="text/javascript" src="../functions/faq.js"></script>
-    <script type="text/javascript" src="../functions/dropdown.js"></script>
-    <script type="text/javascript" src="../functions/order.js"></script>
-
-    <script>
-      
-    </script>
-
+    <script src="<?php echo DOMAIN; ?>/functions/modals.js"></script>
+    <script src="<?php echo DOMAIN; ?>/functions/modals2.js"></script>
+    <script src="<?php echo DOMAIN; ?>/functions/functions.js"></script>
+    <script src="<?php echo DOMAIN; ?>/functions/tabs.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/accordion.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/faq.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/dropdown.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/openoptions.js"></script>
 </body>
 
-</html
+</html>

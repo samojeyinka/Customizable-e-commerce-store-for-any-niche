@@ -1,16 +1,19 @@
 <?php
+include(__DIR__ . '/config/connect.php');
 require_once __DIR__ . "/config/config.php";
-
-// Include authentication utility
 require_once __DIR__ . '/includes/auth/auth.php';
 
 // Get current user if logged in
 $user = isAuthenticated() ? getCurrentUser() : null;
+include(__DIR__ . '/config/products.php');
 
 // Handle logout
 if(isset($_GET['logout'])) {
     logout();
 }
+
+
+
 ?> 
 
 
@@ -39,7 +42,8 @@ if(isset($_GET['logout'])) {
       include(__DIR__ . '/includes/options.php');
       include(__DIR__ . '/includes/hero.php');
       include(__DIR__ . '/includes/categories.php');
-      include(__DIR__ . '/includes/featured.php');
+    include(__DIR__ . '/products/product-lists.php');
+    include(__DIR__ . '/includes/featured.php');
       include(__DIR__ . '/includes/why.php');
       include(__DIR__ . '/includes/intro.php');
       include(__DIR__ . '/includes/faq.php');
