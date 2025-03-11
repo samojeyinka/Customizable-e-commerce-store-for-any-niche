@@ -1,4 +1,5 @@
 <?php
+
 // Get category and brand from URL parameters
 $category_id = isset($_GET['category']) ? (int)$_GET['category'] : null;
 $brand_id = isset($_GET['brand']) ? (int)$_GET['brand'] : null;
@@ -8,29 +9,13 @@ $brand_id = isset($_GET['brand']) ? (int)$_GET['brand'] : null;
 
 $current_path = $_SERVER['REQUEST_URI'];
 
-// // Check if we're on the root/homepage
-// if (preg_match('#^/victosah/?$#', $current_path) || 
-//     preg_match('#^/victosah/index\.php$#', $current_path)) {
-//     $products_per_page = 4; // Smaller number for homepage
-// }
+// Set products per page based on URL
+$products_per_page = 12; // Default value for most pages
 
-// Set default products per page based on the page context
-if (preg_match('#^/products/show\.php$#', $current_path)) {
-    // Show page - display all related products without pagination
-    $products_per_page = 100; // High number to essentially show all
-    $show_related_only = true; // Flag to indicate we're on show page
-    
-    // Get the current product ID from the URL
-    $current_product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-} elseif (preg_match('#^/victosah/?$#', $current_path) || 
+// Check if we're on the root/homepage
+if (preg_match('#^/victosah/?$#', $current_path) || 
     preg_match('#^/victosah/index\.php$#', $current_path)) {
-    // Homepage - fewer products
-    $products_per_page = 4;
-    $show_related_only = false;
-} else {
-    // Regular products page - normal amount
-    $products_per_page = 12;
-    $show_related_only = false;
+    $products_per_page = 4; // Smaller number for homepage
 }
 
 // Get the current page from URL parameter, default to 1 if not set
@@ -50,7 +35,6 @@ $query = "
         p.product_id,
         p.product_name, 
         p.is_featured,
-        p.colors,
         c.category_title,
         b.brand_title,
         i.image_path AS main_image,
@@ -78,24 +62,13 @@ if ($brand_id) {
     $query .= " AND p.brand_id = " . $brand_id;
 }
 
-// Apply additional filters from filter.php
-if (function_exists('applyFiltersToQuery')) {
-    $query = applyFiltersToQuery($query);
-}
-
-// Complete the query with GROUP BY clause
+// Complete the query with GROUP BY and ORDER BY
 $query .= "
     GROUP BY 
-        p.product_id, p.product_name, p.is_featured, p.colors, c.category_title, b.brand_title, i.image_path
+        p.product_id, p.product_name, p.is_featured, c.category_title, b.brand_title, i.image_path
+    ORDER BY 
+        p.date_added DESC
 ";
-
-// Apply sorting
-if (function_exists('applySortingToQuery')) {
-    $query = applySortingToQuery($query);
-} else {
-    // Default sorting if filter.php is not included yet
-    $query .= " ORDER BY p.date_added DESC";
-}
 
 // Get total number of products with these filters (for calculating total pages)
 $count_query = "SELECT COUNT(*) as total FROM (" . $query . ") as counted";
@@ -162,6 +135,7 @@ if ($user) {
     $cart_count = $cart_data['total'] ?? 0;
 }
 
+
 // In your PHP section, fetch the cart items for the current user
 $cart_items = [];
 if ($user) {
@@ -175,6 +149,8 @@ if ($user) {
         $cart_items[$item['product_id']] = $item['cart_id'];
     }
 }
+
+
 
 // Check if each product is in user's favorites
 $favorites = [];
@@ -190,10 +166,4 @@ if ($user) {
     }
 }
 
-// Get filter parameters for the filter system
-$sort_by = isset($_GET['sort']) ? $_GET['sort'] : '';
-$color_filter = isset($_GET['color']) ? $_GET['color'] : '';
-$price_range = isset($_GET['price']) ? $_GET['price'] : '';
-$size_filter = isset($_GET['size']) ? $_GET['size'] : '';
-$texture_filter = isset($_GET['texture']) ? $_GET['texture'] : '';
 ?>

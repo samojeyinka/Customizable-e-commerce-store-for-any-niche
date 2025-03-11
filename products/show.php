@@ -1,10 +1,10 @@
 <?php
-
-
 require_once __DIR__ . "/../config/config.php";
+// Include database connection
 include(__DIR__ . '/../config/connect.php');
-
-session_start();
+require_once __DIR__ . '/../includes/auth/auth.php';
+$user = isAuthenticated() ? getCurrentUser() : null;
+include(__DIR__ . '/../config/products.php');
 
 // Function to get cart count for current user
 function getCartCount($user_id) {
@@ -711,7 +711,16 @@ display: none;
         <div class="reviews-wrapper">
             <!-- The products cards -->
 
-
+            <?php 
+        // Optional: Include filter.php if you need it
+        // include(__DIR__ . '/filter.php');
+        
+        // IMPORTANT: Include products.php first to get product data
+        include(__DIR__ . '/../config/products.php');
+        
+        // Then include product-lists.php to display products
+        include(__DIR__ . '/flex-product-lists.php');
+        ?>
       
         </div>
         </div>
@@ -721,6 +730,11 @@ display: none;
 
 
         <div id="cart-message" class="hidden mt-2 p-2 text-green-700 bg-green-100 rounded-md"></div>
+
+        <?php
+        include(__DIR__ . '/../includes/footer.php');
+
+?>
     </main>
 
 

@@ -27,6 +27,47 @@ include(__DIR__ . '/../config/products.php');
     <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
 
    
+    <style>
+/* Mobile filter options */
+.filteroptions-content {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+}
+
+/* Custom dropdown for mobile filter */
+.custom-dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #E1E1E1;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    margin-top: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.custom-dropdown.active .dropdown-content {
+    display: block;
+}
+
+.custom-dropdown.active .arrow-down {
+    transform: rotate(180deg);
+}
+</style>
 
 
 </head>
@@ -87,13 +128,6 @@ include(__DIR__ . '/../includes/options.php');
                 include(__DIR__ . '/product-lists.php');
 
                 ?>
-
-
-
-     
-
-            
-
 
             </div>
 
@@ -169,284 +203,171 @@ include(__DIR__ . '/../includes/options.php');
 </div>
         </div>
 
-        <div id="filteroptions" class="filteroptions-content border-[1px] border-[#E1E1E1] bg-white">
-            <div class="relative">
+    <!-- Add this to your HTML -->
+<div id="filteroptions" class="filteroptions-content border-[1px] border-[#E1E1E1] bg-white md:hidden">
+    <div class="relative p-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium">Filters</h3>
+            <a href="<?php echo parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); ?>" class="text-[#EE3F3F] text-sm">
+                Reset All
+            </a>
+        </div>
 
-                <div class="flex flex-col gap-2">
-                    <div class="custom-dropdown">
-                        <div class="w-full md:min-w-[5rem] lg:min-w-[7rem] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 md:py-1 px-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Sort by</span>
-                            <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                    <div onclick="selectOption(this)">All</div>
-                                    <div onclick="selectOption(this)">Popularity</div>
-                                    <div onclick="selectOption(this)">Latest</div>
-                                    <div onclick="selectOption(this)">Amount: High to Low</div>
-                                    <div onclick="selectOption(this)">Amount: Low to High</div>
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="custom-dropdown">
-                        <div class="w-full md:min-w-[5rem] lg:min-w-[7rem] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 md:py-1 px-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Color</span>
-                            <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">All</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Black</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Blue</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Red</span>
-                                    </label>
-
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="custom-dropdown">
-                        <div class="w-full md:min-w-[5rem] lg:min-w-[7rem] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 md:py-1 px-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Amount</span>
-                            <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">All</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">₦50,000 - ₦150,000</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">₦151,000 - 250,000</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">₦251,000 - ₦500,000</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">₦500,000 and above</span>
-                                    </label>
-
-
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="custom-dropdown">
-                        <div class="w-full md:min-w-[5rem] lg:min-w-[7rem] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 md:py-1 px-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Size</span>
-                            <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">All</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">5 x 6 x 10 </span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">5 x 6 x 10 </span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">5 x 6 x 10 </span>
-                                    </label>
-
-
-
-
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="custom-dropdown">
-                        <div class="w-full md:min-w-[5rem] lg:min-w-[7rem] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 md:py-1 px-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Category</span>
-                            <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Blankets </span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Throws</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Bed Sheets</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Pillowcases</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Duvet Covers</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Comforters </span>
-                                    </label>
-
-
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Mattress Toppers</span>
-                                    </label>
-
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Lightning</span>
-                                    </label>
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="custom-dropdown">
-                        <div class="w-full md:min-w-[5rem] lg:min-w-[7rem] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 md:py-1 px-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Texture</span>
-                            <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">All</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Soft </span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Medium </span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Hard </span>
-                                    </label>
-
-
-
-
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="custom-dropdown">
-                        <div class="w-full md:min-w-[5rem] lg:min-w-[7rem] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 md:py-1 px-2 dropdown-toggle">
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Rating</span>
-                            <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                        </div>
-                        <div class="dropdown-content">
-                            <div class="flex items-center gap-3">
-                                <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">5 star </span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">4 star</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">3 star</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">2 star</span>
-                                    </label>
-
-                                    <label class="flex items-center gap-2">
-                                        <input type="checkbox" name="color" class="w-[14px] h-[14px]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">1 star</span>
-                                    </label>
-
-
-                                </div>
-
-                            </div>
-                        </div>
+        <div class="flex flex-col gap-4">
+            <!-- Sort By Filter -->
+            <div class="custom-dropdown w-full">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle">
+                    <span class="text-[#262626] text-[14px] font-Onest font-regular">
+                        <?php 
+                        $sort_text = 'Sort by';
+                        switch ($sort_by) {
+                            case 'popular': $sort_text = 'Popularity'; break;
+                            case 'price_high_low': $sort_text = 'Price: High to Low'; break;
+                            case 'price_low_high': $sort_text = 'Price: Low to High'; break;
+                            case 'latest': $sort_text = 'Latest'; break;
+                        }
+                        echo $sort_text;
+                        ?>
+                    </span>
+                    <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                </div>
+                <div class="dropdown-content">
+                    <div class="flex flex-col gap-2 p-2">
+                        <a href="<?php echo buildFilterUrl('sort', ''); ?>" class="<?php echo !$sort_by ? 'text-[#1A237E] font-medium' : ''; ?>">All</a>
+                        <a href="<?php echo buildFilterUrl('sort', 'popular'); ?>" class="<?php echo $sort_by == 'popular' ? 'text-[#1A237E] font-medium' : ''; ?>">Popularity</a>
+                        <a href="<?php echo buildFilterUrl('sort', 'latest'); ?>" class="<?php echo $sort_by == 'latest' ? 'text-[#1A237E] font-medium' : ''; ?>">Latest</a>
+                        <a href="<?php echo buildFilterUrl('sort', 'price_high_low'); ?>" class="<?php echo $sort_by == 'price_high_low' ? 'text-[#1A237E] font-medium' : ''; ?>">Amount: High to Low</a>
+                        <a href="<?php echo buildFilterUrl('sort', 'price_low_high'); ?>" class="<?php echo $sort_by == 'price_low_high' ? 'text-[#1A237E] font-medium' : ''; ?>">Amount: Low to High</a>
                     </div>
                 </div>
+            </div>
 
+            <!-- Color Filter -->
+            <div class="custom-dropdown w-full">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle <?php echo !empty($color_filter) ? 'border-[#1A237E]' : ''; ?>">
+                    <span class="text-[#262626] text-[14px] font-Onest font-regular">
+                        <?php echo empty($color_filter) ? 'Color' : ucfirst($color_filter); ?>
+                    </span>
+                    <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                </div>
+                <div class="dropdown-content">
+                    <div class="flex flex-col gap-2 p-2">
+                        <a href="<?php echo buildFilterUrl('color', ''); ?>" class="<?php echo empty($color_filter) ? 'text-[#1A237E] font-medium' : ''; ?>">All Colors</a>
+                        
+                        <?php foreach ($available_colors as $color): ?>
+                        <a href="<?php echo buildFilterUrl('color', $color); ?>" class="<?php echo $color_filter == $color ? 'text-[#1A237E] font-medium' : ''; ?>">
+                            <?php echo ucfirst($color); ?>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Price Range Filter -->
+            <div class="custom-dropdown w-full">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle <?php echo !empty($price_range) ? 'border-[#1A237E]' : ''; ?>">
+                    <span class="text-[#262626] text-[14px] font-Onest font-regular">
+                        <?php 
+                        $price_text = 'Amount';
+                        if (!empty($price_range) && isset($price_ranges[$price_range])) {
+                            $price_text = $price_ranges[$price_range];
+                        }
+                        echo $price_text;
+                        ?>
+                    </span>
+                    <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                </div>
+                <div class="dropdown-content">
+                    <div class="flex flex-col gap-2 p-2">
+                        <a href="<?php echo buildFilterUrl('price', ''); ?>" class="<?php echo empty($price_range) ? 'text-[#1A237E] font-medium' : ''; ?>">All Prices</a>
+                        
+                        <?php foreach ($price_ranges as $range_key => $range_label): ?>
+                        <a href="<?php echo buildFilterUrl('price', $range_key); ?>" class="<?php echo $price_range == $range_key ? 'text-[#1A237E] font-medium' : ''; ?>">
+                            <?php echo $range_label; ?>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Size Filter -->
+            <div class="custom-dropdown w-full">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle <?php echo !empty($size_filter) ? 'border-[#1A237E]' : ''; ?>">
+                    <span class="text-[#262626] text-[14px] font-Onest font-regular">
+                        <?php echo empty($size_filter) ? 'Size' : $size_filter; ?>
+                    </span>
+                    <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                </div>
+                <div class="dropdown-content">
+                    <div class="flex flex-col gap-2 p-2">
+                        <a href="<?php echo buildFilterUrl('size', ''); ?>" class="<?php echo empty($size_filter) ? 'text-[#1A237E] font-medium' : ''; ?>">All Sizes</a>
+                        
+                        <?php foreach ($available_sizes as $size): ?>
+                        <a href="<?php echo buildFilterUrl('size', $size); ?>" class="<?php echo $size_filter == $size ? 'text-[#1A237E] font-medium' : ''; ?>">
+                            <?php echo $size; ?>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="custom-dropdown w-full">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle <?php echo !empty($category_id) ? 'border-[#1A237E]' : ''; ?>">
+                    <span class="text-[#262626] text-[14px] font-Onest font-regular">
+                        <?php 
+                        $category_text = 'Category';
+                        if ($category_id) {
+                            foreach ($available_categories as $cat) {
+                                if ($cat['category_id'] == $category_id) {
+                                    $category_text = $cat['category_title'];
+                                    break;
+                                }
+                            }
+                        }
+                        echo $category_text;
+                        ?>
+                    </span>
+                    <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                </div>
+                <div class="dropdown-content">
+                    <div class="flex flex-col gap-2 p-2">
+                        <a href="<?php echo buildFilterUrl('category', ''); ?>" class="<?php echo empty($category_id) ? 'text-[#1A237E] font-medium' : ''; ?>">All Categories</a>
+                        
+                        <?php foreach ($available_categories as $category): ?>
+                        <a href="<?php echo buildFilterUrl('category', $category['category_id']); ?>" class="<?php echo $category_id == $category['category_id'] ? 'text-[#1A237E] font-medium' : ''; ?>">
+                            <?php echo $category['category_title']; ?>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Texture Filter -->
+            <div class="custom-dropdown w-full">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle <?php echo !empty($texture_filter) ? 'border-[#1A237E]' : ''; ?>">
+                    <span class="text-[#262626] text-[14px] font-Onest font-regular">
+                        <?php echo empty($texture_filter) ? 'Texture' : ucfirst($texture_filter); ?>
+                    </span>
+                    <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                </div>
+                <div class="dropdown-content">
+                    <div class="flex flex-col gap-2 p-2">
+                        <a href="<?php echo buildFilterUrl('texture', ''); ?>" class="<?php echo empty($texture_filter) ? 'text-[#1A237E] font-medium' : ''; ?>">All Textures</a>
+                        
+                        <?php foreach ($available_textures as $texture): ?>
+                        <a href="<?php echo buildFilterUrl('texture', $texture); ?>" class="<?php echo $texture_filter == $texture ? 'text-[#1A237E] font-medium' : ''; ?>">
+                            <?php echo ucfirst($texture); ?>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
+</div>
+
+
 
 
         <?php
@@ -595,6 +516,61 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+
+
+function filterMenu() {
+    document.getElementById("filteroptions").style.display = "block";
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Close mobile filter when clicking outside
+    window.addEventListener('click', function(e) {
+        if (e.target == document.getElementById('filteroptions')) {
+            document.getElementById('filteroptions').style.display = 'none';
+        }
+    });
+    
+    // Mobile dropdown toggles
+    document.querySelectorAll(".custom-dropdown .dropdown-toggle").forEach(function(toggle) {
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = this.closest('.custom-dropdown');
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.custom-dropdown').forEach(function(dd) {
+                if (dd !== dropdown) {
+                    dd.classList.remove('active');
+                }
+            });
+            
+            // Toggle this dropdown
+            dropdown.classList.toggle('active');
+        });
+    });
+    
+    // Close dropdowns when clicking elsewhere
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.custom-dropdown').forEach(function(dropdown) {
+            dropdown.classList.remove('active');
+        });
+    });
+    
+    // Prevent closing dropdowns when clicking inside them
+    document.querySelectorAll('.dropdown-content').forEach(function(content) {
+        content.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+    
+    // Function to select an option
+    window.selectOption = function(element) {
+        const dropdown = element.closest('.custom-dropdown');
+        const toggleText = dropdown.querySelector('.dropdown-toggle span');
+        toggleText.textContent = element.textContent;
+        dropdown.classList.remove('active');
+    };
+});
 
     </script> 
 </body>
