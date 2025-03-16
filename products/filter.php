@@ -394,10 +394,7 @@ function applySortingToQuery($query) {
 <div class="md:hidden">
     <div class="w-[100%] mx-auto bg-white">
         <div class="flex items-center justify-between">
-            <button onclick="filterMenu()" class="flex items-center gap-2 cursor-pointer">
-                <img src="<?php echo DOMAIN; ?>/assets/products/filter.svg" class="w-[20px]" />
-                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Filter</span>
-            </button>
+
             
             <?php if (!empty($color_filter) || !empty($price_range) || !empty($size_filter) || !empty($texture_filter) || $sort_by != 'latest'): ?>
             <a href="<?php echo parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); ?>" class="flex items-center gap-1 cursor-pointer">

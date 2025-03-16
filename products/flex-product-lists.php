@@ -79,7 +79,7 @@
 <script>
 
 
-const route = 'http://localhost/victosah';
+const route = 'https://victosah.com';
     
 document.addEventListener('DOMContentLoaded', function() {
     // Cart toggle functionality
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                //alert('An error occurred. Please try again.');
             });
             
         } else {
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                //alert('An error occurred. Please try again.');
             });
         }
     }

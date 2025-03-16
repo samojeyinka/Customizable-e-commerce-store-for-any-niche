@@ -233,10 +233,16 @@ display: none;
      include('../includes/header.php');
     include('../includes/options.php');
     ?>
+    
+    <!-- Add to Cart Toast Notification -->
+<div id="cart-toast" class="hidden fixed bottom-4 right-4 bg-green-600 text-white py-2 px-4 rounded-md shadow-lg z-50 transition-opacity duration-300">
+    Item added to your cart!
+</div>
+
         <section class="w-full bg-[#FFFFFFF] py-4">
             <div class="w-[90%] mx-auto">
 
-                <div class="flex items-center gap-1 cursor-pointer">
+<div class="hidden md:flex items-center gap-1 cursor-pointer">
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
                     <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium"><?php echo $product['category_title']; ?></a>
@@ -245,6 +251,28 @@ display: none;
                     <a href="./show.php?id=<?php echo $product['product_id']; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">      <?php
                     $product_name = htmlspecialchars($product['product_name']);
     echo (strlen($product_name) > 20) ? substr($product_name, 0, 30) . '...' : $product_name; 
+?></a>
+                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
+                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
+                </div>
+
+                <div class="flex items-center gap-1 cursor-pointer md:hidden">
+                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
+                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
+                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">
+<?php 
+    // Truncate the category title to 10 characters maximum
+    $truncated_title = (strlen($product['category_title']) > 10) 
+        ? substr($product['category_title'], 0, 10) . '...' 
+        : $product['category_title'];
+    echo $truncated_title; 
+?>
+</a>
+                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
+              
+                    <a href="./show.php?id=<?php echo $product['product_id']; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">      <?php
+                    $product_name = htmlspecialchars($product['product_name']);
+    echo (strlen($product_name) > 9) ? substr($product_name, 0, 10) . '...' : $product_name; 
 ?></a>
                     <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
                     <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
@@ -520,7 +548,7 @@ display: none;
 </div>
                 </div>
 
-                <div class="w-full flex flex-col gap-2 rounded-[8px] border-[#E1E1E1] border-[1px] p-3">
+                <!--<div class="w-full flex flex-col gap-2 rounded-[8px] border-[#E1E1E1] border-[1px] p-3">
                     
              
                 
@@ -595,7 +623,7 @@ display: none;
                    
 
 
-                </div>
+                </div>-->
 
             </div>
 

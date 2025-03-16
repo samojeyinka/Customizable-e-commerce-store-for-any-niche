@@ -3,11 +3,13 @@ require_once __DIR__ . "/../config/config.php";
 // Include database connection
 include(__DIR__ . '/../config/connect.php');
 require_once __DIR__ . '/../includes/auth/auth.php';
+$user = isAuthenticated() ? getCurrentUser() : null;
+include(__DIR__ . '/../config/products.php');
 
 // Check if user is logged in
 if (!isAuthenticated()) {
     // Redirect to login page
-    header('Location: ../login.php');
+    header('Location: /includes/auth/login/signin.php');
     exit;
 }
 

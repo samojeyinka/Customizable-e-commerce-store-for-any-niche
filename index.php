@@ -37,6 +37,10 @@ if(isset($_GET['logout'])) {
 
 <body>
     <main class="bg-[#FEFEFE]">
+            <!-- Add to Cart Toast Notification -->
+<div id="cart-toast" class="hidden fixed bottom-4 right-4 bg-green-600 text-white py-2 px-4 rounded-md shadow-lg z-50 transition-opacity duration-300">
+    Item added to your cart!
+</div>
         <?php
       include(__DIR__ . '/includes/header.php');
       include(__DIR__ . '/includes/options.php');

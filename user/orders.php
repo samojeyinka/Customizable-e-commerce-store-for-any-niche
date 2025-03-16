@@ -15,6 +15,8 @@ if(isset($_GET['logout'])) {
     logout();
 }
 
+
+
 // Database connection
 $conn = mysqli_connect('localhost', 'root', '', 'victosah');
 if (!$conn) {

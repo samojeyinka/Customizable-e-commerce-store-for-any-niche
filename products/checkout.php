@@ -3,6 +3,7 @@
 // Start session to maintain user data
 session_start();
 
+require_once __DIR__ . "/../config/config.php";
 // Include database connection
 include('../config/connect.php');
 // Include authentication utility
@@ -787,7 +788,7 @@ $paystack_data = [
                 <p class="w-[95%] md:w-[67%] mx-auto text-[15px] text-center md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2">
                     Your order has been placed successfully. A confirmation email has been sent to you. Thank you for shopping with us
                 </p>
-                <a href="./view-order.php" class="w-[80%] text-center text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer" id="closepssucces">
+                <a href="<?php echo DOMAIN; ?>/user/orders.php" class="w-[80%] text-center text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer" id="closepssucces">
                     View Order
                 </a>
             </div>

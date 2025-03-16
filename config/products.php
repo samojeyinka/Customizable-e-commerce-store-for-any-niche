@@ -3,35 +3,49 @@
 $category_id = isset($_GET['category']) ? (int)$_GET['category'] : null;
 $brand_id = isset($_GET['brand']) ? (int)$_GET['brand'] : null;
 
-// Set the number of products per page
-// $products_per_page = 12;
+$current_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-$current_path = $_SERVER['REQUEST_URI'];
+// Debug line - uncomment to see the exact path
+// error_log("Current path: " . $current_path);
 
-// // Check if we're on the root/homepage
-// if (preg_match('#^/victosah/?$#', $current_path) || 
-//     preg_match('#^/victosah/index\.php$#', $current_path)) {
-//     $products_per_page = 4; // Smaller number for homepage
-// }
-
+// PRODUCTION ROUTES ONLY
 // Set default products per page based on the page context
-if (preg_match('#^/products/show\.php$#', $current_path)) {
+if ($current_path == '/products/show.php') {
     // Show page - display all related products without pagination
     $products_per_page = 100; // High number to essentially show all
     $show_related_only = true; // Flag to indicate we're on show page
     
     // Get the current product ID from the URL
     $current_product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-} elseif (preg_match('#^/victosah/?$#', $current_path) || 
-    preg_match('#^/victosah/index\.php$#', $current_path)) {
+    
+    // Debug line
+    // error_log("Matched product show page, ID: " . $current_product_id);
+} 
+elseif ($current_path == '/' || $current_path == '/index.php') {
     // Homepage - fewer products
     $products_per_page = 4;
     $show_related_only = false;
-} else {
-    // Regular products page - normal amount
+    
+    // Debug line
+    // error_log("Matched homepage");
+} 
+elseif ($current_path == '/products/' || $current_path == '/products/index.php') {
+    // Products listing page
     $products_per_page = 12;
     $show_related_only = false;
+    
+    // Debug line
+    // error_log("Matched products listing page");
+} 
+else {
+    // Default case - any other page
+    $products_per_page = 12;
+    $show_related_only = false;
+    
+    // Debug line
+    // error_log("Matched default case for path: " . $current_path);
 }
+
 
 // Get the current page from URL parameter, default to 1 if not set
 $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
