@@ -60,7 +60,6 @@ if (isset($_GET['date'])) {
                     $conditions[] = "DATE($date_column) BETWEEN '$start_date' AND '$end_date'";
                 }
                 break;
-            // If 'all' is selected or no valid filter is selected, no condition is added
         }
     }
 }
@@ -109,13 +108,7 @@ $sql .= " LIMIT $offset, $items_per_page";
 
 // Execute query
 $result = $conn->query($sql);
-if (!$result) {
-    // For debugging
-    echo "Error in query: " . $conn->error;
-    $orders = [];
-} else {
-    $orders = $result->fetch_all(MYSQLI_ASSOC);
-}
+$orders = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 
 // Date formatting
 foreach ($orders as &$order) {
@@ -193,42 +186,37 @@ $status_classes = [
                         <img src="../assets/dash/filter-horizontal.svg" class="md:hidden" />
 
                         <div class="hidden md:flex items-center gap-2 md:gap-3 lg:gap-4">
-                           <!-- Replace custom dropdown with standard select -->
-                           <div class="flex items-center gap-2">
-                               <form id="dateFilterForm" action="" method="GET" class="flex items-center">
-                                   <!-- Preserve search parameter if it exists -->
-                                   <?php if(!empty($search_query)): ?>
-                                   <input type="hidden" name="search" value="<?php echo htmlspecialchars($search_query); ?>">
-                                   <?php endif; ?>
-                                   
-                                   <select name="date" id="dateFilter" onchange="this.form.submit()" class="md:min-w-[120px] rounded-[4px] border-[1px] border-[#C5C5C5] py-1 px-2 text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular focus:outline-none">
-                                       <option value="all" <?php echo $date_filter == 'all' ? 'selected' : ''; ?>>All time</option>
-                                       <option value="today" <?php echo $date_filter == 'today' ? 'selected' : ''; ?>>Today</option>
-                                       <option value="last7days" <?php echo $date_filter == 'last7days' ? 'selected' : ''; ?>>Last 7 days</option>
-                                       <option value="last28days" <?php echo $date_filter == 'last28days' ? 'selected' : ''; ?>>Last 28 days</option>
-                                       <option value="custom" <?php echo $date_filter == 'custom' ? 'selected' : ''; ?>>Custom date</option>
-                                   </select>
-                               </form>
-                               
-                               <!-- Only show the custom date button when custom is selected -->
-                               <?php if($date_filter == 'custom'): ?>
-                               <button onclick="showCustomDatePicker()" class="text-[13px] text-blue-700 hover:underline">Change dates</button>
-                               <?php endif; ?>
-                           </div>
-                        </div>
+                           
+                            <div class="custom-dropdown">
+                                <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
+                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Date</span>
+                                    <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                                </div>
+                                <div class="dropdown-content">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
+                                            <a href="?date=all" class="<?php echo $date_filter == 'all' ? 'font-bold' : ''; ?>">All time</a>
+                                            <a href="?date=today" class="<?php echo $date_filter == 'today' ? 'font-bold' : ''; ?>">Today</a>
+                                            <a href="?date=last7days" class="<?php echo $date_filter == 'last7days' ? 'font-bold' : ''; ?>">Last 7 days</a>
+                                            <a href="?date=last28days" class="<?php echo $date_filter == 'last28days' ? 'font-bold' : ''; ?>">Last 28 days</a>
+                                            <div onclick="showCustomDatePicker()">Custom date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-1">
-                        <a href="?date=all">
+                        <a href="?clear=1">
                             <img src="../assets/dash/Path.svg" />
                             <span class="text-[#262626] text-[14px] font-Onest font-regular">Clear filter</span>
                         </a>
                     </div>
 
-                    <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
+                    <button class="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
                         <img src="../assets/dash/send-square.svg" />
-                        Export as Excel
+                        Export as
                     </button>
                 </div>
             </div>
@@ -262,7 +250,7 @@ $status_classes = [
                                         <input type="checkbox" class="border-[#E1E1E1]" />
                                         <span class="text-[#262626] text-[13px] md:text-[14px] font-regular font-['Open Sans']">#<?php echo htmlspecialchars($order['order_id']); ?></span>
                                     </td>
-                                    <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">The first_name and last_name here from profile</td>
+                                    <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">Enyesiobi Golibe</td>
                                     <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">₦<?php echo number_format($order['amount'] ?? 0); ?></td>
                                     <td>
                                         <?php
@@ -344,78 +332,7 @@ $status_classes = [
         </div>
     </div>
 
-    <!-- Export to Excel functionality -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
     <script>
-    // Function to export table data to Excel
-    function exportToExcel() {
-        // Get the table element
-        const table = document.querySelector('table');
-        
-        // Create a workbook and worksheet
-        const wb = XLSX.utils.book_new();
-        
-        // Prepare data for export
-        const data = [];
-        
-        // Get headers (excluding the last column with action buttons)
-        const headers = [];
-        const headerRow = table.querySelector('thead tr');
-        const headerCells = headerRow.querySelectorAll('th');
-        
-        // Skip the last column (actions)
-        for (let i = 0; i < headerCells.length - 1; i++) {
-            // Extract text content from span element if it exists
-            const spanElement = headerCells[i].querySelector('span');
-            if (spanElement) {
-                headers.push(spanElement.textContent.trim());
-            } else if (headerCells[i].textContent) {
-                headers.push(headerCells[i].textContent.trim());
-            }
-        }
-        
-        data.push(headers);
-        
-        // Get rows data
-        const rows = table.querySelectorAll('tbody tr');
-        rows.forEach(row => {
-            const rowData = [];
-            const cells = row.querySelectorAll('td');
-            
-            // Skip the last column (actions)
-            for (let i = 0; i < cells.length - 1; i++) {
-                // For order ID cell, handle the nested span
-                if (i === 0) {
-                    const span = cells[i].querySelector('span');
-                    rowData.push(span ? span.textContent.trim() : '');
-                } 
-                // For status cell, get the button text
-                else if (i === 3) {
-                    const button = cells[i].querySelector('button');
-                    rowData.push(button ? button.textContent.trim() : '');
-                } 
-                // For other cells, get the text content
-                else {
-                    rowData.push(cells[i].textContent.trim());
-                }
-            }
-            
-            data.push(rowData);
-        });
-        
-        // Create worksheet from data
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        
-        // Add worksheet to workbook
-        XLSX.utils.book_append_sheet(wb, ws, 'Orders');
-        
-        // Generate Excel file and trigger download
-        const today = new Date();
-        const dateStr = today.toISOString().split('T')[0];
-        XLSX.writeFile(wb, Orders_Export_${dateStr}.xlsx);
-    }
-    
     // Function to toggle order menu
     function openOrdermenu(element) {
         // Close all other menus first
@@ -457,27 +374,40 @@ $status_classes = [
         
         // Preserve any existing search parameter
         const searchParam = new URLSearchParams(window.location.search).get('search');
-        const searchQueryString = searchParam ? &search=${searchParam} : '';
+        const searchQueryString = searchParam ? `&search=${searchParam}` : '';
         
-        window.location.href = ?date=custom&start_date=${startDate}&end_date=${endDate}${searchQueryString};
+        window.location.href = `?date=custom&start_date=${startDate}&end_date=${endDate}${searchQueryString}`;
     }
 
-    // Document ready function
+    // Function to select dropdown option
+    function selectOption(element) {
+        const dropdownToggle = element.closest('.custom-dropdown').querySelector('.dropdown-toggle span');
+        dropdownToggle.textContent = element.textContent;
+        
+        // Close the dropdown
+        element.closest('.dropdown-content').classList.remove('show');
+    }
+
+    // Implement dropdown functionality
     document.addEventListener('DOMContentLoaded', function() {
-        // Add event listener to custom date selector
-        const dateFilter = document.getElementById('dateFilter');
-        if (dateFilter) {
-            dateFilter.addEventListener('change', function() {
-                if (this.value === 'custom') {
-                    // Prevent form submission for custom date
-                    event.preventDefault();
-                    showCustomDatePicker();
-                } else {
-                    // Submit form for other date options
-                    document.getElementById('dateFilterForm').submit();
-                }
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const dropdownContent = this.nextElementSibling;
+                dropdownContent.classList.toggle('show');
             });
-        }
+        });
+        
+        // Close dropdowns when clicking outside
+        window.addEventListener('click', function(event) {
+            if (!event.target.matches('.dropdown-toggle') && !event.target.matches('.dropdown-toggle *')) {
+                const dropdowns = document.querySelectorAll('.dropdown-content');
+                dropdowns.forEach(dropdown => {
+                    dropdown.classList.remove('show');
+                });
+            }
+        });
     });
     </script>
 </body>
