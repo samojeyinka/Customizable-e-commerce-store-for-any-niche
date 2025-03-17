@@ -1,4 +1,4 @@
-k<?php
+<?php
 // Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -293,14 +293,15 @@ $status_classes = [
                                         <img src="../assets/user/action.svg" class="w-[20px] cursor-pointer" onclick="openOrdermenu(this)" />
 
                                         <!-- Order Menu (specific to this row) -->
-                                        <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-                                            <div class="flex flex-col gap-3">
-                                                <a href="../products/show.php?reorder=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
-                                                <a href="./track-order.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">Track Order</a>
-                                                <a href="../products/review.php?order=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">Leave a review</a>
-                                                <a href="./report-issue.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#E8B006]">Report an issue</a>
-                                            </div>
-                                        </div>
+                                        <div class=" h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
+    <div class="flex flex-col gap-3">
+        <a href="./order-details.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
+        <a href="../products/show.php?reorder=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
+        <a href="./track-order.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">Track Order</a>
+        <a href="../products/review.php?order=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">Leave a review</a>
+        <a href="./report-issue.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#E8B006]">Report an issue</a>
+    </div>
+</div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
