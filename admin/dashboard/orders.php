@@ -1,4 +1,4 @@
-<?php
+k<?php
 // Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -34,7 +34,6 @@ if (in_array('created_at', $available_columns)) {
 
 // Initialize filter conditions and search query variable
 $conditions = [];
-$params = [];
 $search_query = '';
 
 // Date filter handling
@@ -45,19 +44,19 @@ if (isset($_GET['date'])) {
     if (in_array($date_filter, $allowed_filters)) {
         switch ($date_filter) {
             case 'today':
-                $conditions[] = "DATE($date_column) = CURDATE()";
+                $conditions[] = "DATE(orders.$date_column) = CURDATE()";
                 break;
             case 'last7days':
-                $conditions[] = "DATE($date_column) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
+                $conditions[] = "DATE(orders.$date_column) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
                 break;
             case 'last28days':
-                $conditions[] = "DATE($date_column) >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)";
+                $conditions[] = "DATE(orders.$date_column) >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)";
                 break;
             case 'custom':
                 if (isset($_GET['start_date']) && isset($_GET['end_date'])) {
                     $start_date = $conn->real_escape_string($_GET['start_date']);
                     $end_date = $conn->real_escape_string($_GET['end_date']);
-                    $conditions[] = "DATE($date_column) BETWEEN '$start_date' AND '$end_date'";
+                    $conditions[] = "DATE(orders.$date_column) BETWEEN '$start_date' AND '$end_date'";
                 }
                 break;
             // If 'all' is selected or no valid filter is selected, no condition is added
@@ -69,33 +68,36 @@ if (isset($_GET['date'])) {
 if (!empty($_GET['search'])) {
     $search_query = $_GET['search'];
     $search = $conn->real_escape_string($search_query);
-    // Modify this to only search columns that actually exist in the table
-    $conditions[] = "(id LIKE '%$search%')";
-    // Removed customer_name from search condition
+    // Search by order ID and possibly by customer name if joined with profiles
+    $conditions[] = "(orders.id LIKE '%$search%' OR CONCAT(profiles.first_name, ' ', profiles.last_name) LIKE '%$search%')";
 }
 
 // Status filter
 if (!empty($_GET['status'])) {
     $status = $conn->real_escape_string($_GET['status']);
-    $conditions[] = "order_status = '$status'";
+    $conditions[] = "orders.order_status = '$status'";
 }
 
 // Build WHERE clause
 $where_clause = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $conditions);
 
-// Base SQL query - Removed customer_name from SELECT list
+// Base SQL query - Include JOIN with profiles
 $sql = "SELECT 
-            id AS order_id,
-            order_total AS amount,
-            delivery_method,
-            order_status,
-            $date_column AS order_date
+            orders.id AS order_id,
+            orders.order_total AS amount,
+            orders.delivery_method,
+            orders.order_status,
+            orders.$date_column AS order_date,
+            profiles.first_name,
+            profiles.last_name
         FROM orders
+        LEFT JOIN profiles ON orders.user_id = profiles.user_id
         $where_clause
-        ORDER BY $date_column DESC";
+        ORDER BY orders.$date_column DESC";
 
-// Get total count for pagination
-$count_result = $conn->query("SELECT COUNT(*) AS total FROM orders $where_clause");
+// Get total count for pagination with correct JOIN
+$count_sql = "SELECT COUNT(*) AS total FROM orders LEFT JOIN profiles ON orders.user_id = profiles.user_id $where_clause";
+$count_result = $conn->query($count_sql);
 $total_count = $count_result->fetch_assoc()['total'];
 
 // Pagination setup
@@ -183,6 +185,14 @@ $status_classes = [
                         <div class="w-full flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[24px] p-2">
                             <img src="../assets/dash/search-normal (1).svg" alt="Search" class="w-[18px]" />
                             <input type="text" name="search" placeholder="Search" value="<?php echo htmlspecialchars($search_query); ?>" class="w-full md:w-[250px] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
+                            <!-- Preserve date filter when searching -->
+                            <?php if($date_filter != 'all'): ?>
+                                <input type="hidden" name="date" value="<?php echo htmlspecialchars($date_filter); ?>">
+                                <?php if($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])): ?>
+                                    <input type="hidden" name="start_date" value="<?php echo htmlspecialchars($_GET['start_date']); ?>">
+                                    <input type="hidden" name="end_date" value="<?php echo htmlspecialchars($_GET['end_date']); ?>">
+                                <?php endif; ?>
+                            <?php endif; ?>
                         </div>
                     </form>
                 </div>
@@ -262,7 +272,13 @@ $status_classes = [
                                         <input type="checkbox" class="border-[#E1E1E1]" />
                                         <span class="text-[#262626] text-[13px] md:text-[14px] font-regular font-['Open Sans']">#<?php echo htmlspecialchars($order['order_id']); ?></span>
                                     </td>
-                                    <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">The first_name and last_name here from profile</td>
+                                    <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">
+                                    <?php 
+                                    $firstName = $order['first_name'] ?? '';
+                                    $lastName = $order['last_name'] ?? '';
+                                    echo htmlspecialchars(trim("$firstName $lastName")); 
+                                    ?>
+                                    </td>
                                     <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">₦<?php echo number_format($order['amount'] ?? 0); ?></td>
                                     <td>
                                         <?php
@@ -299,7 +315,7 @@ $status_classes = [
             <div class="w-full md:w-[fit-content] ml-auto flex items-center justify-between gap-5">
                 <div class="flex items-center gap-2 cursor-pointer">
                     <?php if ($current_page > 1): ?>
-                        <a href="?page=<?php echo $current_page - 1; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?>">
+                        <a href="?page=<?php echo $current_page - 1; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo ($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])) ? '&start_date=' . urlencode($_GET['start_date']) . '&end_date=' . urlencode($_GET['end_date']) : ''; ?>">
                             <img src="../assets/products/prev.svg" class="w-[6px] h-[11px]" />
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Prev</span>
                         </a>
@@ -319,19 +335,19 @@ $status_classes = [
                         <?php if ($i == $current_page): ?>
                             <span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#1A237E]"><?php echo $i; ?></span>
                         <?php else: ?>
-                            <a href="?page=<?php echo $i; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer"><?php echo $i; ?></a>
+                            <a href="?page=<?php echo $i; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo ($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])) ? '&start_date=' . urlencode($_GET['start_date']) . '&end_date=' . urlencode($_GET['end_date']) : ''; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer"><?php echo $i; ?></a>
                         <?php endif; ?>
                     <?php endfor; ?>
                     
                     <?php if ($end_page < $total_pages): ?>
                         <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">...</span>
-                        <a href="?page=<?php echo $total_pages; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer"><?php echo $total_pages; ?></a>
+                        <a href="?page=<?php echo $total_pages; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo ($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])) ? '&start_date=' . urlencode($_GET['start_date']) . '&end_date=' . urlencode($_GET['end_date']) : ''; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer"><?php echo $total_pages; ?></a>
                     <?php endif; ?>
                 </div>
 
                 <div class="flex items-center gap-2 cursor-pointer">
                     <?php if ($current_page < $total_pages): ?>
-                        <a href="?page=<?php echo $current_page + 1; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?>">
+                        <a href="?page=<?php echo $current_page + 1; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo ($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])) ? '&start_date=' . urlencode($_GET['start_date']) . '&end_date=' . urlencode($_GET['end_date']) : ''; ?>">
                             <img src="../assets/products/next.svg" class="w-[6px] h-[11px]" />
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Next</span>
                         </a>
@@ -348,72 +364,39 @@ $status_classes = [
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <script>
-    // Function to export table data to Excel
+    // Function to export table data to Excel - improved to export all orders
     function exportToExcel() {
-        // Get the table element
-        const table = document.querySelector('table');
+        // Let the user know that the export is being prepared
+        alert("Preparing Excel export with all order data...");
         
-        // Create a workbook and worksheet
-        const wb = XLSX.utils.book_new();
+        // Prepare parameters for the export request
+        let params = new URLSearchParams(window.location.search);
         
-        // Prepare data for export
-        const data = [];
+        // Create a new request to get all orders for export (without pagination)
+        let exportURL = 'export-orders.php';
         
-        // Get headers (excluding the last column with action buttons)
-        const headers = [];
-        const headerRow = table.querySelector('thead tr');
-        const headerCells = headerRow.querySelectorAll('th');
-        
-        // Skip the last column (actions)
-        for (let i = 0; i < headerCells.length - 1; i++) {
-            // Extract text content from span element if it exists
-            const spanElement = headerCells[i].querySelector('span');
-            if (spanElement) {
-                headers.push(spanElement.textContent.trim());
-            } else if (headerCells[i].textContent) {
-                headers.push(headerCells[i].textContent.trim());
+        // Add any existing filters
+        if (params.has('date')) {
+            exportURL += '?date=' + params.get('date');
+            
+            if (params.get('date') === 'custom' && params.has('start_date') && params.has('end_date')) {
+                exportURL += '&start_date=' + params.get('start_date') + '&end_date=' + params.get('end_date');
             }
         }
         
-        data.push(headers);
+        if (params.has('search')) {
+            exportURL += (exportURL.includes('?') ? '&' : '?') + 'search=' + params.get('search');
+        }
         
-        // Get rows data
-        const rows = table.querySelectorAll('tbody tr');
-        rows.forEach(row => {
-            const rowData = [];
-            const cells = row.querySelectorAll('td');
-            
-            // Skip the last column (actions)
-            for (let i = 0; i < cells.length - 1; i++) {
-                // For order ID cell, handle the nested span
-                if (i === 0) {
-                    const span = cells[i].querySelector('span');
-                    rowData.push(span ? span.textContent.trim() : '');
-                } 
-                // For status cell, get the button text
-                else if (i === 3) {
-                    const button = cells[i].querySelector('button');
-                    rowData.push(button ? button.textContent.trim() : '');
-                } 
-                // For other cells, get the text content
-                else {
-                    rowData.push(cells[i].textContent.trim());
-                }
-            }
-            
-            data.push(rowData);
-        });
+        if (params.has('status')) {
+            exportURL += (exportURL.includes('?') ? '&' : '?') + 'status=' + params.get('status');
+        }
         
-        // Create worksheet from data
-        const ws = XLSX.utils.aoa_to_sheet(data);
+        // Append 'export=true' to indicate we want all records
+        exportURL += (exportURL.includes('?') ? '&' : '?') + 'export=true';
         
-        // Add worksheet to workbook
-        XLSX.utils.book_append_sheet(wb, ws, 'Orders');
-        
-        // Generate Excel file and trigger download
-        const today = new Date();
-        const dateStr = today.toISOString().split('T')[0];
-        XLSX.writeFile(wb, Orders_Export_${dateStr}.xlsx);
+        // Redirect to the export script
+        window.location.href = exportURL;
     }
     
     // Function to toggle order menu
@@ -457,9 +440,9 @@ $status_classes = [
         
         // Preserve any existing search parameter
         const searchParam = new URLSearchParams(window.location.search).get('search');
-        const searchQueryString = searchParam ? &search=${searchParam} : '';
+        const searchQueryString = searchParam ? `&search=${searchParam}` : '';
         
-        window.location.href = ?date=custom&start_date=${startDate}&end_date=${endDate}${searchQueryString};
+        window.location.href = `?date=custom&start_date=${startDate}&end_date=${endDate}${searchQueryString}`;
     }
 
     // Document ready function
@@ -467,7 +450,7 @@ $status_classes = [
         // Add event listener to custom date selector
         const dateFilter = document.getElementById('dateFilter');
         if (dateFilter) {
-            dateFilter.addEventListener('change', function() {
+            dateFilter.addEventListener('change', function(event) {
                 if (this.value === 'custom') {
                     // Prevent form submission for custom date
                     event.preventDefault();
