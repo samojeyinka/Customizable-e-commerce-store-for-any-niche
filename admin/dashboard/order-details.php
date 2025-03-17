@@ -64,12 +64,13 @@ $items_sql = "SELECT
                 p.product_name,
                 pv.size,
                 pv.texture,
-                pi.image_path
+                pi.image_path AS main_image,
+                pi.image_id
             FROM order_items oi
             LEFT JOIN products p ON oi.product_id = p.product_id
             LEFT JOIN product_variants pv ON oi.variant_id = pv.variant_id
             LEFT JOIN (
-                SELECT product_id, image_path 
+                SELECT product_id, image_path, image_id
                 FROM product_images 
                 WHERE is_main = 1
             ) pi ON oi.product_id = pi.product_id
@@ -82,6 +83,11 @@ if (!$items_result) {
 
 $order_items = $items_result->fetch_all(MYSQLI_ASSOC);
 
+// Define a domain constant like in cart.php if not already defined
+if (!defined('DOMAIN')) {
+    define('DOMAIN', '../../'); // Adjust this based on your actual domain setup
+}
+
 // Calculate total quantity and amount
 $total_quantity = 0;
 $total_amount = 0;
@@ -91,9 +97,14 @@ foreach ($order_items as &$item) {
     $total_quantity += $item['quantity'];
     $total_amount += $item['total_price'];
     
-    // Set default image if no main image found
-    if (empty($item['image_path'])) {
-        $item['image_path'] = '../assets/products/default-product.jpg';
+    // Handle product image path - adjust based on admin dashboard location
+    // If image_path is stored as relative path in DB
+    if (!empty($item['image_path'])) {
+        // For admin/dashboard location, need to go up two levels
+        $item['image_url'] = "../../assets/products/" . basename($item['image_path']);
+    } else {
+        // Default image if none found
+        $item['image_url'] = "../../assets/products/default.svg";
     }
 }
 
@@ -192,7 +203,9 @@ $status_class = $status_classes[$order['order_status']] ?? 'bg-[#E8B006]';
                             <?php foreach ($order_items as $item): ?>
                                 <tr class="border-b border-gray-200">
                                     <td class="p-3">
-                                        <img src="<?php echo htmlspecialchars($item['image_path']); ?>" alt="Product Image" class="w-16 h-16 object-cover rounded-md">
+                                        <img src="<?php echo !empty($item['main_image']) ? DOMAIN . '/assets/products/' . $item['main_image'] : DOMAIN . '/assets/products/default.svg'; ?>" 
+                                            alt="<?php echo htmlspecialchars($item['product_name']); ?>" 
+                                            class="w-16 h-16 object-cover rounded-md">
                                     </td>
                                     <td class="p-3">
                                         <p class="text-[15px] font-semibold"><?php echo htmlspecialchars($item['product_name']); ?></p>
