@@ -2,6 +2,16 @@
 
 ?>
 
+<style>
+    .actionstab{
+        display: none;
+    }
+
+    .productbox:hover  .actionstab{
+            display: block;
+    }
+</style>
+
 <div class="w-[90%] mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4 my-4">
     <!-- The products cards -->
     <?php if (mysqli_num_rows($result) > 0): ?>
@@ -79,7 +89,9 @@
 <script>
 
 
-const route = 'https://victosah.com';
+//const route = 'https://victosah.com';
+
+const route = 'http://localhost/victosah';
     
 document.addEventListener('DOMContentLoaded', function() {
     // Cart toggle functionality

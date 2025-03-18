@@ -113,29 +113,32 @@ if(isset($_POST['login'])) {
                 type="email"
                 name="email"
                 id="email"
+                required
                 placeholder="Enter your email address"
                 class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
         </div>
 
         <div class="flex flex-col gap-1">
-            <label
-                for="password"
-                class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                Password
-            </label>
+    <label
+        for="password"
+        class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+        Password
+    </label>
 
-            <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-                <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    placeholder="Enter your password"
-                    class="w-full font-['Open Sans'] bg-transparent outline-none font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                <img src="<?php echo DOMAIN; ?>/assets/global/eye.svg" id="togglePassword" class="w-[24px] cursor-pointer" />
-            </div>
-        </div>
+    <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
+        <input
+            type="password"
+            name="password"
+            id="signinpassword"
+            placeholder="Enter your password"
+            required
+            class="w-full font-['Open Sans'] bg-transparent outline-none font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
+        <img src="<?php echo DOMAIN; ?>/assets/global/eye-slash.svg" id="showPasswordIcon" class="w-[24px] cursor-pointer" />
+        <img src="<?php echo DOMAIN; ?>/assets/global/eye.svg" id="hidePasswordIcon" class="w-[24px] cursor-pointer hidden" />
+    </div>
+</div>
 
-        <p id="openPassordRqMail" class='text-[14px] font-["Open Sans"] text-[#1A237E] font-regular cursor-pointer'>Forgot Password?</p>
+ <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-[14px] font-['Open Sans'] text-[#1A237E] font-regular cursor-pointer">Forgot Password</a>
 
         <button type="submit" name="login" class="w-full py-[8px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Sign In</button>
     </form>
@@ -156,16 +159,46 @@ if(isset($_POST['login'])) {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Password toggle
-    const togglePassword = document.getElementById('togglePassword');
-    const password = document.getElementById('password');
+    const showPasswordIcon = document.getElementById('showPasswordIcon');
+    const hidePasswordIcon = document.getElementById('hidePasswordIcon');
+    const signinpassword = document.getElementById('signinpassword');
     
-    if(togglePassword && password) {
-        togglePassword.addEventListener('click', function() {
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
+    if(showPasswordIcon && hidePasswordIcon && password) {
+        // Show password (eye icon clicked)
+        showPasswordIcon.addEventListener('click', function() {
+            // Debug
+            console.log('Show password clicked');
+            
+            // Important: This actually changes the password field to show text
+            signinpassword.type = 'text';
+            
+            // Toggle icon visibility
+            showPasswordIcon.classList.add('hidden');
+            hidePasswordIcon.classList.remove('hidden');
+        });
+        
+        // Hide password (eye-slash icon clicked)
+        hidePasswordIcon.addEventListener('click', function() {
+            // Debug
+            console.log('Hide password clicked');
+            
+            // Important: This actually changes the password field back to hide text
+            signinpassword.type = 'password';
+            
+            // Toggle icon visibility
+            hidePasswordIcon.classList.add('hidden');
+            showPasswordIcon.classList.remove('hidden');
+        });
+    }
+    
+    // Close danger alert if present
+    const closeDangerAlert = document.getElementById('closedangeralert');
+    const dangerAlert = document.getElementById('dangeralert');
+    
+    if(closeDangerAlert && dangerAlert) {
+        closeDangerAlert.addEventListener('click', function() {
+            dangerAlert.style.display = 'none';
         });
     }
 });
-    
-   
 </script>

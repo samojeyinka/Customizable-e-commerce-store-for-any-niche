@@ -7,16 +7,16 @@
                     <div class="reviews-wrapper">
                         <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
 
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
+                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I’ve had a great shopping experience! Easy to navigate, fast checkout, and the quality of the products is unbeatable</p>
                             <div class="flex items-center gap-1">
                                 <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
                                 <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
                                 <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
                                 <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
                             </div>
 
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
+                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Ogundipe K.</p>
 
                         </div>
 
@@ -37,7 +37,7 @@
 
                         <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
 
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
+                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I bought a beautiful chandelier for my living room, and it completely transformed the space. </p>
                             <div class="flex items-center gap-1">
                                 <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
                                 <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
@@ -46,9 +46,26 @@
                                 <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
                             </div>
 
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
+                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Faith N.</p>
 
                         </div>
+
+                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
+
+                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I bought a beautiful chandelier for my living room, and it completely transformed the space.   </p>
+                            <div class="flex items-center gap-1">
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                            </div>
+
+                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Nneka M.</p>
+
+                        </div>
+
+                     
 
                         <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
 
@@ -61,69 +78,11 @@
                                 <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
                             </div>
 
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
+                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Adeola O.</p>
 
                         </div>
 
-                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
-
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
-                            <div class="flex items-center gap-1">
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                            </div>
-
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
-
-                        </div>
-
-                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
-
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
-                            <div class="flex items-center gap-1">
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                            </div>
-
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
-
-                        </div>
-
-                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
-
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
-                            <div class="flex items-center gap-1">
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                            </div>
-
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
-
-                        </div>
-
-                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
-
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
-                            <div class="flex items-center gap-1">
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                            </div>
-
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
-
-                        </div>
+    
 
 
                     </div>
@@ -133,7 +92,7 @@
                     <div class="reviews-wrapper">
                         <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
 
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
+                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I ordered a set of pillows super comfy and they match my bedroom décor a. Delivery was fast too. </p>
                             <div class="flex items-center gap-1">
                                 <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
                                 <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
@@ -142,7 +101,37 @@
                                 <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
                             </div>
 
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
+                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">—Jenneans D.</p>
+
+                        </div>
+
+                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
+
+                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular"> I’ve been looking for high-quality bedding for a while and finally found the perfect duvets here </p>
+                            <div class="flex items-center gap-1">
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                            </div>
+
+                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Akin L.</p>
+
+                        </div>
+
+                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
+
+                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">The chandeliers I ordered transformed my living room. They are so elegant and add the perfect touch of class to my home </p>
+                            <div class="flex items-center gap-1">
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
+                            </div>
+
+                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Samuel O.</p>
 
                         </div>
 
@@ -157,99 +146,11 @@
                                 <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
                             </div>
 
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
+                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— — Khadijat N.</p>
 
                         </div>
 
-                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
-
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
-                            <div class="flex items-center gap-1">
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                            </div>
-
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
-
-                        </div>
-
-                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
-
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
-                            <div class="flex items-center gap-1">
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                            </div>
-
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
-
-                        </div>
-
-                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
-
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
-                            <div class="flex items-center gap-1">
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                            </div>
-
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
-
-                        </div>
-
-                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
-
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
-                            <div class="flex items-center gap-1">
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                            </div>
-
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
-
-                        </div>
-
-                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
-
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
-                            <div class="flex items-center gap-1">
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                            </div>
-
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
-
-                        </div>
-
-                        <div class="review flex flex-col gap-2 rounded-[8px] p-3 bg-[#FFFFFF]">
-
-                            <p class="text-[#777777]  text-[14px] md:text-[15px] font-['Open Sans'] font-regular">I absolutely love the duvet I ordered! It's so soft, comfortable, and the perfect fit for my bed. The delivery was quick too. </p>
-                            <div class="flex items-center gap-1">
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                            </div>
-
-                            <p class="text-[#0E1345]  text-[15px] md:text-[16px] font-['Open Sans'] font-medium">— Chiamaka O.</p>
-
-                        </div>
+                  
 
 
                     </div>

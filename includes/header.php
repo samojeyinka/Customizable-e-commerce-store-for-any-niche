@@ -69,19 +69,6 @@ if(isset($_GET['logout'])) {
 
 
 
-    <!-- The password resets directories -->
-
-    <?php
-    // include('./includes/auth/password-reset/password-request-mail.php');
-    // include('./includes/auth/password-reset/password-request-verify.php');
-    // include('./includes/auth/password-reset/password-request-new-password.php');
-    // include('./includes/auth/password-reset/password-request-success.php');
-    include(__DIR__ . '/auth/password-reset/password-request-mail.php');
-include(__DIR__ . '/auth/password-reset/password-request-verify.php');
-include(__DIR__ . '/auth/password-reset/password-request-new-password.php');
-include(__DIR__ . '/auth/password-reset/password-request-success.php');
-
-    ?>
 
 </header>
 

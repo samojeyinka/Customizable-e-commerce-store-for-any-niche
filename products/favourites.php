@@ -9,7 +9,7 @@ include(__DIR__ . '/../config/products.php');
 // Check if user is logged in
 if (!isAuthenticated()) {
     // Redirect to login page
-    header('Location: /includes/auth/login/signin.php');
+    header('Location: ' . DOMAIN . '/includes/auth/login/signin.php');
     exit;
 }
 

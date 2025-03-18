@@ -44,7 +44,7 @@ if (isset($_POST['send'])) {
             echo "
             <script>
             alert('This email is already registered. Please sign in instead.');
-            document.location.href='signin.php';
+            document.location.href='../login/signin.php';
             </script>
             ";
             exit();

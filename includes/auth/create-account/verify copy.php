@@ -1,15 +1,13 @@
 <?php
-
 require_once "../../../config/config.php";
 
-// Start session at the beginning before any output
-session_start();
 
 // If user is already logged in, redirect to dashboard
 if(isset($_SESSION['user_id'])) {
     header("Location: " . DOMAIN . "/user/orders.php");
     exit();
 }
+session_start();
 
 // Include PHPMailer at the top of the file
 require './phpmailer/src/Exception.php';
@@ -30,12 +28,8 @@ if($conn->connect_error){
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Initialize message variables
-$error_message = "";
-$success_message = "";
-
-// Process OTP verification - only if it's a POST request
-if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
+// Process OTP verification
+if(isset($_POST['verify'])) {
     // Combine the 4 OTP digits
     $digit1 = $_POST['digit1'];
     $digit2 = $_POST['digit2'];
@@ -79,11 +73,18 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
                 $login_stmt->bind_param("i", $user['id']);
                 $login_stmt->execute();
                 
-                // Redirect instead of using JavaScript alert
-                header("Location: " . DOMAIN . "/user/orders.php");
-                exit();
+                echo "
+                <script>
+                alert('Account verification successful! You are now logged in.');
+                document.location.href='../../../../dashboard.php';
+                </script>
+                ";
             } else {
-                $error_message = "Error updating account status";
+                echo "
+                <script>
+                alert('Error updating account status');
+                </script>
+                ";
             }
         } else {
             // Check if OTP is expired
@@ -94,107 +95,27 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
             $expired_result = $expired_stmt->get_result();
             
             if($expired_result->num_rows > 0) {
-                $error_message = "OTP has expired. Please request a new one.";
-            } else {
-                $error_message = "Invalid OTP. Please try again.";
-            }
-        }
-    } else {
-        // Redirect to registration page if session expired
-        header("Location: ./create-account/signup.php");
-        exit();
-    }
-}
-
-// Process resend OTP code - only if it's a POST request
-if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
-    if(isset($_SESSION['email'])) {
-        $email = $_SESSION['email'];
-        
-        // Generate new OTP
-        $new_otp = rand(1000, 9999);
-        
-        // Update OTP in database
-        $update_sql = "UPDATE users SET otp = ?, otp_send_time = NOW() WHERE email = ? AND status = 'pending'";
-        $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("ss", $new_otp, $email);
-        
-        if($update_stmt->execute()) {
-            // Send email with PHPMailer
-            $mail = new PHPMailer(true);
-            
-            try {
-                // Server settings
-                $mail->SMTPDebug = 0;
-                $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = 'samuelojeyinka@gmail.com';
-                $mail->Password   = 'teir bvqp ijrx rijl';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
-                $mail->Timeout    = 60;
-                $mail->SMTPKeepAlive = true;
-                
-                $mail->SMTPOptions = array(
-                    'ssl' => array(
-                        'verify_peer' => false,
-                        'verify_peer_name' => false,
-                        'allow_self_signed' => true
-                    )
-                );
-                
-                // Recipients
-                $mail->setFrom('samuelojeyinka@gmail.com', 'Victosah');
-                $mail->addAddress($email);
-                
-                // Content
-                $mail->isHTML(true);
-                $mail->Subject = 'Your New OTP Verification Code';
-                $mail->Body    = "
-                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;'>
-                    <h2 style='color: #1A237E; text-align: center;'>Victosah Solution</h2>
-                    <p style='font-size: 16px; line-height: 1.5;'>Hello,</p>
-                    <p style='font-size: 16px; line-height: 1.5;'>You requested a new verification code. Please use the following OTP code:</p>
-                    <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
-                        {$new_otp}
-                    </div>
-                    <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this code, please ignore this email.</p>
-                    <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
-                </div>
+                echo "
+                <script>
+                alert('OTP has expired. Please request a new one.');
+                </script>
                 ";
-                $mail->AltBody = "Your new OTP Verification code is: {$new_otp}";
-                
-                $mail->send();
-                
-                // Set success message
-                $success_message = "New verification code has been sent to your email.";
-                
-                // Redirect to prevent form resubmission
-                header("Location: " . $_SERVER['PHP_SELF'] . "?resent=1");
-                exit();
-            } catch(Exception $e) {
-                $error_message = "Error sending email: {$mail->ErrorInfo}";
+            } else {
+                echo "
+                <script>
+                alert('Invalid OTP. Please try again.');
+                </script>
+                ";
             }
-        } else {
-            $error_message = "Error updating OTP";
         }
     } else {
-        // Redirect to registration page if session expired
-        header("Location: ../create-account/signup.php");
-        exit();
+        echo "
+        <script>
+        alert('Session expired. Please register again.');
+        document.location.href='index.php';
+        </script>
+        ";
     }
-}
-
-// Display messages based on URL parameter after redirect
-if(isset($_GET['resent']) && $_GET['resent'] == 1) {
-    $success_message = "New verification code has been sent to your email.";
-}
-
-// Check if email is stored in session, if not - redirect to registration
-if(!isset($_SESSION['email'])) {
-    header("Location: ../create-account/signup.php");
-    exit();
 }
 
 // Resend OTP code
@@ -282,7 +203,7 @@ if(isset($_POST['resend'])) {
         echo "
         <script>
         alert('Session expired. Please register again.');
-        document.location.href='../create-account/signup.php';
+        document.location.href='index.php';
         </script>
         ";
     }
@@ -293,7 +214,7 @@ if(!isset($_SESSION['email'])) {
     echo "
     <script>
     alert('Please complete registration first.');
-    document.location.href='../create-account/signup.php';
+    document.location.href='index.php';
     </script>
     ";
 }
@@ -321,7 +242,7 @@ if(!isset($_SESSION['email'])) {
         include(__DIR__ . '/../../options.php');
         ?>
     <div class="w-full">
-    <div class="w-[95%] md:w-[50%] mx-auto p-4 bg-white border border-[1px] border-[#EFEFEF] my-5 rounded-md">
+    <div class="md:w-[50%] mx-auto p-4 bg-white border border-[1px] border-[#EFEFEF] my-5 rounded-md">
             <!-- <img src="../../../assets/global/back.svg" alt="back" id="backtoreg" class="w-[26px] md:w-[32px] absolute left-4 cursor-pointer" />
              -->
             <p class="font-['Open Sans'] text-[19px] text-[24px] font-medium text-center">
@@ -394,67 +315,53 @@ if(!isset($_SESSION['email'])) {
 
 <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/inputs.js"></script>
 <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/accordion.js"></script>
-   <script>
-   // OTP input handling - auto-focus next input
-document.addEventListener('DOMContentLoaded', function() {
-    const otpInputs = document.querySelectorAll('.otp-input');
-    
-    otpInputs.forEach((input, index) => {
-        input.addEventListener('input', function(e) {
-            // Allow only numbers
-            this.value = this.value.replace(/[^0-9]/g, '');
+    <script>
+        // OTP input handling - auto-focus next input
+        const otpInputs = document.querySelectorAll('.otp-input');
+        
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                // Allow only numbers
+                this.value = this.value.replace(/[^0-9]/g, '');
+                
+                // Move to next input after entering a digit
+                if (this.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
             
-            // Move to next input after entering a digit
-            if (this.value.length === 1 && index < otpInputs.length - 1) {
-                otpInputs[index + 1].focus();
-            }
+            // Handle backspace - move to previous input
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && index > 0 && this.value.length === 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
         });
         
-        // Handle backspace - move to previous input
-        input.addEventListener('keydown', function(e) {
-            if (e.key === 'Backspace' && index > 0 && this.value.length === 0) {
-                otpInputs[index - 1].focus();
-            }
-        });
-    });
-    
-    // Back button functionality - only if element exists
-    const backToRegButton = document.getElementById('backtoreg');
-    if (backToRegButton) {
-        backToRegButton.addEventListener('click', function() {
+        // Back button functionality
+        document.getElementById('backtoreg').addEventListener('click', function() {
             window.location.href = 'index.php';
         });
-    }
-    
-    // Countdown timer for resend
-    let countdownTime = 60;
-    const countdownElement = document.getElementById('countdown');
-    const countdownTextElement = document.getElementById('countdown-text');
-    const resendLink = document.getElementById('resendLink');
-    
-    // Make sure all elements exist before setting up the countdown
-    if (countdownElement && countdownTextElement && resendLink) {
-        // Initialize countdown display
-        countdownElement.textContent = countdownTime;
         
-        // Make sure the initial state is correct
-        countdownTextElement.classList.remove('hidden');
-        resendLink.classList.add('hidden');
+         // Countdown timer for resend
+         let countdownTime = 60;
+        const countdownElement = document.getElementById('countdown');
+        const countdownTextElement = document.getElementById('countdown-text');
+        const resendLink = document.getElementById('resendLink');
         
         function updateCountdown() {
+            countdownElement.textContent = countdownTime;
+            
             if (countdownTime <= 0) {
                 clearInterval(countdownInterval);
                 countdownTextElement.classList.add('hidden');
                 resendLink.classList.remove('hidden');
             } else {
                 countdownTime--;
-                countdownElement.textContent = countdownTime;
             }
         }
         
         const countdownInterval = setInterval(updateCountdown, 1000);
-    }
-});
-   </script>
+    </script>
 </body>
 </html>
