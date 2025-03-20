@@ -144,7 +144,7 @@ if (!defined('DOMAIN')) {
                 <div class="flex flex-col gap-2">
                     <h1 class="text-[#262626] text-[20px] md:text-[24px] font-['Montserrat'] font-medium">Get on the List</h1>
                     <p class="text-[#777777] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Sign up to know when we have new products</p>
-
+                    <div id="response-message"></div>
                     <form id="subscription-form" class="flex items-center gap-2 mt-2">
                         <div class="flex items-center gap-2 border-[1px] border-[#B8BBD7] rounded-[4px] p-1">
                             <input type="text" placeholder="Enter your email address"  name="email" 
@@ -154,7 +154,7 @@ if (!defined('DOMAIN')) {
                             Subscribe
                         </button>
                     </form>
-                    <div id="response-message"></div>
+                 
                 </div>
 
             </div>

@@ -148,7 +148,6 @@ $status_classes = [
 ];
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -166,35 +165,12 @@ $status_classes = [
     <link rel="stylesheet" href="../styles/dash.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <title>Orders</title>
-
-    <style>
-        .adminordersMenu{
-            position: absolute;
-            left: -10rem;
-         min-width: 10rem;
-         min-height: 10rem;
-           height: 100%;
-           z-index: 2;
-        }
-    </style>
-
 </head>
 
-
 <body class="relative">
-
-<?php
-include "./header.php";
-include "./sidebar.php"
-?>
-
-
-  
-
-
     <div id="main" class="md:p-4 flex flex-col gap-3 bg-[#FAFAFA]">
         <div class="w-full rounded-[16px] bg-white mx-auto p-2">
-            <h1 class="md:hidden  text-[18px] font-Onest font-semibold mb-3 md:mb-0">Orders</h1>
+            <h1 class="md:hidden text-[18px] font-Onest font-semibold mb-3 md:mb-0">Orders</h1>
 
             <div id="myBtn" class="w-full md:w-[274px] border-[1px] border-[#F3F3F3] cursor-pointer rounded-[8px] p-2 flex justify-between items-center">
                 <h1 class="text-[16px] font-Onest font-regular">Orders Overview</h1>
@@ -202,9 +178,6 @@ include "./sidebar.php"
             </div>
         </div>
 
-
-
-     
         <div class="w-full rounded-[16px] bg-white mx-auto p-3">
             <div id="myBtn" class="w-full flex flex-col md:flex-row md:items-center gap-3 md:gap-5 justify-between">
                 <div class="flex items-center gap-0">
@@ -243,32 +216,34 @@ include "./sidebar.php"
                                        <option value="today" <?php echo $date_filter == 'today' ? 'selected' : ''; ?>>Today</option>
                                        <option value="last7days" <?php echo $date_filter == 'last7days' ? 'selected' : ''; ?>>Last 7 days</option>
                                        <option value="last28days" <?php echo $date_filter == 'last28days' ? 'selected' : ''; ?>>Last 28 days</option>
-                        
+                                       <option value="custom" <?php echo $date_filter == 'custom' ? 'selected' : ''; ?>>Custom date</option>
                                    </select>
                                </form>
                                
-                             
+                               <!-- Only show the custom date button when custom is selected -->
+                               <?php if($date_filter == 'custom'): ?>
+                               <button onclick="showCustomDatePicker()" class="text-[13px] text-blue-700 hover:underline">Change dates</button>
+                               <?php endif; ?>
                            </div>
                         </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-1 shrink-0">
-                    <img src="../assets/dash/Path.svg" />
+                    <div class="flex items-center gap-1">
                         <a href="?date=all">
+                            <img src="../assets/dash/Path.svg" />
                             <span class="text-[#262626] text-[14px] font-Onest font-regular">Clear filter</span>
                         </a>
                     </div>
 
-                    <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer shrink-0">
+                    <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
                         <img src="../assets/dash/send-square.svg" />
                         Export as Excel
                     </button>
                 </div>
             </div>
 
-            
-            <div class="overflow-x-auto mt-3 h-[33rem]">
+            <div class="overflow-x-auto mt-3 min-h-[20rem]">
                 <table cols="" class="w-full shrink-0">
                     <thead class="w-full bg-[#E7E7E7] text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
                         <th class="text-nowrap p-2 flex items-center gap-2">
@@ -315,19 +290,18 @@ include "./sidebar.php"
                                     <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo htmlspecialchars($order['delivery_method'] ?? 'Express Delivery'); ?></td>
                                     <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo htmlspecialchars($order['formatted_date'] . ' ' . $order['formatted_time']); ?></td>
                                     <td class="relative">
-                                        <img src="../assets/user/action.svg" class="w-[20px] cursor-pointer" onclick="openAdminOrderMenu(this)" />
+                                        <img src="../assets/user/action.svg" class="w-[20px] cursor-pointer" onclick="openOrdermenu(this)" />
 
-                                        <!-- The menu for each order  starts ---->
-                                        <div class="adminordersMenu h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
+                                        <!-- Order Menu (specific to this row) -->
+                                        <div class=" h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
     <div class="flex flex-col gap-3">
         <a href="./order-details.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-        <a href="../products/show.php?reorder=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">Update Order Status</a>
-        <a href="./track-order.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#E8B006]">Issue a Refund</a>
-        <a href="./report-issue.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#D93939]">Cancel Order</a>
+        <a href="../products/show.php?reorder=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
+        <a href="./track-order.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">Track Order</a>
+        <a href="../products/review.php?order=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">Leave a review</a>
+        <a href="./report-issue.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#E8B006]">Report an issue</a>
     </div>
 </div>
-
-  <!-- The menu for each order  ends ---->
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -335,8 +309,9 @@ include "./sidebar.php"
                     </tbody>
                 </table>
             </div>
+        </div>
 
-            <div class="w-[90%] md:w-full py-2 mx-auto flex flex-col gap-2 md:flex-row md:items-center justify-between">
+        <div class="w-[90%] md:w-full py-2 mx-auto flex flex-col gap-2 md:flex-row md:items-center justify-between">
             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">Showing <?php echo count($orders); ?> results from <?php echo $total_count; ?></span>
             <div class="w-full md:w-[fit-content] ml-auto flex items-center justify-between gap-5">
                 <div class="flex items-center gap-2 cursor-pointer">
@@ -371,219 +346,123 @@ include "./sidebar.php"
                     <?php endif; ?>
                 </div>
 
-                <div class="flex items-center gap-2 cursor-pointer shrink-0">
+                <div class="flex items-center gap-2 cursor-pointer">
                     <?php if ($current_page < $total_pages): ?>
-                        <a href="?page=<?php echo $current_page + 1; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo ($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])) ? '&start_date=' . urlencode($_GET['start_date']) . '&end_date=' . urlencode($_GET['end_date']) : ''; ?>" class="shrink-0 text-nowrap">
+                        <a href="?page=<?php echo $current_page + 1; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo ($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])) ? '&start_date=' . urlencode($_GET['start_date']) . '&end_date=' . urlencode($_GET['end_date']) : ''; ?>">
                             <img src="../assets/products/next.svg" class="w-[6px] h-[11px]" />
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Next</span>
                         </a>
                     <?php else: ?>
-                        
-                        <img src="../assets/products/next.svg" class="w-[6px] h-[11px] opacity-50 " />
+                        <img src="../assets/products/next.svg" class="w-[6px] h-[11px] opacity-50" />
                         <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular opacity-50">Next</span>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
-     
-    </div>
     </div>
 
-
-
-    <!-- The modals starts -->
-    <div id="myModal" class="modal reg">
-        <!-- Modal content -->
-        <div class="modal-content overflow-hidden p-4">
-            <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Order Overview</h1>
-            <img src="../assets/global/close-circle.svg" alt="close" id="closeauth" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
-
-
-            <div class="flex items-center gap-3 my-4">
-            <span class="text-[#2c2c2c] text-[14px] md:text-[16px] font-Onest font-medium">Sort by:</span>
-
-            <div class="flex items-center gap-2 md:gap-3 lg:gap-4">
-                <div class="custom-dropdown">
-                    <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
-                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">2025</span>
-                        <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                    </div>
-                    <div class="dropdown-content">
-                        <div class="flex items-center gap-3">
-                            <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                <div onclick="selectOption(this)">2025</div>
-                                <div onclick="selectOption(this)">2024</div>
-                                <div onclick="selectOption(this)">2023</div>
-                                <div onclick="selectOption(this)">2022</div>
-
-
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="custom-dropdown">
-                    <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
-                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Last 28 days</span>
-                        <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                    </div>
-                    <div class="dropdown-content">
-                        <div class="flex items-center gap-3">
-                            <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                <div onclick="selectOption(this)">Today</div>
-                                <div onclick="selectOption(this)">Last 7 days</div>
-                                <div onclick="selectOption(this)">Last 28 days</div>
-                                <div onclick="selectOption(this)">Custom date</div>
-
-
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-            <div class="grid grid-cols-1 md:grid-cols-2  p-2 gap-4 mt-2">
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/illu.svg" class="w-full h-full" />
-                    </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Orders</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">53,000</h2>
-                            <!-- <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">Listed items</p> -->
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/decrease.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#D93939]">+12%</span> from last 28 days</p>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/illu.svg" class="w-full h-full" />
-                    </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Completed Orders</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">52,370</h2>
-                            <!-- <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">items need restocking</p> -->
-                        </div>
-
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#39D959]">+12%</span> from last 28 days</p>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/illu.svg" class="w-full h-full" />
-                    </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Pending Orders</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">430</h2>
-                            <!-- <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">available for purchase</p> -->
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/decrease.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#D93939]">+12%</span> from last 28 days</p>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
-                    </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Returned Orders</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">200</h2>
-                            <!-- <p class="text-[#1A237E] text-[14px] text-[15px] font-regular font-['Open Sans']">products have less than 5 items left</p> -->
-                        </div>
-
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#39D959]">+12%</span> from last 28 days</p>
-                        </div>
-
-                    </div>
-                </div>
-
-
-            </div>
-
-            ​
-        </div>
-
-    </div>
-
-    <!-- The modals ends -->
-
-
-
-
-
-
-    <script type="text/javascript" src="../functions/drop-select.js"></script>
-    <script type="text/javascript" src="../functions/order.js"></script>
-    <script type="text/javascript" src="../functions/dash.js"></script>
-    <script type="text/javascript" src="../functions/tab.js"></script>
-    <script type="text/javascript" src="../functions/overlay.js"></script>
-    <script type="text/javascript" src="../functions/ordermenu.js"></script>
-    <script type="text/javascript" src="../functions/nav.js"></script>
-
-<script>
-    function openAdminOrderMenu(element) {
-    // Find the closest parent td and then find the menu inside it
-  const menuContainer = element.closest('td').querySelector('.adminordersMenu');
+    <!-- Export to Excel functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    // Toggle the display of the menu
-    if (menuContainer.style.display === "block") {
-        menuContainer.style.display = "none";
-    } else {
-        // First, close all other open menus
-        document.querySelectorAll('.adminordersMenu').forEach(menu => {
-            menu.style.display = "none";
+    <script>
+    // Function to export table data to Excel - improved to export all orders
+    function exportToExcel() {
+        // Let the user know that the export is being prepared
+        alert("Preparing Excel export with all order data...");
+        
+        // Prepare parameters for the export request
+        let params = new URLSearchParams(window.location.search);
+        
+        // Create a new request to get all orders for export (without pagination)
+        let exportURL = 'export-orders.php';
+        
+        // Add any existing filters
+        if (params.has('date')) {
+            exportURL += '?date=' + params.get('date');
+            
+            if (params.get('date') === 'custom' && params.has('start_date') && params.has('end_date')) {
+                exportURL += '&start_date=' + params.get('start_date') + '&end_date=' + params.get('end_date');
+            }
+        }
+        
+        if (params.has('search')) {
+            exportURL += (exportURL.includes('?') ? '&' : '?') + 'search=' + params.get('search');
+        }
+        
+        if (params.has('status')) {
+            exportURL += (exportURL.includes('?') ? '&' : '?') + 'status=' + params.get('status');
+        }
+        
+        // Append 'export=true' to indicate we want all records
+        exportURL += (exportURL.includes('?') ? '&' : '?') + 'export=true';
+        
+        // Redirect to the export script
+        window.location.href = exportURL;
+    }
+    
+    // Function to toggle order menu
+    function openOrdermenu(element) {
+        // Close all other menus first
+        const allMenus = document.querySelectorAll('.ordermenu-content');
+        allMenus.forEach(menu => {
+            if (menu !== element.nextElementSibling) {
+                menu.classList.remove('showom');
+            }
         });
         
-        // Then open the clicked menu
-        menuContainer.style.display = "block";
+        // Toggle the clicked menu
+        element.nextElementSibling.classList.toggle('showom');
     }
-}
 
-// Add this to hide menus when clicking outside
-document.addEventListener('click', function(event) {
-    // Check if the click was outside any menu or menu trigger
-    if (!event.target.closest('.adminordersMenu') && !event.target.matches('img[onclick="openAdminOrderMenu(this)"]')) {
-        document.querySelectorAll('.adminordersMenu').forEach(menu => {
-            menu.style.display = "none";
-        });
-    }
-});
-
-// Make sure menus are hidden initially
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.adminordersMenu').forEach(menu => {
-        menu.style.display = "none";
+    // Close all menus when clicking elsewhere
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.ordermenu-content') && !event.target.matches('[onclick="openOrdermenu(this)"]')) {
+            const allMenus = document.querySelectorAll('.ordermenu-content');
+            allMenus.forEach(menu => {
+                menu.classList.remove('showom');
+            });
+        }
     });
-});
-</script>
 
+    // Function to show custom date picker
+    function showCustomDatePicker() {
+        const today = new Date();
+        const formattedToday = today.toISOString().split('T')[0];
+        
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        const formattedOneMonthAgo = oneMonthAgo.toISOString().split('T')[0];
+        
+        const startDate = prompt('Enter start date (YYYY-MM-DD):', formattedOneMonthAgo);
+        if (startDate === null) return;
+        
+        const endDate = prompt('Enter end date (YYYY-MM-DD):', formattedToday);
+        if (endDate === null) return;
+        
+        // Preserve any existing search parameter
+        const searchParam = new URLSearchParams(window.location.search).get('search');
+        const searchQueryString = searchParam ? `&search=${searchParam}` : '';
+        
+        window.location.href = `?date=custom&start_date=${startDate}&end_date=${endDate}${searchQueryString}`;
+    }
+
+    // Document ready function
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener to custom date selector
+        const dateFilter = document.getElementById('dateFilter');
+        if (dateFilter) {
+            dateFilter.addEventListener('change', function(event) {
+                if (this.value === 'custom') {
+                    // Prevent form submission for custom date
+                    event.preventDefault();
+                    showCustomDatePicker();
+                } else {
+                    // Submit form for other date options
+                    document.getElementById('dateFilterForm').submit();
+                }
+            });
+        }
+    });
+    </script>
 </body>
-
 </html>

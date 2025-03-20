@@ -122,31 +122,68 @@ $search_query = isset($_GET['search']) ? $_GET['search'] : '';
     <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
 
     <style>
-        .ordermenu-content {
-            display: none;
+   
+        .adminordersMenu{
             position: absolute;
-            top: 70%;
-            right:-50%;
-            min-width: 160px;
-            min-height: 10rem;
-            z-index: 5;
-            background-color: white !important;
-            border: 1px solid #E1E1E1;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 8px;
-            border-radius: 4px;
+            left: -10rem;
+         min-width: 10rem;
+         min-height: 10rem;
+           height: 100%;
+           z-index: 2;
         }
 
-        .showom {
-            display: block;
-        }
 
-        @media screen and (max-width:768px){
-            .ordermenu-content {
-                top: 100%;
-                right:0%;
-            }
-        }
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    
+    .modal-content {
+        position: relative;
+        margin: 10% auto;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .close {
+        color: #aaa;
+        font-weight: bold;
+    }
+    
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    
+    /* Active Status Styles */
+    .status-active {
+        background-color: #1A237E !important;
+    }
+    
+    .status-completed {
+        background-color: #39D959 !important;
+    }
+    
+    /* For cancelled orders */
+    .status-cancelled .status-icon {
+        background-color: #E1E1E1 !important;
+    }
+    
+    .status-cancelled .status-content h4,
+    .status-cancelled .status-content p {
+        color: #8F8F8F;
+    }
+
     </style>
 </head>
 
@@ -252,37 +289,46 @@ $search_query = isset($_GET['search']) ? $_GET['search'] : '';
                                     // Get image path or use placeholder
                                     $image_path = isset($item['image_path']) ? "../assets/products/" . $item['image_path'] : "../assets/products/img1.svg";
                                     
-                                    echo "
-                                    <tr>
-                                        <td class='py-3 flex gap-2'>
-                                            <div class='w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden'>
-                                                <img src='{$image_path}' class='w-full h-full object-cover' />
-                                            </div>
-                                            <div class='flex flex-col gap-[2px]'>
-                                                <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Name: {$item['product_name']}</p>
-                                                <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Color: {$color}</p>
-                                                <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Size: {$variant['size']}</p>
-                                            </div>
-                                        </td>
-                                        <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>₦" . number_format($item['price']) . "/{$item['quantity']}</td>
-                                        <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>#{$order['id']}</td>
-                                        <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order['delivery_method']}</td>
-                                        <td>
-                                            <button type='button' class='py-1 px-4 {$status_color} text-white text-[16px] font-[\"Open Sans\"] cursor-pointer rounded-[28px]'>{$status_text}</button>
-                                        </td>
-                                        <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order_date}</td>
-                                        <td class='relative'>
-                                            <img src='../assets/user/action.svg' class='w-[24px] ml-auto cursor-pointer' onclick='openOrdermenu(this)' />
-                                            <div class='ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]'>
-                                                <div class='flex flex-col gap-3'>
-                                                    <a href='../products/show.php?id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Re-Order</a>
-                                                    <a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Track Order</a>
-                                                    <a href='../products/review.php?id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>
-                                                    <a href='./report-issue.php?id={$order['id']}' class='text-[16px] font-medium text-[#E8B006]'>Report an issue</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>";
+                                  echo "
+<tr>
+    <td class='py-3 flex gap-2'>
+        <div class='w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden'>
+            <img src='{$image_path}' class='w-full h-full object-cover' />
+        </div>
+        <div class='flex flex-col gap-[2px]'>
+            <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Name: {$item['product_name']}</p>
+            <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Color: {$color}</p>
+            <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Size: {$variant['size']}</p>
+        </div>
+    </td>
+    <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>₦" . number_format($item['price']) . "/{$item['quantity']}</td>
+    <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>#{$order['id']}</td>
+    <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order['delivery_method']}</td>
+    <td>
+        <button type='button' class='py-1 px-4 {$status_color} text-white text-[16px] font-[\"Open Sans\"] cursor-pointer rounded-[28px]'>{$status_text}</button>
+    </td>
+    <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order_date}</td>
+    <td class='relative'>
+        <img src='../assets/user/action.svg' class='w-[20px] cursor-pointer openAdminOrderMenu' />
+
+        <!-- The menu for each order starts -->
+        <div class='adminordersMenu h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]'>
+            <div class='flex flex-col gap-3'>
+                <a href='../products/show.php?id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Re-Order</a>
+                <a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Track Order</a>";
+                
+if ($status_text == 'Delivered') {
+    echo "<a href='./write-review.php?order_id={$order['id']}&product_id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>";
+} else {
+    echo "<span class='text-[16px] font-medium text-gray-400 cursor-not-allowed' title='You can review this product after delivery'>Leave a review</span>";
+}
+
+echo "
+                <a href='./report-issue.php?id={$order['id']}' class='text-[16px] font-medium text-[#E8B006]'>Report an issue</a>
+            </div>
+        </div>
+    </td>
+</tr>";
                                     
                                     // Only show the first item for each order in desktop view
                                     break;
@@ -352,15 +398,7 @@ $search_query = isset($_GET['search']) ? $_GET['search'] : '';
                                     <div class='flex items-center justify-between relative'>
                                         <p class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order_date}</p>
                                         <img src='../assets/user/action.svg' class='w-[24px] ml-auto cursor-pointer' onclick='openOrdermenu(this)'/>
-                                        
-                                        <div class='ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]'>
-                                            <div class='flex flex-col gap-3'>
-                                                <a href='../products/show.php?id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Re-Order</a>
-                                                <a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Track Order</a>
-                                                <a href='../products/review.php?id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>
-                                                <a href='./report-issue.php?id={$order['id']}' class='text-[16px] font-medium text-[#E8B006]'>Report an issue</a>
-                                            </div>
-                                        </div>
+                                     
                                     </div>
                                     
                                     <div class='w-full h-[1px] bg-[#E1E1E1]'></div>
@@ -402,6 +440,114 @@ $search_query = isset($_GET['search']) ? $_GET['search'] : '';
         <?php
         include(__DIR__ . '/../includes/footer.php');
         ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- The order tracking modal starts here -->
+ <!-- Order Tracking Modal -->
+<div id="trackOrderModal" class="modal">
+    <div class="modal-content w-[90%] md:w-[80%] lg:w-[60%] mx-auto bg-white rounded-[8px] p-5">
+        <div class="modal-header flex justify-between items-center mb-4">
+            <h2 class="text-[18px] md:text-[20px] font-['Open Sans'] font-semibold">Track Order</h2>
+            <span class="close cursor-pointer text-[24px]">&times;</span>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Order Details -->
+            <div class="order-details bg-[#F8F9FB] p-4 rounded-[8px] mb-4">
+                <div class="flex flex-col md:flex-row justify-between mb-4">
+                    <div>
+                        <p class="text-[14px] text-[#262626] font-['Open Sans']">Order ID: <span id="modal-order-id" class="font-medium"></span></p>
+                        <p class="text-[14px] text-[#262626] font-['Open Sans']">Order Date: <span id="modal-order-date" class="font-medium"></span></p>
+                    </div>
+                    <div class="mt-2 md:mt-0">
+                        <p class="text-[14px] text-[#262626] font-['Open Sans']">Payment Ref: <span id="modal-payment-ref" class="font-medium"></span></p>
+                        <p class="text-[14px] text-[#262626] font-['Open Sans']">Delivery Method: <span id="modal-delivery-method" class="font-medium"></span></p>
+                    </div>
+                </div>
+                
+                <div id="modal-pickup-location-container" class="mb-4 hidden">
+                    <p class="text-[14px] text-[#262626] font-['Open Sans']">Pickup Location: <span id="modal-pickup-location" class="font-medium"></span></p>
+                </div>
+                
+                <div id="modal-status-notes-container" class="mb-4 hidden">
+                    <p class="text-[14px] text-[#262626] font-['Open Sans'] font-medium">Status Notes:</p>
+                    <p id="modal-status-notes" class="text-[14px] text-[#262626] font-['Open Sans'] bg-white p-2 rounded-[4px] mt-1"></p>
+                </div>
+            </div>
+            
+            <!-- Status Tracker -->
+            <div class="status-tracker p-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-[16px] font-['Open Sans'] font-semibold">Order Status</h3>
+                    <div id="modal-status-badge" class="py-1 px-4 bg-[#E8B006] text-white text-[14px] font-['Open Sans'] rounded-[28px]">Processing</div>
+                </div>
+                
+                <div class="tracker-timeline mt-6">
+                    <div class="relative">
+                        <!-- Status Line -->
+                        <div class="absolute left-6 top-0 w-[2px] h-full bg-[#E1E1E1]"></div>
+                        
+                        <!-- Processing Status -->
+                        <div class="status-item relative flex mb-8">
+                            <div id="processing-icon" class="status-icon w-[40px] h-[40px] rounded-full bg-[#1A237E] flex items-center justify-center z-10">
+                                <img src="../assets/user/clipboard-check.svg" alt="Processing" class="w-[20px] h-[20px]" />
+                            </div>
+                            <div class="status-content ml-4">
+                                <h4 class="text-[16px] font-['Open Sans'] font-semibold">Order Processing</h4>
+                                <p id="processing-date" class="text-[14px] text-[#262626] font-['Open Sans']">Not processed yet</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Shipped Status -->
+                        <div class="status-item relative flex mb-8">
+                            <div id="shipped-icon" class="status-icon w-[40px] h-[40px] rounded-full bg-[#E1E1E1] flex items-center justify-center z-10">
+                                <img src="../assets/user/shipping.svg" alt="Shipped" class="w-[20px] h-[20px]" />
+                            </div>
+                            <div class="status-content ml-4">
+                                <h4 class="text-[16px] font-['Open Sans'] font-semibold">Order Dispatched</h4>
+                                <p id="shipped-date" class="text-[14px] text-[#262626] font-['Open Sans']">Not shipped yet</p>
+                                <p id="shipped-notes" class="text-[14px] text-[#262626] font-['Open Sans'] hidden"></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Delivered Status -->
+                        <div class="status-item relative flex">
+                            <div id="delivered-icon" class="status-icon w-[40px] h-[40px] rounded-full bg-[#E1E1E1] flex items-center justify-center z-10">
+                                <img src="../assets/user/box.svg" alt="Delivered" class="w-[20px] h-[20px]" />
+                            </div>
+                            <div class="status-content ml-4">
+                                <h4 class="text-[16px] font-['Open Sans'] font-semibold">Order Delivered</h4>
+                                <p id="delivered-date" class="text-[14px] text-[#262626] font-['Open Sans']">Not delivered yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Items Preview -->
+            <div class="order-items mt-6">
+                <h3 class="text-[16px] font-['Open Sans'] font-semibold mb-3">Order Items</h3>
+                <div id="modal-order-items" class="flex flex-col gap-4">
+                    <!-- Order items will be populated here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+ <!-- The order tracking modal ends here -->
+
     </main>
 
     <script src="<?php echo DOMAIN; ?>/functions/modals.js"></script>
@@ -412,6 +558,74 @@ $search_query = isset($_GET['search']) ? $_GET['search'] : '';
     <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/faq.js"></script>
     <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/dropdown.js"></script>
     <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/openoptions.js"></script>
+
+  <script>
+    // Select all admin order menu triggers
+const adminOrderMenuButtons = document.querySelectorAll(".openAdminOrderMenu");
+
+// Add click event listeners to each button
+adminOrderMenuButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        // Find the closest parent td and then find the menu inside it
+        const menuContainer = this.closest('td').querySelector('.adminordersMenu');
+        
+        // Toggle the display of the menu
+        if (menuContainer.style.display === "block") {
+            menuContainer.style.display = "none";
+        } else {
+            // First, close all other open menus
+            document.querySelectorAll('.adminordersMenu').forEach(menu => {
+                menu.style.display = "none";
+            });
+            
+            // Then open the clicked menu
+            menuContainer.style.display = "block";
+        }
+    });
+});
+
+// Handle mobile order menus
+function openOrdermenu(element) {
+    const menuContent = element.nextElementSibling;
+    
+    // Toggle show class
+    if (menuContent.classList.contains('showom')) {
+        menuContent.classList.remove('showom');
+    } else {
+        // Close all other menus first
+        document.querySelectorAll('.ordermenu-content').forEach(menu => {
+            menu.classList.remove('showom');
+        });
+        
+        // Show this menu
+        menuContent.classList.add('showom');
+    }
+}
+
+// Close menus when clicking outside
+document.addEventListener('click', function(event) {
+    // Close admin order menus if clicking outside
+    if (!event.target.closest('.adminordersMenu') && !event.target.closest('.openAdminOrderMenu')) {
+        document.querySelectorAll('.adminordersMenu').forEach(menu => {
+            menu.style.display = "none";
+        });
+    }
+    
+    // Close mobile order menus if clicking outside
+    if (!event.target.closest('.ordermenu-content') && !event.target.matches('img[onclick="openOrdermenu(this)"]')) {
+        document.querySelectorAll('.ordermenu-content').forEach(menu => {
+            menu.classList.remove('showom');
+        });
+    }
+});
+
+// Make sure menus are hidden initially
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.adminordersMenu').forEach(menu => {
+        menu.style.display = "none";
+    });
+});
+  </script>
 </body>
 
 </html>

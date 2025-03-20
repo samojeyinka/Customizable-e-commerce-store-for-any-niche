@@ -108,6 +108,57 @@ if (!empty($variants)) {
         }
     }
 }
+
+
+// The reviews
+
+$avg_rating_sql = "SELECT ROUND(AVG(rating), 1) as avg_rating, COUNT(*) as total_reviews
+                  FROM reviews
+                  WHERE product_id = ? AND status = 'approved'";
+
+$stmt = mysqli_prepare($con, $avg_rating_sql);
+mysqli_stmt_bind_param($stmt, "i", $product_id);
+mysqli_stmt_execute($stmt);
+$avg_result = mysqli_stmt_get_result($stmt);
+$rating_data = mysqli_fetch_assoc($avg_result);
+
+$avg_rating = $rating_data['avg_rating'] ?: 0;
+$total_reviews = $rating_data['total_reviews'] ?: 0;
+
+// Get reviews for this product (limited to 4 for display)
+$reviews_sql = "SELECT r.review_id, r.rating, r.review_text, r.created_at,
+               CONCAT(p.first_name, ' ', LEFT(p.last_name, 1), '.') as reviewer_name,
+               p.profile_image
+               FROM reviews r
+               JOIN profiles p ON r.user_id = p.user_id
+               WHERE r.product_id = ? AND r.status = 'approved'
+               ORDER BY r.created_at DESC
+               LIMIT 4";
+
+$stmt = mysqli_prepare($con, $reviews_sql);
+mysqli_stmt_bind_param($stmt, "i", $product_id);
+mysqli_stmt_execute($stmt);
+$reviews_result = mysqli_stmt_get_result($stmt);
+$reviews = [];
+while ($row = mysqli_fetch_assoc($reviews_result)) {
+    $reviews[] = $row;
+}
+
+// Function to generate star rating HTML
+function generateStarRating($rating) {
+    $html = '<div class="flex items-center gap-1">';
+    for ($i = 1; $i <= 5; $i++) {
+        if ($i <= $rating) {
+            $html .= '<img src="' . DOMAIN . '/assets/products/star.svg" class="w-[16px]" />';
+        } else {
+            $html .= '<img src="' . DOMAIN . '/assets/products/lstar.svg" class="w-[16px]" />';
+        }
+    }
+    $html .= '</div>';
+    return $html;
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -298,99 +349,53 @@ display: none;
                     </div>
                 </div>
                  <!-- reviews starts -->
-                <div class="w-full border-b-[1.5px]  border-[#E1E1E1] hidden md:block">
-                    <div class="accordion w-full flex items-center justify-between">
+                 <div class="w-full border-b-[1.5px] border-[#E1E1E1] hidden md:block">
+    <div class="accordion w-full flex items-center justify-between">
+        <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">
+            View Reviews (<?php echo $total_reviews; ?>)
+        </span>
+    </div>
 
-                        <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">View Reviews (15)</span>
-                        
-
-
+    <div class="faqext flex flex-col gap-3">
+        <?php if (empty($reviews)): ?>
+            <div class="text-center py-4">
+                <p class="text-[#5B5B5B] text-[14px] font-['Montserrat']">No reviews yet for this product.</p>
+                
+                <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[#1A237E] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
+                <?php endif; ?>
+            </div>
+        <?php else: ?>
+            <?php foreach ($reviews as $review): ?>
+                <div class="flex flex-col gap-2 border-b-[1px] pb-1 border-[#E1E1E1]">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                        <?php 
+    // Use profile image if available, otherwise use default avatar
+    $reviewer_avatar = !empty($review['profile_image']) 
+        ? DOMAIN . '/' . $review['profile_image'] 
+        : DOMAIN . '/assets/global/avatar.svg'; 
+    ?>
+    <img src="<?php echo htmlspecialchars($reviewer_avatar); ?>" 
+         alt="<?php echo htmlspecialchars($review['reviewer_name']); ?>" 
+         class="w-[24px] h-[24px] rounded-full object-cover" />
+                            <span class="text-[#262626] text-[13px] md:text-[14px] font-['Montserrat'] font-medium"><?php echo htmlspecialchars($review['reviewer_name']); ?></span>
+                            <?php echo generateStarRating($review['rating']); ?>
+                        </div>
+                        <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular"><?php echo date('m/d/Y', strtotime($review['created_at'])); ?></span>
                     </div>
-
-                    <div class="faqext flex flex-col gap-3">
-
-                        <div class="flex flex-col gap-2 border-b-[1px] pb-1  border-[#E1E1E1]">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <img src="<?php echo DOMAIN; ?>/assets/global/avatar.svg" class="w-[24px]" />
-                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-['Montserrat'] font-medium">Favour</span>
-                                    <div class="flex items-center gap-1">
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                                    </div>
-                                </div>
-                                <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">11/05/2024</span>
-
-                            </div>
-                            <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">The softesr pillow ever, I also love how comfortable it is</span>
-                        </div>
-
-                        <div class="flex flex-col gap-2 border-b-[1px] pb-1  border-[#E1E1E1]">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <img src="<?php echo DOMAIN; ?>/assets/global/avatar.svg" class="w-[24px]" />
-                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-['Montserrat'] font-medium">Favour</span>
-                                    <div class="flex items-center gap-1">
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                                    </div>
-                                </div>
-                                <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">11/05/2024</span>
-
-                            </div>
-                            <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">The softesr pillow ever, I also love how comfortable it is</span>
-                        </div>
-
-                        <div class="flex flex-col gap-2 border-b-[1px] pb-1  border-[#E1E1E1]">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <img src="<?php echo DOMAIN; ?>/assets/global/avatar.svg" class="w-[24px]" />
-                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-['Montserrat'] font-medium">Favour</span>
-                                    <div class="flex items-center gap-1">
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                                    </div>
-                                </div>
-                                <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">11/05/2024</span>
-
-                            </div>
-                            <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">The softesr pillow ever, I also love how comfortable it is</span>
-                        </div>
-
-                        <div class="flex flex-col gap-2 border-b-[1px] pb-1  border-[#E1E1E1]">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <img src="<?php echo DOMAIN; ?>/assets/global/avatar.svg" class="w-[24px]" />
-                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-['Montserrat'] font-medium">Favour</span>
-                                    <div class="flex items-center gap-1">
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                                    </div>
-                                </div>
-                                <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">11/05/2024</span>
-
-                            </div>
-                            <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">The softesr pillow ever, I also love how comfortable it is</span>
-                        </div>
-                        
-                      
-
-                    </div>
-
-
+                    <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular"><?php echo htmlspecialchars($review['review_text']); ?></span>
                 </div>
+            <?php endforeach; ?>
+            
+            <?php if ($total_reviews > count($reviews)): ?>
+                <div class="text-center mt-2">
+                    <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[#1A237E] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+</div>
 
                   <!-- reviews ends -->
 
@@ -411,15 +416,12 @@ display: none;
                         <?php endif; ?>
                     </div>
                     <div class="flex items-center gap-2">
-                        <div class="flex items-center gap-1">
-                            <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                            <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                            <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                            <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                            <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                        </div>
-                        <span class="text-[#9A9A9A] text-[13px] md:text-[14px] font-['Open Sans'] font-medium">(15 reviews)</span>
-                    </div>
+    <div class="flex items-center gap-1">
+        <?php echo generateStarRating($avg_rating); ?>
+    </div>
+    <span class="text-[#9A9A9A] text-[13px] md:text-[14px] font-['Open Sans'] font-medium">(<?php echo $total_reviews; ?> reviews)</span>
+</div>
+
 
                 </div>
 
@@ -629,101 +631,54 @@ display: none;
 
 
                 <!-- reviews starts -->
-                <div class="w-full border-b-[1.5px]  border-[#E1E1E1] md:hidden">
-                    <div class="accordion w-full flex items-center justify-between">
+                <div class="w-full border-b-[1.5px] border-[#E1E1E1] md:hidden">
+    <div class="accordion w-full flex items-center justify-between">
+        <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">
+            View Reviews (<?php echo $total_reviews; ?>)
+        </span>
+    </div>
 
-                        <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">View Reviews (15)</span>
-                        
-
-
+    <div class="faqext flex flex-col gap-3">
+        <?php if (empty($reviews)): ?>
+            <div class="text-center py-4">
+                <p class="text-[#5B5B5B] text-[14px] font-['Montserrat']">No reviews yet for this product.</p>
+                
+                <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[#1A237E] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
+                <?php endif; ?>
+            </div>
+        <?php else: ?>
+            <?php foreach ($reviews as $review): ?>
+                <div class="flex flex-col gap-2 border-b-[1px] pb-1 border-[#E1E1E1]">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                             <?php 
+    // Use profile image if available, otherwise use default avatar
+    $reviewer_avatar = !empty($review['profile_image']) 
+        ? DOMAIN . '/' . $review['profile_image'] 
+        : DOMAIN . '/assets/global/avatar.svg'; 
+    ?>
+    <img src="<?php echo htmlspecialchars($reviewer_avatar); ?>" 
+         alt="<?php echo htmlspecialchars($review['reviewer_name']); ?>" 
+         class="w-[24px] h-[24px] rounded-full object-cover" />
+                            <?php echo generateStarRating($review['rating']); ?>
+                        </div>
+                        <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular"><?php echo date('m/d/Y', strtotime($review['created_at'])); ?></span>
                     </div>
-
-                    <div class="faqext flex flex-col gap-3">
-
-                        <div class="flex flex-col gap-2 border-b-[1px] pb-1  border-[#E1E1E1]">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <img src="<?php echo DOMAIN; ?>/assets/global/avatar.svg" class="w-[24px]" />
-                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-['Montserrat'] font-medium">Favour</span>
-                                    <div class="flex items-center gap-1">
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                                    </div>
-                                </div>
-                                <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">11/05/2024</span>
-
-                            </div>
-                            <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">The softesr pillow ever, I also love how comfortable it is</span>
-                        </div>
-
-                        <div class="flex flex-col gap-2 border-b-[1px] pb-1  border-[#E1E1E1]">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <img src="<?php echo DOMAIN; ?>/assets/global/avatar.svg" class="w-[24px]" />
-                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-['Montserrat'] font-medium">Favour</span>
-                                    <div class="flex items-center gap-1">
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                                    </div>
-                                </div>
-                                <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">11/05/2024</span>
-
-                            </div>
-                            <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">The softesr pillow ever, I also love how comfortable it is</span>
-                        </div>
-
-
-                        <div class="flex flex-col gap-2 border-b-[1px] pb-1  border-[#E1E1E1]">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <img src="<?php echo DOMAIN; ?>/assets/global/avatar.svg" class="w-[24px]" />
-                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-['Montserrat'] font-medium">Favour</span>
-                                    <div class="flex items-center gap-1">
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                                    </div>
-                                </div>
-                                <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">11/05/2024</span>
-
-                            </div>
-                            <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">The softesr pillow ever, I also love how comfortable it is</span>
-                        </div>
-
-
-                        <div class="flex flex-col gap-2 border-b-[1px] pb-1  border-[#E1E1E1]">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <img src="<?php echo DOMAIN; ?>/assets/global/avatar.svg" class="w-[24px]" />
-                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-['Montserrat'] font-medium">Favour</span>
-                                    <div class="flex items-center gap-1">
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/star.svg" class="w-[16px]" />
-                                        <img src="<?php echo DOMAIN; ?>/assets/products/lstar.svg" class="w-[16px]" />
-                                    </div>
-                                </div>
-                                <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">11/05/2024</span>
-
-                            </div>
-                            <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular">The softesr pillow ever, I also love how comfortable it is</span>
-                        </div>
-
-                     
-
-                    </div>
-
-
+                    <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular"><?php echo htmlspecialchars($review['review_text']); ?></span>
                 </div>
+            <?php endforeach; ?>
+            
+            <?php if ($total_reviews > count($reviews)): ?>
+                <div class="text-center mt-2">
+                    <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[#1A237E] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+</div>
+
+
 
                   <!-- reviews ends -->
         </div>

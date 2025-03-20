@@ -10,7 +10,6 @@ require_once './profile-manager.php';
 // Authentication check
 requireAuth();
 
-
 // Get user data
 $user = getCurrentUser();
 $userId = $user['id'];
@@ -23,10 +22,6 @@ if (!isset($conn)) {
     $dbPassword = "";          
     $dbName = "victosah";  
     
-    
-    
-    
-    
     $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
     
     if ($conn->connect_error) {
@@ -34,27 +29,71 @@ if (!isset($conn)) {
     }
 }
 
-// Initialize profile manager with the database connection
+// Initialize profile manager with the database connection BEFORE any operations
 $profileManager = new ProfileManager($conn);
+
+// Debug function to log upload errors
+function logUploadError($message) {
+    error_log("Profile Image Upload Error: " . $message);
+}
+
+// Profile Image Upload Handling
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_image'])) {
+    // Debugging: Log file upload details
+    error_log("File Upload Attempt Detected");
+    error_log("File Details: " . print_r($_FILES['profile_image'], true));
+
+    // Check for upload errors
+    switch ($_FILES['profile_image']['error']) {
+        case UPLOAD_ERR_OK:
+            break;
+        case UPLOAD_ERR_NO_FILE:
+            logUploadError("No file was uploaded.");
+            $_SESSION['error_message'] = "No image selected.";
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
+        case UPLOAD_ERR_INI_SIZE:
+        case UPLOAD_ERR_FORM_SIZE:
+            logUploadError("File is too large.");
+            $_SESSION['error_message'] = "Image is too large. Maximum size is 5MB.";
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
+        default:
+            logUploadError("Unknown upload error: " . $_FILES['profile_image']['error']);
+            $_SESSION['error_message'] = "Upload failed. Please try again.";
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
+    }
+
+    // Attempt to upload the image
+    $uploadResult = $profileManager->uploadProfileImage($userId, $_FILES['profile_image']);
+    
+    if ($uploadResult) {
+        $_SESSION['success_message'] = "Profile image updated successfully!";
+    } else {
+        $_SESSION['error_message'] = "Error uploading profile image. Please check file type and size.";
+    }
+    
+    // Redirect to prevent form resubmission
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+// Get user profile
 $profile = $profileManager->getProfileByUserId($userId);
 
-
-// Find where you define $successMessage (usually near the beginning of the file)
-// Replace this:
+// Initialize messages
 $successMessage = '';
 $errorMessage = '';
 
-// With this:
-$successMessage = '';
-$errorMessage = '';
+// Handle success message from session
 if (isset($_SESSION['success_message'])) {
     $successMessage = $_SESSION['success_message'];
     unset($_SESSION['success_message']); // Clear the message
 }
 
-// Find this section in your profilet.php file:
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Process profile data update
+// Process profile data update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_FILES['profile_image'])) {
     $profileData = [
         'first_name' => $_POST['first_name'] ?? '',
         'last_name' => $_POST['last_name'] ?? '',
@@ -77,10 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = $profileManager->updateProfile($userId, $profileData);
     
     if ($result) {
-        // Set a success message in the session
         $_SESSION['success_message'] = "Profile updated successfully!";
-        
-        // Redirect back to the same page, but as a GET request
         header("Location: " . $_SERVER['PHP_SELF']);
         exit;
     } else {
@@ -156,13 +192,41 @@ if(isset($_GET['logout'])) {
                 <div class="alert alert-danger"><?php echo $errorMessage; ?></div>
             <?php endif; ?>
 
-            <div class="flex items-center gap-2">
-                <div class="w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-[50%]">
-                    <img src="<?php echo DOMAIN; ?>/assets/user/avatar.svg" alt="Profile Picture" class="w-full h-full" />
+            <div class="flex items-center gap-2 relative">
+    <div class="w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-[50%] relative group">
+        <?php 
+        // Get current profile image or use default
+        $profileImage = $profileManager->getProfileImage($userId);
+        $imageSrc = $profileImage ? DOMAIN . '/' . $profileImage : DOMAIN . '/assets/user/avatar.svg';
+        ?>
+        <form method="POST" enctype="multipart/form-data" class="absolute inset-0">
+            <label for="profile_image_upload" class="cursor-pointer">
+                <img src="<?php echo htmlspecialchars($imageSrc); ?>" 
+                     alt="Profile Picture" 
+                     class="w-full h-full object-cover rounded-[50%] transition-opacity group-hover:opacity-70" 
+                     id="current-profile-image" />
+                
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 rounded-[50%]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
                 </div>
+            </label>
+            
+            <input 
+                type="file" 
+                name="profile_image" 
+                id="profile_image_upload" 
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                class="hidden"
+                onchange="this.form.submit()"
+            />
+        </form>
+    </div>
 
-                <h1 class="text-[15px] md:text-[16px] font-Onest font-medium"><?php echo htmlspecialchars($user['email']); ?></h1>
-            </div>
+    <h1 class="text-[15px] md:text-[16px] font-Onest font-medium"><?php echo htmlspecialchars($user['email']); ?></h1>
+</div>
 
             <section class="flex flex-col items-center w-full bg-[#EEE7FF] py-3 px-4 rounded">
                 <div class="flex items-center gap-2 mr-auto">
@@ -541,6 +605,40 @@ if(isset($_GET['logout'])) {
             // Add event listener
             billingCheckbox.addEventListener('change', toggleBillingSection);
         });
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('profile_image_upload');
+    const currentImage = document.getElementById('current-profile-image');
+
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            // Validate file type and size
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+
+            if (!allowedTypes.includes(file.type)) {
+                alert('Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.');
+                fileInput.value = ''; // Clear the file input
+                return;
+            }
+
+            if (file.size > maxSize) {
+                alert('File is too large. Maximum file size is 5MB.');
+                fileInput.value = ''; // Clear the file input
+                return;
+            }
+
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
     </script>
 </body>
 </html>

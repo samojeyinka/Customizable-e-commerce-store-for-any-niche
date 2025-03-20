@@ -223,6 +223,49 @@ try {
         }
     }
 
+    // Insert transaction into transaction_history table
+    $payment_method = $_POST['payment_method'] ?? 'online';
+    $currency = $_POST['currency'] ?? 'NGN';
+    $customer_name = $user['first_name'] . ' ' . $user['last_name'];
+    if (empty($customer_name) || $customer_name == ' ') {
+        $customer_name = $_POST['first_name'] . ' ' . $_POST['last_name'];
+    }
+    
+    $notes = "Order #$order_id - $delivery_method delivery";
+    if ($delivery_method === 'pickup') {
+        $notes .= " from $pickup_location";
+    }
+    
+    $transaction_insert = "INSERT INTO transaction_history (
+        user_id, customer_name, email, transaction_id, payment_reference,
+        order_id, amount, status, payment_method, currency, 
+        delivery_method, transaction_date, notes
+    ) VALUES (
+        $user_id,
+        '" . mysqli_real_escape_string($con, $customer_name) . "',
+        '" . mysqli_real_escape_string($con, $delivery_email) . "',
+        '" . mysqli_real_escape_string($con, $_POST['transaction_id']) . "',
+        '" . mysqli_real_escape_string($con, $_POST['payment_reference']) . "',
+        $order_id,
+        $total,
+        'completed',
+        '" . mysqli_real_escape_string($con, $payment_method) . "',
+        '" . mysqli_real_escape_string($con, $currency) . "',
+        '" . mysqli_real_escape_string($con, $delivery_method) . "',
+        NOW(),
+        '" . mysqli_real_escape_string($con, $notes) . "'
+    )";
+    
+    logOrderError("Transaction history query: " . $transaction_insert);
+    
+    if (!mysqli_query($con, $transaction_insert)) {
+        logOrderError("Transaction history insertion failed: " . mysqli_error($con));
+        // Continue processing even if transaction history fails
+        // This is not critical to order completion
+    } else {
+        logOrderError("Transaction history created successfully");
+    }
+
     // Clear user's cart
     $clear_cart_query = "DELETE FROM cart WHERE user_id = $user_id";
     mysqli_query($con, $clear_cart_query);
@@ -230,6 +273,35 @@ try {
     // Clear buy_now item from session if it exists
     if (isset($_SESSION['buy_now_item'])) {
         unset($_SESSION['buy_now_item']);
+    }
+
+    // Update user profile if requested
+    if (isset($_POST['update_profile']) && $_POST['update_profile'] == '1') {
+        // Update the user's profile with the shipping/billing details from this order
+        $update_profile_query = "UPDATE profiles SET 
+            first_name = ?, last_name = ?, phone = ?, country = ?, 
+            address = ?, state = ?, city = ?, zip_code = ?,
+            billing_first_name = ?, billing_last_name = ?, billing_country = ?,
+            billing_address = ?, billing_state = ?, billing_city = ?, 
+            billing_zip_code = ?, billing_phone = ?
+            WHERE user_id = ?";
+            
+        $stmt = mysqli_prepare($con, $update_profile_query);
+        mysqli_stmt_bind_param($stmt, "ssssssssssssssssi", 
+            $_POST['first_name'], $_POST['last_name'], $_POST['phone'], $_POST['country'],
+            $_POST['address'], $_POST['state'], $_POST['city'], $_POST['zip_code'],
+            $_POST['billing_first_name'] ?? $_POST['first_name'], 
+            $_POST['billing_last_name'] ?? $_POST['last_name'],
+            $_POST['billing_country'] ?? $_POST['country'],
+            $_POST['billing_address'] ?? $_POST['address'], 
+            $_POST['billing_state'] ?? $_POST['state'],
+            $_POST['billing_city'] ?? $_POST['city'], 
+            $_POST['billing_zip_code'] ?? $_POST['zip_code'],
+            $_POST['billing_phone'] ?? $_POST['phone'],
+            $user_id
+        );
+        mysqli_stmt_execute($stmt);
+        logOrderError("User profile updated with order details");
     }
 
     // Commit transaction
@@ -242,35 +314,6 @@ try {
         'message' => 'Order processed successfully'
     ]);
     exit;
-
-        // In your process-order.php, after successful order creation
-if (isset($_POST['update_profile']) && $_POST['update_profile'] == '1') {
-    // Update the user's profile with the shipping/billing details from this order
-    $update_profile_query = "UPDATE profiles SET 
-        first_name = ?, last_name = ?, phone = ?, country = ?, 
-        address = ?, state = ?, city = ?, zip_code = ?,
-        billing_first_name = ?, billing_last_name = ?, billing_country = ?,
-        billing_address = ?, billing_state = ?, billing_city = ?, 
-        billing_zip_code = ?, billing_phone = ?
-        WHERE user_id = ?";
-        
-    $stmt = mysqli_prepare($con, $update_profile_query);
-    mysqli_stmt_bind_param($stmt, "ssssssssssssssssi", 
-        $_POST['first_name'], $_POST['last_name'], $_POST['phone'], $_POST['country'],
-        $_POST['address'], $_POST['state'], $_POST['city'], $_POST['zip_code'],
-        $_POST['billing_first_name'] ?? $_POST['first_name'], 
-        $_POST['billing_last_name'] ?? $_POST['last_name'],
-        $_POST['billing_country'] ?? $_POST['country'],
-        $_POST['billing_address'] ?? $_POST['address'], 
-        $_POST['billing_state'] ?? $_POST['state'],
-        $_POST['billing_city'] ?? $_POST['city'], 
-        $_POST['billing_zip_code'] ?? $_POST['zip_code'],
-        $_POST['billing_phone'] ?? $_POST['phone'],
-        $user_id
-    );
-    mysqli_stmt_execute($stmt);
-    logOrderError("User profile updated with order details");
-}
 
 } catch (Exception $e) {
     // Rollback transaction
