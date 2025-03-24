@@ -1,6 +1,5 @@
 <?php
 // Include PHPMailer at the top of the file
-
 require '../create-account/phpmailer/src/Exception.php';
 require '../create-account/phpmailer/src/PHPMailer.php';
 require '../create-account/phpmailer/src/SMTP.php';
@@ -15,12 +14,13 @@ require_once "../../../config/config.php";
 session_start();
 
 // Check if reset email and new password are stored in session, if not - redirect
-if(!isset($_SESSION['reset_email']) || !isset($_SESSION['new_password'])) {
+// Use user-specific session variables
+if(!isset($_SESSION['user_reset_email']) || !isset($_SESSION['user_new_password'])) {
     header("Location: " . DOMAIN . "/includes/auth/password-reset/mail.php");
     exit();
 }
 
-$email = $_SESSION['reset_email'];
+$email = $_SESSION['user_reset_email'];
 
 // Database connection
 $servername = "localhost";
@@ -60,7 +60,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
         $user = $result->fetch_assoc();
         
         // Hash the new password
-        $hashed_password = password_hash($_SESSION['new_password'], PASSWORD_DEFAULT);
+        $hashed_password = password_hash($_SESSION['user_new_password'], PASSWORD_DEFAULT);
         
         // Update the password in the database
         $update_sql = "UPDATE users SET password = ? WHERE email = ?";
@@ -68,9 +68,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
         $update_stmt->bind_param("ss", $hashed_password, $email);
         
         if($update_stmt->execute()) {
-            // Clear the session variables
-            unset($_SESSION['reset_email']);
-            unset($_SESSION['new_password']);
+            // IMPORTANT CHANGE: Set the original session variable for success page
+            $_SESSION['reset_email'] = $email;
+            
+            // Clear the user-specific session variables
+            unset($_SESSION['user_new_password']);
+            
+            // Don't unset user_reset_email yet as success page might need it
             
             // Redirect to success page
             header("Location: " . DOMAIN . "/includes/auth/password-reset/success.php");

@@ -147,7 +147,7 @@ if (!defined('DOMAIN')) {
                     <div id="response-message"></div>
                     <form id="subscription-form" class="flex items-center gap-2 mt-2">
                         <div class="flex items-center gap-2 border-[1px] border-[#B8BBD7] rounded-[4px] p-1">
-                            <input type="text" placeholder="Enter your email address"  name="email" 
+                            <input type="email" placeholder="Enter your email address"  name="email" 
                                 class="lg:w-[12rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
                         </div>
                         <button type="submit" class="py-1 px-4 bg-[#1A237E] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]">

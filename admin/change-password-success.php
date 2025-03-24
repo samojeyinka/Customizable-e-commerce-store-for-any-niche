@@ -58,7 +58,7 @@ You have reset your password successfully
 
 
 
-<a href="./dashboard/overview.php" class="text-center w-[90%] mx-auto text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer"
+<a href="./index.php" class="text-center w-[90%] mx-auto text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer"
     >
     Sign In
     </a>

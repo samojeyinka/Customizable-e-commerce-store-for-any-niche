@@ -1,105 +1,446 @@
+<?php
+session_start();
+require_once "../config/config.php";
+
+// Check if the required session variables are set
+if (!isset($_SESSION['temp_admin_id']) || !isset($_SESSION['admin_email']) || !isset($_SESSION['admin_fullname'])) {
+    // Redirect to login page if verification is accessed directly
+    header("Location: ./index.php");
+    exit();
+}
+
+// Include PHPMailer setup if needed for resending OTP
+$phpmailer_path = '../includes/auth/create-account/phpmailer/src/';
+if (file_exists($phpmailer_path . 'Exception.php')) {
+    require $phpmailer_path . 'Exception.php';
+    require $phpmailer_path . 'PHPMailer.php';
+    require $phpmailer_path . 'SMTP.php';
+} else {
+    $phpmailer_path = 'phpmailer/src/';
+    if (file_exists($phpmailer_path . 'Exception.php')) {
+        require $phpmailer_path . 'Exception.php';
+        require $phpmailer_path . 'PHPMailer.php';
+        require $phpmailer_path . 'SMTP.php';
+    }
+}
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+$error_message = "";
+$success_message = "";
+
+// Process OTP verification
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
+    $otp = $_POST['otp'];
+    $admin_id = $_SESSION['temp_admin_id'];
+    
+    // Connect to database
+    $servername = "localhost";
+    $dbname = 'victosah';
+    $username = 'root';
+    $dbpassword = '';
+    
+    $conn = new mysqli($servername, $username, $dbpassword, $dbname);
+    
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    
+    // Check if OTP matches - Updated table and column names
+    $sql = "SELECT * FROM administrators WHERE admin_id = ? AND otp_code = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("is", $admin_id, $otp);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $admin = $result->fetch_assoc();
+        
+        // Check if OTP has expired (10 minutes)
+        $otp_expires = strtotime($admin['otp_expires']);
+        $current_time = time();
+        
+        if ($current_time > $otp_expires) {
+            $error_message = "OTP has expired. Please request a new one.";
+        } else {
+            // OTP is valid, set admin session
+            $_SESSION['admin_id'] = $admin_id;
+            $_SESSION['admin_email'] = $admin['email'];
+            $_SESSION['admin_fullname'] = $admin['full_name'];
+            $_SESSION['admin_role'] = $admin['role'];
+            
+            // Clear temporary session variables
+            unset($_SESSION['temp_admin_id']);
+            
+            // Clear OTP from database (optional)
+            $clear_otp = "UPDATE administrators SET otp_code = NULL, otp_expires = NULL WHERE admin_id = ?";
+            $clear_stmt = $conn->prepare($clear_otp);
+            $clear_stmt->bind_param("i", $admin_id);
+            $clear_stmt->execute();
+            
+            // Update last login time
+            $update_login = "UPDATE administrators SET last_login = NOW() WHERE admin_id = ?";
+            $login_stmt = $conn->prepare($update_login);
+            $login_stmt->bind_param("i", $admin_id);
+            $login_stmt->execute();
+            
+            // Redirect to dashboard
+            header("Location: ./dashboard/overview.php");
+            exit();
+        }
+    } else {
+        $error_message = "Invalid OTP. Please try again.";
+    }
+    
+    $conn->close();
+}
+
+// Resend OTP
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
+    // Connect to database
+    $servername = "localhost";
+    $dbname = 'victosah';
+    $username = 'root';
+    $dbpassword = '';
+    
+    $conn = new mysqli($servername, $username, $dbpassword, $dbname);
+    
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    
+    // Generate new OTP
+    $otp = sprintf("%04d", rand(1000, 9999));
+    $admin_id = $_SESSION['temp_admin_id'];
+    
+    // Update OTP in database - Updated table and column names
+    $update_sql = "UPDATE administrators SET otp_code = ?, otp_expires = DATE_ADD(NOW(), INTERVAL 10 MINUTE) WHERE admin_id = ?";
+    $update_stmt = $conn->prepare($update_sql);
+    $update_stmt->bind_param("si", $otp, $admin_id);
+    
+    if ($update_stmt->execute()) {
+        // Send email with new OTP
+        $mail = new PHPMailer(true);
+        
+        try {
+            // Server settings
+            $mail->SMTPDebug = 0;
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'samuelojeyinka@gmail.com'; // Update with your email
+            $mail->Password   = 'teir bvqp ijrx rijl'; // Update with your app password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+            $mail->Timeout    = 60;
+            $mail->SMTPKeepAlive = true;
+            
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                )
+            );
+            
+            // Recipients
+            $mail->setFrom('samuelojeyinka@gmail.com', 'Victosah Admin');
+            $mail->addAddress($_SESSION['admin_email'], $_SESSION['admin_fullname']);
+            
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = 'Admin Login Verification Code (Resent)';
+            $mail->Body = "
+            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;'>
+                <h2 style='color: #1A237E; text-align: center;'>Victosah Solution</h2>
+                <p style='font-size: 16px; line-height: 1.5;'>Hello {$_SESSION['admin_fullname']},</p>
+                <p style='font-size: 16px; line-height: 1.5;'>You requested a new OTP code. To verify your identity, please use the following code:</p>
+                <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
+                    {$otp}
+                </div>
+                <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this, please contact the system administrator immediately.</p>
+                <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
+            </div>
+            ";
+            $mail->AltBody = "Your new admin login verification code is: {$otp}";
+            
+            $mail->send();
+            $success_message = "New OTP has been sent to your email.";
+        } catch (Exception $e) {
+            $error_message = "Error sending verification email: " . $mail->ErrorInfo;
+        }
+    } else {
+        $error_message = "Error generating new OTP: " . $conn->error;
+    }
+    
+    $conn->close();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH ADMIN | Verify</title>
+    <title>VICTOSAH ADMIN | Verify Login</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="./styles/modal.css">
-    <link rel="stylesheet" href="./styles/tabs.css">
-
+    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css" />
+    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
+    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
 
     <style>
-        body {
-            width: 100%;
-            height: 100vh;
+            body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             background-image: url("./assets/global/bg.svg");
             background-position: center;
             background-size: cover;
         }
+        
+        .otp-input-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 1px solid #E1E1E1;
+            border-radius: 8px;
+            background-color: transparent;
+            outline: none;
+        }
+        
+        .otp-input:focus {
+            border-color: #1A237E;
+            box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2);
+        }
+        
+        .timer {
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .timer-highlight {
+            color: #1A237E;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 480px) {
+            .otp-input {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
     </style>
-
 </head>
 
 <body>
-    <div class="w-[90%] lg:w-[50%] h-[fit-content] mx-auto bg-white rounded-[24px] p-5">
-
-        <div class="w-[95%] mx-auto flex items-center justify-between">
-            <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">WELCOME BACK</h3>
-
-            <div class="flex items-center gap-1 md:gap-2">
-                <img src="./assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
+    <div class="w-[90%] lg:w-[450px] h-[fit-content] mx-auto bg-white rounded-[24px] p-6 shadow-lg">
+        <div class="w-[95%] mx-auto flex items-center justify-between mb-4">
+            <h3 class="text-[#262626] text-[20px] md:text-[24px] font-medium">Verify Login</h3>
+            <div class="flex items-center gap-2">
+                <img src="<?php echo DOMAIN; ?>/assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
                 <h1 class="text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
             </div>
         </div>
+        
+        <h3 class="text-[#262626] text-center text-[18px] md:text-[22px] font-medium pt-2 pb-4">ADMIN PANEL</h3>
+        
+        <div class="text-center mb-6">
+            <p class="text-[#1A237E] font-medium text-[18px]">Login Verification</p>
+            <p class="text-[#777777] mt-2">
+                Enter the 4-digit code sent to: <span class="font-semibold text-[#333333]"><?php echo htmlspecialchars($_SESSION['admin_email']); ?></span>
+            </p>
+        </div>
 
-        <p class="font-['Open Sans']  text-[18px] text-[22px] font-medium text-center">
-            ADMIN PANEL
-        </p>
+        <?php if (!empty($error_message)): ?>
+        <div class="bg-[#FDECEC] shadow-lg mb-4 py-3 px-4 rounded relative" id="errorAlert">
+            <div class="h-full w-[5px] bg-[#EE3F3F] absolute left-0 top-0"></div>
+            <div class="flex items-center justify-between">
+                <p class="text-[16px] md:text-[17px] text-[#2C2C2C] font-medium">Error</p>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 cursor-pointer text-[#777]" viewBox="0 0 20 20" fill="currentColor" onclick="document.getElementById('errorAlert').style.display='none'">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <p class="text-[14px] text-[#7F7F7F] mt-1"><?php echo $error_message; ?></p>
+        </div>
+        <?php endif; ?>
 
+        <?php if (!empty($success_message)): ?>
+        <div class="bg-[#E0F8E9] shadow-lg mb-4 py-3 px-4 rounded relative" id="successAlert">
+            <div class="h-full w-[5px] bg-[#28C76F] absolute left-0 top-0"></div>
+            <div class="flex items-center justify-between">
+                <p class="text-[16px] md:text-[17px] text-[#2C2C2C] font-medium">Success</p>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 cursor-pointer text-[#777]" viewBox="0 0 20 20" fill="currentColor" onclick="document.getElementById('successAlert').style.display='none'">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <p class="text-[14px] text-[#7F7F7F] mt-1"><?php echo $success_message; ?></p>
+        </div>
+        <?php endif; ?>
 
-      
-        <p class="pl-[2.5%] font-['Open Sans']  text-[18px] text-[22px] font-medium text-left pt-5">
-            Let us verify it’s you
-        </p>
-        <p class="pl-[2.5%]  mr-auto text-[15px] text-left md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2">
-            Enter the 4 digit code sent to golibe.f@gmail.com to create your account
-        </p>
-
-        <form class="w-full mt-[1rem] flex items-center flex-col">
-        <p   class="pl-[2.5%] mr-auto text-left font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                    Enter Code
-                </p>
-
-            <div class="pl-[2.5%] w-[fit-content] flex items-center gap-3 mr-auto">
-                <input
-                    type="password"
-                    inputMode="numeric"
-                    class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
-                <input
-                    type="password"
-                    inputMode="numeric"
-                    class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
-                <input
-                    type="password"
-                    inputMode="numeric"
-                    class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
-                <input
-                    type="password"
-                    inputMode="numeric"
-                    class="w-[40px] h-[40px] rounded-[4px] border-[1px] text-center bg-[#FFFFFF] border-[#E1E1E1] rounded text-[#262626] py-3 px-1 outline-none" />
+        <form method="POST" action="" class="mt-4">
+            <input type="hidden" name="verify_otp" value="1">
+            
+            <div class="otp-input-group">
+                <input type="password" maxlength="1" class="otp-input" inputmode="numeric" id="otp1" autofocus>
+                <input type="password" maxlength="1" class="otp-input" inputmode="numeric" id="otp2">
+                <input type="password" maxlength="1" class="otp-input" inputmode="numeric" id="otp3">
+                <input type="password" maxlength="1" class="otp-input" inputmode="numeric" id="otp4">
+                <input type="hidden" name="otp" id="otpFull">
+            </div>
+            
+            <div class="timer" id="otpTimer">
+                OTP expires in: <span id="timer" class="timer-highlight">10:00</span>
             </div>
 
-
-            <a href="/victosah-admin/success-signin.php"
-
-                
-                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
-                Verify
-            </a>
+            <button type="submit" class="w-full py-[12px] px-3 bg-[#1A237E] text-white text-[16px] font-medium cursor-pointer rounded-[8px] transition-colors hover:bg-[#0e1442]">
+                Verify & Continue
+            </button>
         </form>
-
-        <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-left">
-                        Resend code in <span class="text-[#1A237E]">23sec</span>
-                    </p>
-      
-
-
-
+        
+        <div class="text-center mt-6">
+            <a href="#" id="resendLink" class="text-[#1A237E] font-medium text-[14px] hidden">
+                Resend verification code
+            </a>
+            <p class="text-[#777777] text-[14px]" id="resendTimer">
+                Resend code in <span class="text-[#1A237E] font-medium" id="resendCounter">60</span> seconds
+            </p>
+        </div>
+        
+        <form method="POST" action="" id="resendForm" class="hidden">
+            <input type="hidden" name="resend_otp" value="1">
+        </form>
     </div>
 
-
-
-    </div>
-
-    <script src="./functions/modals.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // OTP input handling
+        const inputs = document.querySelectorAll('.otp-input');
+        const otpFull = document.getElementById('otpFull');
+        
+        // Function to update the hidden input with complete OTP
+        function updateOtpValue() {
+            let otp = '';
+            inputs.forEach(input => {
+                otp += input.value;
+            });
+            otpFull.value = otp;
+        }
+        
+        // Auto-focus next input and only allow numbers
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                // Allow only numbers
+                this.value = this.value.replace(/[^0-9]/g, '');
+                
+                // Move to next input after entering a digit
+                if (this.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                
+                updateOtpValue();
+            });
+            
+            // Handle backspace to go to previous input
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+            
+            // Handle paste event
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pasteData = e.clipboardData.getData('text').trim();
+                if (/^\d+$/.test(pasteData)) { // Check if paste data contains only digits
+                    // Fill inputs with pasted digits
+                    for (let i = 0; i < Math.min(pasteData.length, inputs.length); i++) {
+                        inputs[i].value = pasteData[i];
+                    }
+                    // Focus on appropriate input after paste
+                    if (pasteData.length >= inputs.length) {
+                        inputs[inputs.length - 1].focus();
+                    } else {
+                        inputs[pasteData.length].focus();
+                    }
+                    updateOtpValue();
+                }
+            });
+        });
+        
+        // OTP expiry timer (10 minutes)
+        let timeLeft = 10 * 60; // 10 minutes in seconds
+        const timerElement = document.getElementById('timer');
+        const timerInterval = setInterval(function() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            
+            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerElement.textContent = "Expired";
+                timerElement.style.color = "#EE3F3F";
+                document.getElementById('resendLink').classList.remove('hidden');
+                document.getElementById('resendTimer').classList.add('hidden');
+            } else {
+                timeLeft--;
+            }
+        }, 1000);
+        
+        // Resend OTP timer and link handling
+        let resendCounter = 60;
+        const resendCounterElement = document.getElementById('resendCounter');
+        const resendTimerElement = document.getElementById('resendTimer');
+        const resendLinkElement = document.getElementById('resendLink');
+        const resendForm = document.getElementById('resendForm');
+        
+        const resendInterval = setInterval(function() {
+            resendCounterElement.textContent = resendCounter;
+            
+            if (resendCounter <= 0) {
+                clearInterval(resendInterval);
+                resendTimerElement.classList.add('hidden');
+                resendLinkElement.classList.remove('hidden');
+            } else {
+                resendCounter--;
+            }
+        }, 1000);
+        
+        // Handle resend link click
+        resendLinkElement.addEventListener('click', function(e) {
+            e.preventDefault();
+            resendForm.submit();
+        });
+        
+        // Close alerts
+        const closeButtons = document.querySelectorAll('[id$="Alert"] svg');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                this.closest('[id$="Alert"]').style.display = 'none';
+            });
+        });
+    });
+    </script>
 </body>
-
 </html>

@@ -60,7 +60,8 @@ if(isset($_POST['send'])) {
         
         if($update_stmt->execute()) {
             // Store email in session for verification page
-            $_SESSION['reset_email'] = $email;
+            // Use a different session variable name to avoid conflicts with admin reset
+            $_SESSION['user_reset_email'] = $email;
             
             // Send the OTP via email
             $mail = new PHPMailer(true);

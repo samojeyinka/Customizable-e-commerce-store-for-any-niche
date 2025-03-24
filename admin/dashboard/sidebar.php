@@ -10,6 +10,7 @@
 
 <div class="flex flex-col gap-2 mb-7">
     <a href="./settings/options.php" class="nav-link  flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/setting-2 (1).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/setting-2.svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Settings</span></a>
-    <span class="cursor-pointer logout-text flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/logout.svg" class="nonactiveicon w-[20px] h-[20px]" /><span class="text-[#D93939]">Logout</span></span>
+    <a href="../logout.php" class="cursor-pointer logout-text flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/logout.svg" class="nonactiveicon w-[20px] h-[20px]" /><span class="text-[#D93939]">Logout</span></a>
 </div>
 </div>
+

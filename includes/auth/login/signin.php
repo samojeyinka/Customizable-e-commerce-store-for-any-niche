@@ -133,7 +133,7 @@ if(isset($_POST['login'])) {
                     name="email"
                     id="email"
                     placeholder="Enter your email address"
-                    required
+                    require
                     class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
             </div>
             
@@ -181,7 +181,7 @@ if(isset($_POST['login'])) {
         </div>
         
         <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#7A7A7A] mt-4">
-            Don't have an account? <a href="index.php" class="text-[#1A237E]">Create an account</a>
+            Don't have an account? <a href="../create-account/sign-up.php" class="text-[#1A237E]">Create an account</a>
         </p>
     </div>
 </div>

@@ -2,12 +2,20 @@
 // Start session and include necessary files
 session_start();
 require_once '../../config/connect.php';
-require_once '../../includes/auth/auth.php';
+require_once '../../config/config.php';
 
-// Authentication and user validation
-requireAuth();
-$user = getCurrentUser();
-$user_id = $user['id'];
+// Admin Authentication Check
+if (!isset($_SESSION['admin_id'])) {
+    // Redirect to login page
+    header("Location: ../index.php");
+    exit();
+}
+
+// Get admin information
+$admin_id = $_SESSION['admin_id'];
+$admin_name = $_SESSION['admin_fullname'] ?? '';
+$admin_email = $_SESSION['admin_email'] ?? '';
+$admin_role = $_SESSION['admin_role'] ?? 'admin';
 
 // Set default values
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
@@ -83,6 +91,25 @@ if (!$result) {
 
 // Fetch transaction statistics for overview modal
 $stats = fetchTransactionStats($con, $start_date, $end_date);
+
+// Admin authorization check function - can be used to check specific permissions
+function checkAdminPermission($required_role = 'admin') {
+    $admin_role = $_SESSION['admin_role'] ?? '';
+    
+    // If superadmin, allow access to everything
+    if ($admin_role === 'superadmin') {
+        return true;
+    }
+    
+    // For regular admin, check if they have the required role
+    if ($required_role === 'admin' && $admin_role === 'admin') {
+        return true;
+    }
+    
+    // Additional role checks can be added here
+    
+    return false;
+}
 
 /**
  * Function to fetch transaction statistics for the overview modal

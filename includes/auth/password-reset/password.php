@@ -9,7 +9,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Check if reset email is stored in session, if not - redirect to mail page
-if(!isset($_SESSION['reset_email'])) {
+// Use the user-specific session variable
+if(!isset($_SESSION['user_reset_email'])) {
     header("Location: " . DOMAIN . "/includes/auth/password-reset/mail.php");
     exit();
 }
@@ -38,7 +39,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         $error_message = "Password must contain at least 1 special character.";
     } else {
         // Store password in session to be used after OTP verification
-        $_SESSION['new_password'] = $password;
+        // Use a user-specific session variable to avoid conflicts
+        $_SESSION['user_new_password'] = $password;
         
         // Redirect to verification page
         header("Location: " . DOMAIN . "/includes/auth/password-reset/verify.php");
@@ -100,7 +102,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         <input
             type="password"
             name="password"
-            id="new_password"
+            id="password"
             placeholder="Enter your password"
             required
             class="w-full font-['Open Sans'] bg-transparent outline-none font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
@@ -151,15 +153,15 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
 document.addEventListener('DOMContentLoaded', function() {
     // Password toggle
     const togglePassword = document.getElementById('toggle-password');
-    const new_password = document.getElementById('new_password');
+    const password = document.getElementById('password');
     
-    if(togglePassword && new_password) {
+    if(togglePassword && password) {
         togglePassword.addEventListener('click', function() {
-            if (new_password.type === 'password') {
-                new_password.type = 'text';
+            if (password.type === 'password') {
+                password.type = 'text';
                 this.src = '<?php echo DOMAIN; ?>/assets/global/eye.svg';
             } else {
-                new_password.type = 'password';
+                password.type = 'password';
                 this.src = '<?php echo DOMAIN; ?>/assets/global/eye-slash.svg';
             }
         });
@@ -181,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Rest of your password validation code...
+    // Password validation
     const passwordError = document.getElementById('passwordError');
     
     function validatePassword(password) {
