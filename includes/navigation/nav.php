@@ -46,7 +46,7 @@ if (!defined('DOMAIN')) {
             type="text" 
             id="searchInput" 
             placeholder="What are you shopping for?" 
-            class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" 
+            class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7] bg-transparent" 
             autocomplete="off"
         />
     </div>
