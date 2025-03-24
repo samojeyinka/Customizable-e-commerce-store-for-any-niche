@@ -132,6 +132,8 @@ $search_query = isset($_GET['search']) ? $_GET['search'] : '';
            z-index: 2;
         }
 
+  
+        
 
     /* Modal Styles */
     .modal {
@@ -397,7 +399,30 @@ echo "
                                 <div class='border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2'>
                                     <div class='flex items-center justify-between relative'>
                                         <p class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order_date}</p>
-                                        <img src='../assets/user/action.svg' class='w-[24px] ml-auto cursor-pointer' onclick='openOrdermenu(this)'/>
+                                   
+                                        <!--  The order menu starts -->
+
+ <img src='../assets/user/action.svg' class='w-[20px] cursor-pointer openAdminOrderMenuForMobile' />
+
+        <!-- The menu for each order starts -->
+       <div class='adminordersMenuformobile hidden h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px] absolute right-0 top-[2rem]   min-h-[10rem] min-h-[10rem]'>
+            <div class='flex flex-col gap-3'>
+                <a href='../products/show.php?id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Re-Order</a>
+                <a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Track Order</a>";
+                
+if ($status_text == 'Delivered') {
+    echo "<a href='./write-review.php?order_id={$order['id']}&product_id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>";
+} else {
+    echo "<span class='text-[16px] font-medium text-gray-400 cursor-not-allowed' title='You can review this product after delivery'>Leave a review</span>";
+}
+
+echo "
+                <a href='./report-issue.php?id={$order['id']}' class='text-[16px] font-medium text-[#E8B006]'>Report an issue</a>
+            </div>
+        </div>
+                                <!-- The order menu ends -->
+
+
                                      
                                     </div>
                                     
@@ -599,6 +624,7 @@ function openOrdermenu(element) {
         
         // Show this menu
         menuContent.classList.add('showom');
+        console.log("Clickeddddddddddddd")
     }
 }
 
@@ -625,6 +651,51 @@ document.addEventListener('DOMContentLoaded', function() {
         menu.style.display = "none";
     });
 });
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Select all action icons and their corresponding menus
+    const actionIcons = document.querySelectorAll('.openAdminOrderMenuForMobile');
+
+    actionIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+            // Find the closest menu to this icon
+            const menu = this.nextElementSibling;
+
+            // Toggle menu visibility
+            if (menu.classList.contains('hidden')) {
+                // Close any other open menus
+                document.querySelectorAll('.adminordersMenuformobile').forEach(openMenu => {
+                    if (openMenu !== menu) {
+                        openMenu.classList.add('hidden');
+                    }
+                });
+
+                // Show this menu
+                menu.classList.remove('hidden');
+            } else {
+                // Hide this menu
+                menu.classList.add('hidden');
+            }
+        });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const menus = document.querySelectorAll('.adminordersMenuformobile');
+        
+        menus.forEach(menu => {
+            // Check if the click is outside the menu and its trigger icon
+            if (!menu.contains(event.target) && 
+                !menu.previousElementSibling.contains(event.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+    });
+});
+
+
   </script>
 </body>
 

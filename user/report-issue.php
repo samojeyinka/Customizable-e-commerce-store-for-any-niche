@@ -322,7 +322,13 @@ function getStatusBadgeClass($status) {
     </main>
 
     <script src="<?php echo DOMAIN; ?>/functions/modals.js"></script>
+    <script src="<?php echo DOMAIN; ?>/functions/modals2.js"></script>
     <script src="<?php echo DOMAIN; ?>/functions/functions.js"></script>
+    <script src="<?php echo DOMAIN; ?>/functions/tabs.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/accordion.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/faq.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/dropdown.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/openoptions.js"></script>
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {

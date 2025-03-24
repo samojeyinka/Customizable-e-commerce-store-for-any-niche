@@ -127,98 +127,59 @@ if(isset($_SESSION['user_id'])) {
         }
     });
 
-  
- // Password validation
- const passwordError = document.getElementById('passwordError');
-    const form = document.getElementById('userCreationForm');
-    
+    // Comprehensive password validation function
     function validatePassword(password) {
-    // Check minimum length of 6 characters
-    if (password.length < 6) {
-        return {
-            isValid: false,
-            message: 'Password must be at least 6 characters long.'
-        };
-    }
-    
-    // Check for at least 2 uppercase letters
-    const uppercaseMatches = password.match(/[A-Z]/g) || [];
-    if (uppercaseMatches.length < 2) {
-        return {
-            isValid: false,
-            message: 'Password must contain at least 2 uppercase letters.'
-        };
-    }
-    
-    // Check for at least 2 lowercase letters
-    const lowercaseMatches = password.match(/[a-z]/g) || [];
-    if (lowercaseMatches.length < 2) {
-        return {
-            isValid: false,
-            message: 'Password must contain at least 2 lowercase letters.'
-        };
-    }
-    
-    // Check for at least 1 number
-    const numberMatches = password.match(/\d/g) || [];
-    if (numberMatches.length < 1) {
-        return {
-            isValid: false,
-            message: 'Password must contain at least 1 number.'
-        };
-    }
-    
-    // Check for at least 1 special character
-    const specialCharMatches = password.match(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g) || [];
-    if (specialCharMatches.length < 1) {
-        return {
-            isValid: false,
-            message: 'Password must contain at least 1 special character.'
-        };
-    }
-    
-    // If all checks pass
-    return {
-        isValid: true,
-        message: 'Password meets all requirements!'
-    };
-}
+        const validationRules = [
+            { 
+                test: (pw) => pw.length >= 6, 
+                message: 'Password must be at least 6 characters long'
+            },
+            { 
+                test: (pw) => (pw.match(/[A-Z]/g) || []).length >= 2, 
+                message: 'Password must contain at least 2 uppercase letters'
+            },
+            { 
+                test: (pw) => (pw.match(/[a-z]/g) || []).length >= 2, 
+                message: 'Password must contain at least 2 lowercase letters'
+            },
+            { 
+                test: (pw) => /\d/.test(pw), 
+                message: 'Password must contain at least 1 number'
+            },
+            { 
+                test: (pw) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw), 
+                message: 'Password must contain at least 1 special character'
+            }
+        ];
 
-document.addEventListener('DOMContentLoaded', function() {
-    const passwordInput = document.getElementById('passwordcpp');
-    const passwordToggle = document.getElementById('password-toggle');
-    const passwordError = document.getElementById('passwordError');
-    const form = document.getElementById('userCreationForm');
-    
-    // Toggle password visibility
-    passwordToggle.addEventListener('click', function() {
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text'; // Change to text (show password)
-            passwordToggle.src = "<?php echo DOMAIN; ?>/assets/global/eye.svg"; // Change to open eye
-        } else {
-            passwordInput.type = 'password'; // Change to password (hide password)
-            passwordToggle.src = "<?php echo DOMAIN; ?>/assets/global/eye-slash.svg"; // Change to closed eye
-        }
-    });
-    
+        // Check all validation rules
+        const failedRules = validationRules.filter(rule => !rule.test(password));
+
+        return {
+            isValid: failedRules.length === 0,
+            errors: failedRules.map(rule => rule.message)
+        };
+    }
+
     function updatePasswordError(validationResult) {
         passwordError.style.display = 'block';
         
         if (!validationResult.isValid) {
+            // Show detailed error messages
             passwordError.className = 'text-[14px] font-["Open Sans"] text-[#EE3F3F] font-regular';
-            passwordError.textContent = validationResult.message;
+            passwordError.textContent = validationResult.errors.join('. ');
         } else {
             passwordError.className = 'text-[14px] font-["Open Sans"] text-[#22C55E] font-regular';
-            passwordError.textContent = validationResult.message;
+            passwordError.textContent = 'Password meets all requirements!';
         }
     }
-    
+
     // Check password on input
     passwordInput.addEventListener('input', function() {
         const validationResult = validatePassword(this.value);
         updatePasswordError(validationResult);
     });
-    
+
     // Form submission validation
     form.addEventListener('submit', function(event) {
         const validationResult = validatePassword(passwordInput.value);
@@ -229,27 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordInput.focus();
         }
     });
-    
-    // Generate OTP (kept from original script)
-    function generateRandomNumber() {
-        let min = 1000;
-        let max = 9999;
-        
-        let randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-        
-        let lastGeneratedNumber = localStorage.getItem('lastGeneratedNumber');
-        while(randomNumber === parseInt(lastGeneratedNumber)) {
-            randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-        
-        localStorage.setItem('lastGeneratedNumber', randomNumber);
-        return randomNumber;
-    }
-    
-    document.getElementById('otp').value = generateRandomNumber();
 });
-        
-    
 </script>
 </body>
 </html>
