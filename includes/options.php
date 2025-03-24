@@ -187,13 +187,204 @@ $topCategoriesJson = json_encode($topCategories);
                 <!-- The mobile nav ends -->
 
 
-                <div class="w-[100%]  flex items-center  items-center gap-0">
-                    <div class="w-full flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#B8BBD7] rounded-l-[4px] p-2">
-                        <img src="<?php echo DOMAIN; ?>/assets/global/search.svg" alt="Search" class="w-[24px]" />
-                        <input type="text" placeholder="What are you shopping for?" class="w-full text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
-                    </div>
-                    <button type="submit" class="py-2 px-4 bg-[#1A237E] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
-                </div>
+                <?php
+// Hardcoded categories and brands data specifically for mobile search
+// Different variable names to avoid conflicts
+$mobileSearchCategories = [
+    ['category_id' => 17, 'category_title' => 'Bedsheets'],
+    ['category_id' => 18, 'category_title' => 'Foams'],
+    ['category_id' => 19, 'category_title' => 'Pillows'],
+    ['category_id' => 20, 'category_title' => 'Lightings'],
+    ['category_id' => 21, 'category_title' => 'Duvets'],
+    ['category_id' => 22, 'category_title' => 'Mattress'],
+    ['category_id' => 23, 'category_title' => 'Duvet Bedsheet & Pillowcases'],
+    ['category_id' => 24, 'category_title' => 'Toppers']
+];
+
+// Brands data with unique variable name
+$mobileSearchBrands = [
+    ['brand_id' => 23, 'brand_title' => 'Mattress'],
+    ['brand_id' => 24, 'brand_title' => 'Duvet & Bedsheet & Pillowcases'],
+    ['brand_id' => 25, 'brand_title' => 'Duvet & Bedsheet'],
+    ['brand_id' => 26, 'brand_title' => 'Bedsheet & Pillowcases'],
+    ['brand_id' => 27, 'brand_title' => 'Duvet & Pillowcases'],
+    ['brand_id' => 28, 'brand_title' => 'Mattress Topper'],
+    ['brand_id' => 29, 'brand_title' => 'Throw Pillow'],
+    ['brand_id' => 30, 'brand_title' => 'Pillows'],
+    ['brand_id' => 31, 'brand_title' => 'Duvets']
+];
+?>
+
+<!-- Mobile Search Input - Uses different IDs to avoid conflicts -->
+<div class="mobile-search-container flex items-center gap-0 relative w-full">
+    <div class="flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#B8BBD7] rounded-l-[4px] p-2 w-full">
+        <img src="<?php echo DOMAIN; ?>/assets/global/search.svg" alt="Search" class="w-[24px]" />
+        <input 
+            type="text" 
+            id="mobileOnlySearchInput" 
+            placeholder="What are you shopping for?" 
+            class="w-full text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" 
+            autocomplete="off"
+        />
+    </div>
+    <button type="submit" id="mobileOnlySearchButton" class="py-2 px-4 bg-[#1A237E] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
+    
+    <!-- Search Results Dropdown - Unique ID -->
+    <div id="mobileOnlySearchResults" class="absolute top-full left-0 w-full bg-white shadow-md rounded-b-md z-50 mt-1 hidden">
+        <div class="p-3">
+            <!-- Categories Section -->
+            <div class="mb-3">
+                <h4 class="text-[#1A237E] font-medium text-[14px] mb-2 font-Onest">Categories</h4>
+                <div id="mobileOnlyCategoryList" class="flex flex-col gap-2"></div>
+            </div>
+            
+            <!-- Tags Section -->
+            <div>
+                <h4 class="text-[#1A237E] font-medium text-[14px] mb-2 font-Onest">Tags</h4>
+                <div id="mobileOnlyBrandList" class="flex flex-col gap-2"></div>
+            </div>
+            
+            <!-- No Results Message -->
+            <div id="mobileOnlyNoResults" class="hidden text-center py-2">
+                <p class="text-[14px] text-[#777]">No matching results found</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Use an IIFE to isolate variables and avoid global scope conflicts
+(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Using unique variable names to avoid conflicts
+        const mobileCategories = <?php echo json_encode($mobileSearchCategories); ?>;
+        const mobileBrands = <?php echo json_encode($mobileSearchBrands); ?>;
+        const mobileDomain = '<?php echo DOMAIN; ?>';
+        
+        // DOM Elements with unique IDs
+        const mobileSearchInput = document.getElementById('mobileOnlySearchInput');
+        const mobileSearchResults = document.getElementById('mobileOnlySearchResults');
+        const mobileCategoryList = document.getElementById('mobileOnlyCategoryList');
+        const mobileBrandList = document.getElementById('mobileOnlyBrandList');
+        const mobileNoResults = document.getElementById('mobileOnlyNoResults');
+        const mobileSearchButton = document.getElementById('mobileOnlySearchButton');
+        
+        // Skip initialization if elements don't exist (prevents errors)
+        if (!mobileSearchInput || !mobileSearchResults) return;
+        
+        // Filter function with unique name
+        function filterMobileResults(query) {
+            query = query.toLowerCase().trim();
+            
+            if (query.length < 2) {
+                mobileSearchResults.classList.add('hidden');
+                return;
+            }
+            
+            // Show results container
+            mobileSearchResults.classList.remove('hidden');
+            
+            // Filter categories
+            const filteredCategories = mobileCategories.filter(category => 
+                category.category_title.toLowerCase().includes(query)
+            );
+            
+            // Filter brands
+            const filteredBrands = mobileBrands.filter(brand => 
+                brand.brand_title.toLowerCase().includes(query)
+            );
+            
+            displayMobileResults(filteredCategories, filteredBrands);
+        }
+        
+        // Display results function with unique name
+        function displayMobileResults(filteredCategories, filteredBrands) {
+            mobileCategoryList.innerHTML = '';
+            mobileBrandList.innerHTML = '';
+            
+            const hasCategories = filteredCategories.length > 0;
+            const hasBrands = filteredBrands.length > 0;
+            
+            // Display categories
+            if (hasCategories) {
+                filteredCategories.forEach(category => {
+                    const item = document.createElement('a');
+                    item.href = `${mobileDomain}/products/index.php?category=${category.category_id}`;
+                    item.className = 'text-[13px] hover:text-[#1A237E] transition-colors';
+                    item.textContent = category.category_title;
+                    mobileCategoryList.appendChild(item);
+                });
+            }
+            
+            // Display brands
+            if (hasBrands) {
+                filteredBrands.forEach(brand => {
+                    const item = document.createElement('a');
+                    item.href = `${mobileDomain}/products/index.php?brand=${brand.brand_id}`;
+                    item.className = 'text-[13px] hover:text-[#1A237E] transition-colors';
+                    item.textContent = brand.brand_title;
+                    mobileBrandList.appendChild(item);
+                });
+            }
+            
+            // Show/hide no results message
+            if (!hasCategories && !hasBrands) {
+                mobileNoResults.classList.remove('hidden');
+            } else {
+                mobileNoResults.classList.add('hidden');
+            }
+        }
+        
+        // Debounce function with unique name
+        function debounceMobile(func, wait) {
+            let timeout;
+            return function() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    func.apply(context, args);
+                }, wait);
+            };
+        }
+        
+        // Create debounced version with unique name
+        const debouncedMobileFilter = debounceMobile(function(query) {
+            filterMobileResults(query);
+        }, 300);
+        
+        // Event listeners
+        mobileSearchInput.addEventListener('input', function() {
+            debouncedMobileFilter(this.value);
+        });
+        
+        mobileSearchInput.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2) {
+                filterMobileResults(this.value);
+            }
+        });
+        
+        // Hide search results when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!mobileSearchInput.contains(event.target) && !mobileSearchResults.contains(event.target)) {
+                mobileSearchResults.classList.add('hidden');
+            }
+        });
+        
+        // Handle Enter key press
+        mobileSearchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                window.location.href = `${mobileDomain}/products/index.php?search=${encodeURIComponent(this.value.trim())}`;
+            }
+        });
+        
+        // Handle search button click
+        mobileSearchButton.addEventListener('click', function() {
+            window.location.href = `${mobileDomain}/products/index.php?search=${encodeURIComponent(mobileSearchInput.value.trim())}`;
+        });
+    });
+})(); // Immediately invoked function to isolate scope
+</script>
             </div>
 </section>
     
