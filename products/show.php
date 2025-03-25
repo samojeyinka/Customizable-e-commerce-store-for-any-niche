@@ -275,6 +275,21 @@ display: none;
 }
 
 
+.active-thumbnail {
+    border: 2px solid #3498db; /* or any color that matches your design */
+    opacity: 1;
+}
+
+.thumbnail-image {
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.thumbnail-image:hover {
+    opacity: 0.9;
+}
+
+
     </style>
 </head>
 
@@ -334,33 +349,36 @@ display: none;
         <div class="w-[90%] mx-auto flex flex-col md:flex-row gap-5">
 
             <div class="w-full flex flex-col gap-3">
-                <div class="flex flex-col gap-2">
-                    <div class="w-full h-[397px] rounded-[4px] overflow-hidden">
+            <div class="flex flex-col gap-2">
+    <!-- Main Image -->
+    <div class="w-full h-[397px] rounded-[4px] overflow-hidden">
+        <img id="mainImage" src="<?php echo $main_image; ?>" class="w-full h-full object-cover" alt="<?php echo $product['product_name']; ?>" />
+    </div>
 
-                        <img src="<?php echo $main_image; ?>" class="w-full h-full object-cover" alt="<?php echo $product['product_name']; ?>" />
-                    </div>
-                    <div class="flex items-center gap-2">
-                    <?php foreach ($images as $index => $image): ?>
-                            <div class="w-[127.4px] h-[80px] rounded-[4px] overflow-hidden flex-shrink-0 cursor-pointer thumbnail-image" 
-                                 data-img="<?php echo DOMAIN; ?>/assets/products/<?php echo $image['image_path']; ?>">
-                                <img src="<?php echo DOMAIN; ?>/assets/products/<?php echo $image['image_path']; ?>" class="w-full h-full object-cover" alt="Product image <?php echo $index + 1; ?>" />
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                 <!-- reviews starts -->
-                 <div class="w-full border-b-[1.5px] border-[#E1E1E1] hidden md:block">
-    <div class="accordion w-full flex items-center justify-between">
+    <!-- Thumbnail Images -->
+    <div class="flex items-center gap-2">
+        <?php foreach ($images as $index => $image): ?>
+            <div class="w-[127.4px] h-[80px] rounded-[4px] overflow-hidden flex-shrink-0 cursor-pointer thumbnail-image"
+                data-img="<?php echo DOMAIN; ?>/assets/products/<?php echo $image['image_path']; ?>" 
+                onclick="changeMainImage('<?php echo DOMAIN; ?>/assets/products/<?php echo $image['image_path']; ?>')">
+                <img src="<?php echo DOMAIN; ?>/assets/products/<?php echo $image['image_path']; ?>" class="w-full h-full object-cover" alt="Product image <?php echo $index + 1; ?>" />
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<!-- The large screen reviews starts -->
+<div class="w-full border-b-[1.5px] border-[#E1E1E1] hidden md:block">
+    <div class="accordion w-full flex items-center justify-between cursor-pointer" id="accordionHeader">
         <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">
             View Reviews (<?php echo $total_reviews; ?>)
         </span>
     </div>
 
-    <div class="faqext flex flex-col gap-3">
+    <div class="revs flex flex-col gap-3" id="accordionContent">
         <?php if (empty($reviews)): ?>
             <div class="text-center py-4">
                 <p class="text-[#5B5B5B] text-[14px] font-['Montserrat']">No reviews yet for this product.</p>
-                
                 <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[#1A237E] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
                 <?php endif; ?>
@@ -370,15 +388,14 @@ display: none;
                 <div class="flex flex-col gap-2 border-b-[1px] pb-1 border-[#E1E1E1]">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                        <?php 
-    // Use profile image if available, otherwise use default avatar
-    $reviewer_avatar = !empty($review['profile_image']) 
-        ? DOMAIN . '/' . $review['profile_image'] 
-        : DOMAIN . '/assets/global/avatar.svg'; 
-    ?>
-    <img src="<?php echo htmlspecialchars($reviewer_avatar); ?>" 
-         alt="<?php echo htmlspecialchars($review['reviewer_name']); ?>" 
-         class="w-[24px] h-[24px] rounded-full object-cover" />
+                            <?php 
+                            $reviewer_avatar = !empty($review['profile_image']) 
+                                ? DOMAIN . '/' . $review['profile_image'] 
+                                : DOMAIN . '/assets/global/avatar.svg'; 
+                            ?>
+                            <img src="<?php echo htmlspecialchars($reviewer_avatar); ?>" 
+                                 alt="<?php echo htmlspecialchars($review['reviewer_name']); ?>" 
+                                 class="w-[24px] h-[24px] rounded-full object-cover" />
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-['Montserrat'] font-medium"><?php echo htmlspecialchars($review['reviewer_name']); ?></span>
                             <?php echo generateStarRating($review['rating']); ?>
                         </div>
@@ -396,8 +413,8 @@ display: none;
         <?php endif; ?>
     </div>
 </div>
+<!-- The large screen reviews ends -->
 
-                  <!-- reviews ends -->
 
             </div>
 
@@ -629,20 +646,18 @@ display: none;
 
             </div>
 
-
-                <!-- reviews starts -->
-                <div class="w-full border-b-[1.5px] border-[#E1E1E1] md:hidden">
-    <div class="accordion w-full flex items-center justify-between">
+<!-- The mobile reviews starts -->
+<div class="w-full border-b-[1.5px] border-[#E1E1E1] md:hidden">
+    <div class="accordion w-full flex items-center justify-between cursor-pointer" id="mobileAccordionHeader">
         <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">
             View Reviews (<?php echo $total_reviews; ?>)
         </span>
     </div>
 
-    <div class="faqext flex flex-col gap-3">
+    <div class="faqext flex flex-col gap-3 transition-all duration-300 ease-in-out" id="mobileAccordionContent">
         <?php if (empty($reviews)): ?>
             <div class="text-center py-4">
                 <p class="text-[#5B5B5B] text-[14px] font-['Montserrat']">No reviews yet for this product.</p>
-                
                 <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[#1A237E] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
                 <?php endif; ?>
@@ -652,15 +667,14 @@ display: none;
                 <div class="flex flex-col gap-2 border-b-[1px] pb-1 border-[#E1E1E1]">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                             <?php 
-    // Use profile image if available, otherwise use default avatar
-    $reviewer_avatar = !empty($review['profile_image']) 
-        ? DOMAIN . '/' . $review['profile_image'] 
-        : DOMAIN . '/assets/global/avatar.svg'; 
-    ?>
-    <img src="<?php echo htmlspecialchars($reviewer_avatar); ?>" 
-         alt="<?php echo htmlspecialchars($review['reviewer_name']); ?>" 
-         class="w-[24px] h-[24px] rounded-full object-cover" />
+                            <?php 
+                            $reviewer_avatar = !empty($review['profile_image']) 
+                                ? DOMAIN . '/' . $review['profile_image'] 
+                                : DOMAIN . '/assets/global/avatar.svg'; 
+                            ?>
+                            <img src="<?php echo htmlspecialchars($reviewer_avatar); ?>" 
+                                 alt="<?php echo htmlspecialchars($review['reviewer_name']); ?>" 
+                                 class="w-[24px] h-[24px] rounded-full object-cover" />
                             <?php echo generateStarRating($review['rating']); ?>
                         </div>
                         <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular"><?php echo date('m/d/Y', strtotime($review['created_at'])); ?></span>
@@ -677,10 +691,7 @@ display: none;
         <?php endif; ?>
     </div>
 </div>
-
-
-
-                  <!-- reviews ends -->
+<!-- The mobile reviews ends -->
         </div>
 
 
@@ -734,6 +745,63 @@ display: none;
 
 
 <script>
+ function changeMainImage(imgSrc) {
+        // Target the main image element by its id and change its src
+        document.getElementById('mainImage').src = imgSrc;
+    }
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const mobileAccordionHeader = document.getElementById("mobileAccordionHeader");
+    const mobileAccordionContent = document.getElementById("mobileAccordionContent");
+    
+    // Track state with a variable instead of relying on style checking
+    let isOpen = true;
+    
+    // Keep it open by default
+    mobileAccordionContent.style.maxHeight = mobileAccordionContent.scrollHeight + "px";
+    
+    mobileAccordionHeader.addEventListener("click", function () {
+        isOpen = !isOpen; // Toggle state
+        
+        if (isOpen) {
+            mobileAccordionContent.style.maxHeight = mobileAccordionContent.scrollHeight + "px";
+        } else {
+            mobileAccordionContent.style.maxHeight = "0px";
+        }
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const accordionHeader = document.getElementById("accordionHeader");
+    const accordionContent = document.getElementById("accordionContent");
+    
+    // Set initial state - open by default
+    let isOpen = true;
+    
+    // Initial setup for animation
+    accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
+    accordionContent.style.overflow = "hidden";
+    accordionContent.style.transition = "max-height 0.3s ease-in-out";
+    
+    accordionHeader.addEventListener("click", function () {
+        isOpen = !isOpen;
+        
+        if (isOpen) {
+            // Open the accordion with animation
+            accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
+        } else {
+            // Close the accordion with animation
+            accordionContent.style.maxHeight = "0px";
+        }
+    });
+});
+
+
+    
+
+
     // Variables to store selected values
 let selectedVariantId = null;
 let selectedColor = null;

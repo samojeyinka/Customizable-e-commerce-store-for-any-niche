@@ -240,7 +240,10 @@ $paystack_data = [
 
 <body>
     <main class="bg-[#FEFEFE] relative">
-   
+    <?php
+     include('../includes/header.php');
+    include('../includes/options.php');
+    ?>
         <section class="w-full bg-[#FFFFFFF] py-1">
             <div class="w-[90%] mx-auto">
                 <div class="flex items-center gap-1 cursor-pointer">
@@ -694,6 +697,8 @@ $paystack_data = [
                     </div>
                 </div>
 
+                
+
              
 
       <div class="w-full flex flex-col gap-3 rounded-[4px] bg-[#E8E9F2] md:bg-[#EEEEEE] mt-[9rem] md:mt-0 p-2">
@@ -775,6 +780,11 @@ $paystack_data = [
 
             </div>
         </div>
+
+        <?php
+        include(__DIR__ . '/../includes/footer.php');
+
+?>
     </main>
 
     <!-- Payment success modal (hidden by default) -->
@@ -800,6 +810,15 @@ $paystack_data = [
     <!-- Add Paystack script as external file -->
 
 <!-- Add your external JS file with nonce if needed -->
+
+<script src="<?php echo DOMAIN; ?>/functions/modals.js"></script>
+    <script src="<?php echo DOMAIN; ?>/functions/modals2.js"></script>
+    <script src="<?php echo DOMAIN; ?>/functions/functions.js"></script>
+    <script src="<?php echo DOMAIN; ?>/functions/tabs.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/accordion.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/faq.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/dropdown.js"></script>
+    <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/openoptions.js"></script>
 
     <script>
 document.addEventListener('DOMContentLoaded', function() {

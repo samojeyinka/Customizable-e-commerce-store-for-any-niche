@@ -27,7 +27,7 @@ $existing_review = null;
 
 // Validate parameters
 if (!$order_id || !$product_id) {
-    $error_message = "Missing required parameters.";
+    $error_message = "You can only leave a review for a product you bought.";
 } else {
     // Get order details to verify it belongs to the user and is delivered
     $order_sql = "SELECT o.id, o.order_status, o.delivered_at, 
