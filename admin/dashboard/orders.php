@@ -146,7 +146,78 @@ $status_classes = [
     'Refunded' => 'bg-[#D93939]',
     'Cancelled' => 'bg-red-500'
 ];
+
+
+
+// Get order statistics for the modal
+$stats_query = "SELECT 
+    COUNT(*) as total_orders,
+    SUM(CASE WHEN order_status = 'Delivered' THEN 1 ELSE 0 END) as completed_orders,
+    SUM(CASE WHEN order_status IN ('Processing', 'Shipped') THEN 1 ELSE 0 END) as pending_orders,
+    SUM(CASE WHEN order_status IN ('Refunded', 'Cancelled') THEN 1 ELSE 0 END) as returned_orders,
+    (SELECT COUNT(*) FROM orders WHERE $date_column >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)) as last_28_days,
+    (SELECT COUNT(*) FROM orders WHERE $date_column >= DATE_SUB(CURDATE(), INTERVAL 56 DAY) AND $date_column < DATE_SUB(CURDATE(), INTERVAL 28 DAY)) as previous_28_days
+FROM orders";
+
+$stats_result = $conn->query($stats_query);
+$order_stats = $stats_result->fetch_assoc();
+
+// Calculate percentage changes
+$total_change = $order_stats['last_28_days'] - $order_stats['previous_28_days'];
+$total_percentage = $order_stats['previous_28_days'] != 0 
+    ? round(($total_change / $order_stats['previous_28_days']) * 100) 
+    : ($order_stats['last_28_days'] > 0 ? 100 : 0);
+
+
+    
+// Add this at the top of your PHP code (before any HTML output)
+if (isset($_GET['export']) && $_GET['export'] == 'excel') {
+    // Set headers for Excel download
+    header('Content-Type: application/vnd.ms-excel');
+    header('Content-Disposition: attachment; filename="orders_export_'.date('Y-m-d').'.xls"');
+    
+    // Get all orders without pagination for export
+    $export_sql = "SELECT 
+        orders.id AS order_id,
+        CONCAT(profiles.first_name, ' ', profiles.last_name) AS customer_name,
+        orders.order_total AS amount,
+        orders.order_status,
+        orders.delivery_method,
+        orders.$date_column AS order_date
+    FROM orders
+    LEFT JOIN profiles ON orders.user_id = profiles.user_id
+    $where_clause
+    ORDER BY orders.$date_column DESC";
+    
+    $export_result = $conn->query($export_sql);
+    
+    // Start Excel output
+    echo "<table border='1'>";
+    echo "<tr>
+            <th>Order ID</th>
+            <th>Customer Name</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Delivery Method</th>
+            <th>Order Date</th>
+          </tr>";
+    
+    while ($order = $export_result->fetch_assoc()) {
+        echo "<tr>
+                <td>#".htmlspecialchars($order['order_id'])."</td>
+                <td>".htmlspecialchars($order['customer_name'])."</td>
+                <td>₦".number_format($order['amount'])."</td>
+                <td>".htmlspecialchars($order['order_status'])."</td>
+                <td>".htmlspecialchars($order['delivery_method'])."</td>
+                <td>".date('d/m/Y h:ia', strtotime($order['order_date']))."</td>
+              </tr>";
+    }
+    echo "</table>";
+    exit;
+}
 ?>
+
+
 
 
 <!DOCTYPE html>
@@ -196,7 +267,7 @@ include "./sidebar.php"
         <div class="w-full rounded-[16px] bg-white mx-auto p-2">
             <h1 class="md:hidden  text-[18px] font-Onest font-semibold mb-3 md:mb-0">Orders</h1>
 
-            <div id="myBtn" class="w-full md:w-[274px] border-[1px] border-[#F3F3F3] cursor-pointer rounded-[8px] p-2 flex justify-between items-center">
+            <div id="openOrdersModal" class="w-full md:w-[274px] border-[1px] border-[#F3F3F3] cursor-pointer rounded-[8px] p-2 flex justify-between items-center">
                 <h1 class="text-[16px] font-Onest font-regular">Orders Overview</h1>
                 <img src="../assets/dash/Vector 6905.svg" />
             </div>
@@ -261,9 +332,9 @@ include "./sidebar.php"
                     </div>
 
                     <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer shrink-0">
-                        <img src="../assets/dash/send-square.svg" />
-                        Export as Excel
-                    </button>
+    <img src="../assets/dash/send-square.svg" />
+    Export
+</button>
                 </div>
             </div>
 
@@ -392,146 +463,93 @@ include "./sidebar.php"
 
 
     <!-- The modals starts -->
-    <div id="myModal" class="modal reg">
-        <!-- Modal content -->
-        <div class="modal-content overflow-hidden p-4">
-            <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Order Overview</h1>
-            <img src="../assets/global/close-circle.svg" alt="close" id="closeauth" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+    <div id="ordersModal" class="modal reg">
+    <!-- Modal content -->
+    <div class="modal-content overflow-hidden p-4">
+        <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Order Overview</h1>
+        <img src="../assets/global/close-circle.svg" alt="close" id="closeOrdersModal" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
 
-
-            <div class="flex items-center gap-3 my-4">
-            <span class="text-[#2c2c2c] text-[14px] md:text-[16px] font-Onest font-medium">Sort by:</span>
-
-            <div class="flex items-center gap-2 md:gap-3 lg:gap-4">
-                <div class="custom-dropdown">
-                    <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
-                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">2025</span>
-                        <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                    </div>
-                    <div class="dropdown-content">
-                        <div class="flex items-center gap-3">
-                            <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                <div onclick="selectOption(this)">2025</div>
-                                <div onclick="selectOption(this)">2024</div>
-                                <div onclick="selectOption(this)">2023</div>
-                                <div onclick="selectOption(this)">2022</div>
-
-
-                            </div>
-
-                        </div>
-                    </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 p-2 gap-4 mt-2">
+            <!-- Total Orders Card -->
+            <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                    <img src="../assets/dash/illu.svg" class="w-full h-full" />
                 </div>
-
-                <div class="custom-dropdown">
-                    <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
-                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Last 28 days</span>
-                        <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                <div class="flex flex-col gap-[1px]">
+                    <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Orders</span>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($order_stats['total_orders']); ?></h2>
                     </div>
-                    <div class="dropdown-content">
-                        <div class="flex items-center gap-3">
-                            <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                <div onclick="selectOption(this)">Today</div>
-                                <div onclick="selectOption(this)">Last 7 days</div>
-                                <div onclick="selectOption(this)">Last 28 days</div>
-                                <div onclick="selectOption(this)">Custom date</div>
-
-
-                            </div>
-
-                        </div>
+                    <div class="flex items-center gap-1">
+                        <img src="../assets/dash/<?php echo $total_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
+                            <span class="text-<?php echo $total_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
+                                <?php echo abs($total_percentage); ?>%
+                            </span> from last 28 days
+                        </p>
                     </div>
                 </div>
             </div>
 
-        </div>
-            <div class="grid grid-cols-1 md:grid-cols-2  p-2 gap-4 mt-2">
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/illu.svg" class="w-full h-full" />
+            <!-- Completed Orders Card -->
+            <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                    <img src="../assets/dash/illu.svg" class="w-full h-full" />
+                </div>
+                <div class="flex flex-col gap-[1px]">
+                    <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Completed Orders</span>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($order_stats['completed_orders']); ?></h2>
                     </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Orders</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">53,000</h2>
-                            <!-- <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">Listed items</p> -->
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/decrease.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#D93939]">+12%</span> from last 28 days</p>
-                        </div>
-
+                    <div class="flex items-center gap-1">
+                        <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
+                        <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
+                            <span class="text-[#39D959]">+12%</span> from last 28 days
+                        </p>
                     </div>
                 </div>
-
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/illu.svg" class="w-full h-full" />
-                    </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Completed Orders</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">52,370</h2>
-                            <!-- <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">items need restocking</p> -->
-                        </div>
-
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#39D959]">+12%</span> from last 28 days</p>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/illu.svg" class="w-full h-full" />
-                    </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Pending Orders</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">430</h2>
-                            <!-- <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">available for purchase</p> -->
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/decrease.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#D93939]">+12%</span> from last 28 days</p>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
-                    </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Returned Orders</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">200</h2>
-                            <!-- <p class="text-[#1A237E] text-[14px] text-[15px] font-regular font-['Open Sans']">products have less than 5 items left</p> -->
-                        </div>
-
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#39D959]">+12%</span> from last 28 days</p>
-                        </div>
-
-                    </div>
-                </div>
-
-
             </div>
 
-            ​
-        </div>
+            <!-- Pending Orders Card -->
+            <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                    <img src="../assets/dash/illu.svg" class="w-full h-full" />
+                </div>
+                <div class="flex flex-col gap-[1px]">
+                    <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Pending Orders</span>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($order_stats['pending_orders']); ?></h2>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <img src="../assets/dash/decrease.svg" class="w-[20px] h-[20px]" />
+                        <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
+                            <span class="text-[#D93939]">+12%</span> from last 28 days
+                        </p>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Returned Orders Card -->
+            <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                    <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
+                </div>
+                <div class="flex flex-col gap-[1px]">
+                    <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Returned Orders</span>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($order_stats['returned_orders']); ?></h2>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
+                        <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
+                            <span class="text-[#39D959]">+12%</span> from last 28 days
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
+</div>
     <!-- The modals ends -->
 
 
@@ -582,6 +600,34 @@ document.addEventListener('DOMContentLoaded', function() {
         menu.style.display = "none";
     });
 });
+
+
+
+
+
+const openOrdersModal = document.getElementById("openOrdersModal");
+const closeOrdersModal = document.getElementById("closeOrdersModal");
+const ordersModal = document.getElementById("ordersModal");
+
+openOrdersModal.onclick = function () {
+    ordersModal.style.display = "block";
+}
+
+
+closeOrdersModal.onclick = function () {
+    ordersModal.style.display = "none";
+}
+
+
+function exportToExcel() {
+    // Get current filter parameters
+    const params = new URLSearchParams(window.location.search);
+    params.set('export', 'excel');
+    
+    // Redirect to the export URL
+    window.location.href = 'orders.php?' + params.toString();
+}
+
 </script>
 
 </body>

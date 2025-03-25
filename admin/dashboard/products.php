@@ -1,7 +1,17 @@
-<!-- connect file -->
 <?php
 include('../../config/connect.php');
 
+// Get filter parameters from URL
+$category_filter = isset($_GET['category']) ? $_GET['category'] : '';
+$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
+$date_filter = isset($_GET['date']) ? $_GET['date'] : '';
+$search_query = isset($_GET['search']) ? $_GET['search'] : '';
+
+// Pagination variables
+$per_page = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$start = ($page - 1) * $per_page;
 
 // Process category deletion if requested
 if (isset($_GET['delete_category'])) {
@@ -15,7 +25,7 @@ if (isset($_GET['delete_category'])) {
         if (!empty($row['category_image'])) {
             $image_path = "../../assets/categories/" . $row['category_image'];
             if (file_exists($image_path)) {
-                unlink($image_path); // Delete the image file
+                unlink($image_path);
             }
         }
     }
@@ -31,206 +41,239 @@ if (isset($_GET['delete_category'])) {
     }
 }
 
-// Process category update if requested
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['cat_title']) && isset($_POST['edit_id'])) {
-    $category_title = $_POST['cat_title'];
-    $category_id = $_POST['edit_id'];
-
-    // Check if another category with the same name exists
-    $select_query = "SELECT * FROM categories WHERE category_title='$category_title' AND category_id != '$category_id'";
-    $result_select = mysqli_query($con, $select_query);
-
-    if (!$result_select) {
-        echo "<script>alert('Error checking category: " . mysqli_error($con) . "');</script>";
-    } else {
-        $number = mysqli_num_rows($result_select);
-
-        if ($number > 0) {
-            echo "<script>alert('Category name already exists');</script>";
-        } else {
-            // Handle image upload
-            $category_image = "";
-            $update_image = false;
-
-            if (isset($_FILES['edit_cat_image']) && $_FILES['edit_cat_image']['error'] == 0) {
-                $upload_dir = "../../assets/categories/";
-
-                // Create directory if it doesn't exist
-                if (!file_exists($upload_dir)) {
-                    mkdir($upload_dir, 0777, true);
-                }
-
-                // Get file info
-                $file_name = basename($_FILES["edit_cat_image"]["name"]);
-                $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-
-                // Generate a unique filename
-                $new_file_name = uniqid() . '_' . time() . '.' . $file_ext;
-                $target_file = $upload_dir . $new_file_name;
-
-                // Allowed file types
-                $allowed_types = array('jpg', 'jpeg', 'png', 'gif', 'svg');
-
-                // Validate file type
-                if (in_array($file_ext, $allowed_types)) {
-                    // Move uploaded file
-                    if (move_uploaded_file($_FILES["edit_cat_image"]["tmp_name"], $target_file)) {
-                        $category_image = $new_file_name;
-                        $update_image = true;
-
-                        // Delete old image if exists
-                        $select_image = "SELECT category_image FROM categories WHERE category_id = '$category_id'";
-                        $image_result = mysqli_query($con, $select_image);
-                        if ($image_result && mysqli_num_rows($image_result) > 0) {
-                            $row = mysqli_fetch_assoc($image_result);
-                            if (!empty($row['category_image'])) {
-                                $old_image_path = $upload_dir . $row['category_image'];
-                                if (file_exists($old_image_path)) {
-                                    unlink($old_image_path); // Delete the old image file
-                                }
-                            }
-                        }
-                    } else {
-                        echo "<script>alert('Sorry, there was an error uploading your file.');</script>";
-                    }
-                } else {
-                    echo "<script>alert('Sorry, only JPG, JPEG, PNG, GIF, and SVG files are allowed.');</script>";
-                }
-            }
-
-            // Update category
-            if ($update_image) {
-                $update_query = "UPDATE categories SET category_title='$category_title', category_image='$category_image' WHERE category_id='$category_id'";
-            } else {
-                $update_query = "UPDATE categories SET category_title='$category_title' WHERE category_id='$category_id'";
-            }
-
-            $result = mysqli_query($con, $update_query);
-
-            if ($result) {
-                echo "<script>alert('Category updated successfully');</script>";
-                echo "<script>window.location.href='products.php';</script>";
-            } else {
-                echo "<script>alert('Error updating category: " . mysqli_error($con) . "');</script>";
-            }
-        }
+// Process export to Excel
+if (isset($_GET['export']) && $_GET['export'] == 'excel') {
+    header('Content-Type: application/vnd.ms-excel');
+    header('Content-Disposition: attachment; filename="products_export_'.date('Y-m-d').'.xls"');
+    
+    // Fetch all products without pagination for export
+    $export_query = buildProductQuery($con, '', '', '', '', true);
+    $export_result = mysqli_query($con, $export_query);
+    
+    echo "<table border='1'>";
+    echo "<tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Quantity</th>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Date Added</th>
+          </tr>";
+    
+    while ($product = mysqli_fetch_assoc($export_result)) {
+        $status_text = getStatusText($product['total_quantity']);
+        echo "<tr>
+                <td>".htmlspecialchars($product['product_name'])."</td>
+                <td>".htmlspecialchars($product['sku'])."</td>
+                <td>".number_format($product['total_quantity'])."</td>
+                <td>".htmlspecialchars($product['category_title'])."</td>
+                <td>₦".number_format($product['min_price'])."</td>
+                <td>".$status_text."</td>
+                <td>".date('d/m/Y h:i a', strtotime($product['date_added']))."</td>
+              </tr>";
     }
+    echo "</table>";
+    exit;
 }
 
-// Process brand deletion if requested
-if (isset($_GET['delete_brand'])) {
-    $brand_id = $_GET['delete_brand'];
+// Function to build product query with filters
+function buildProductQuery($con, $category_filter, $status_filter, $date_filter, $search_query, $all = false) {
+    $query = "
+        SELECT 
+            p.product_id,
+            p.product_name,
+            p.sku,
+            p.date_added,
+            c.category_title,
+            i.image_path AS main_image,
+            (SELECT SUM(quantity) FROM product_variants WHERE product_id = p.product_id) AS total_quantity,
+            (SELECT MIN(original_price) FROM product_variants WHERE product_id = p.product_id) AS min_price
+        FROM 
+            products p
+        LEFT JOIN 
+            categories c ON p.category_id = c.category_id
+        LEFT JOIN 
+            product_images i ON p.product_id = i.product_id AND i.is_main = 1
+        WHERE 1=1";
+    
+    // Apply category filter
+    if (!empty($category_filter)) {
+        $category_filter = mysqli_real_escape_string($con, $category_filter);
+        $query .= " AND c.category_title = '$category_filter'";
+    }
+    
+    // Apply status filter
+    if (!empty($status_filter)) {
+        switch ($status_filter) {
+            case 'inStock':
+                $query .= " AND (SELECT SUM(quantity) FROM product_variants WHERE product_id = p.product_id) > 0";
+                break;
+            case 'outOfStock':
+                $query .= " AND (SELECT SUM(quantity) FROM product_variants WHERE product_id = p.product_id) <= 0";
+                break;
+            case 'lowStock':
+                $query .= " AND (SELECT SUM(quantity) FROM product_variants WHERE product_id = p.product_id) BETWEEN 1 AND 9";
+                break;
+        }
+    }
+    
+    // Apply date filter
+    if (!empty($date_filter)) {
+        switch ($date_filter) {
+            case 'today':
+                $query .= " AND DATE(p.date_added) = CURDATE()";
+                break;
+            case 'last7':
+                $query .= " AND p.date_added >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
+                break;
+            case 'last28':
+                $query .= " AND p.date_added >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)";
+                break;
+        }
+    }
+    
+    // Apply search filter
+    if (!empty($search_query)) {
+        $search_query = mysqli_real_escape_string($con, $search_query);
+        $query .= " AND (p.product_name LIKE '%$search_query%' OR p.sku LIKE '%$search_query%')";
+    }
+    
+    $query .= " ORDER BY p.date_added DESC";
+    
+    // Add pagination if not exporting all
+    if (!$all) {
+        global $start, $per_page;
+        $query .= " LIMIT $start, $per_page";
+    }
+    
+    return $query;
+}
 
-    // Get image filename before deleting
-    $select_image = "SELECT brand_image FROM brands WHERE brand_id = '$brand_id'";
-    $image_result = mysqli_query($con, $select_image);
-    if ($image_result && mysqli_num_rows($image_result) > 0) {
-        $row = mysqli_fetch_assoc($image_result);
-        if (!empty($row['brand_image'])) {
-            $image_path = "../../assets/brands/" . $row['brand_image'];
+// Function to get status text
+function getStatusText($quantity) {
+    if ($quantity <= 0) return "Out of Stock";
+    if ($quantity < 10) return "Low Stock";
+    return "In Stock";
+}
+
+// Get total products count for pagination
+function getTotalProducts($con, $category_filter, $status_filter, $date_filter, $search_query) {
+    $count_query = "
+        SELECT COUNT(*) as total 
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        WHERE 1=1";
+    
+    if (!empty($category_filter)) {
+        $category_filter = mysqli_real_escape_string($con, $category_filter);
+        $count_query .= " AND c.category_title = '$category_filter'";
+    }
+    
+    if (!empty($status_filter)) {
+        switch ($status_filter) {
+            case 'inStock':
+                $count_query .= " AND (SELECT SUM(quantity) FROM product_variants WHERE product_id = p.product_id) > 0";
+                break;
+            case 'outOfStock':
+                $count_query .= " AND (SELECT SUM(quantity) FROM product_variants WHERE product_id = p.product_id) <= 0";
+                break;
+            case 'lowStock':
+                $count_query .= " AND (SELECT SUM(quantity) FROM product_variants WHERE product_id = p.product_id) BETWEEN 1 AND 9";
+                break;
+        }
+    }
+    
+    if (!empty($date_filter)) {
+        switch ($date_filter) {
+            case 'today':
+                $count_query .= " AND DATE(p.date_added) = CURDATE()";
+                break;
+            case 'last7':
+                $count_query .= " AND p.date_added >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
+                break;
+            case 'last28':
+                $count_query .= " AND p.date_added >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)";
+                break;
+        }
+    }
+    
+    if (!empty($search_query)) {
+        $search_query = mysqli_real_escape_string($con, $search_query);
+        $count_query .= " AND (p.product_name LIKE '%$search_query%' OR p.sku LIKE '%$search_query%')";
+    }
+    
+    $result = mysqli_query($con, $count_query);
+    $row = mysqli_fetch_assoc($result);
+    return $row['total'];
+}
+
+// Get all categories for filter dropdown
+$categories_query = "SELECT category_title FROM categories ORDER BY category_title";
+$categories_result = mysqli_query($con, $categories_query);
+$categories = [];
+while ($row = mysqli_fetch_assoc($categories_result)) {
+    $categories[] = $row['category_title'];
+}
+
+// Process product deletion if requested
+if (isset($_GET['delete_product']) && is_numeric($_GET['delete_product'])) {
+    $product_id = $_GET['delete_product'];
+    
+    // Start transaction
+    mysqli_begin_transaction($con);
+    try {
+        // Delete variants
+        $delete_variants = "DELETE FROM product_variants WHERE product_id = ?";
+        $stmt = mysqli_prepare($con, $delete_variants);
+        mysqli_stmt_bind_param($stmt, "i", $product_id);
+        mysqli_stmt_execute($stmt);
+        
+        // Get images to delete files
+        $get_images = "SELECT image_path FROM product_images WHERE product_id = ?";
+        $stmt = mysqli_prepare($con, $get_images);
+        mysqli_stmt_bind_param($stmt, "i", $product_id);
+        mysqli_stmt_execute($stmt);
+        $image_result = mysqli_stmt_get_result($stmt);
+        
+        // Delete actual image files
+        while ($image = mysqli_fetch_assoc($image_result)) {
+            $image_path = "../../assets/products/" . $image['image_path'];
             if (file_exists($image_path)) {
-                unlink($image_path); // Delete the image file
+                unlink($image_path);
             }
         }
-    }
-
-    // Delete brand
-    $delete_query = "DELETE FROM brands WHERE brand_id = '$brand_id'";
-    $result_delete = mysqli_query($con, $delete_query);
-    if ($result_delete) {
-        echo "<script>alert('Brand deleted successfully!');</script>";
-        echo "<script>window.location.href='products.php';</script>";
-    } else {
-        echo "<script>alert('Error deleting brand: " . mysqli_error($con) . "');</script>";
-    }
-}
-// Process brand update if requested
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isset($_POST['edit_id'])) {
-    $brand_title = $_POST['brand_title'];
-    $brand_id = $_POST['edit_id'];
-
-    // Check if another brand with the same name exists
-    $select_query = "SELECT * FROM brands WHERE brand_title='$brand_title' AND brand_id != '$brand_id'";
-    $result_select = mysqli_query($con, $select_query);
-
-    if (!$result_select) {
-        echo "<script>alert('Error checking brand: " . mysqli_error($con) . "');</script>";
-    } else {
-        $number = mysqli_num_rows($result_select);
-
-        if ($number > 0) {
-            echo "<script>alert('Brand name already exists');</script>";
-        } else {
-            // Handle image upload
-            $brand_image = "";
-            $update_image = false;
-
-            if (isset($_FILES['edit_brand_image']) && $_FILES['edit_brand_image']['error'] == 0) {
-                $upload_dir = "../../assets/brands/";
-
-                // Create directory if it doesn't exist
-                if (!file_exists($upload_dir)) {
-                    mkdir($upload_dir, 0777, true);
-                }
-
-                // Get file info
-                $file_name = basename($_FILES["edit_brand_image"]["name"]);
-                $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-
-                // Generate a unique filename
-                $new_file_name = uniqid() . '_' . time() . '.' . $file_ext;
-                $target_file = $upload_dir . $new_file_name;
-
-                // Allowed file types
-                $allowed_types = array('jpg', 'jpeg', 'png', 'gif', 'svg');
-
-                // Validate file type
-                if (in_array($file_ext, $allowed_types)) {
-                    // Move uploaded file
-                    if (move_uploaded_file($_FILES["edit_brand_image"]["tmp_name"], $target_file)) {
-                        $brand_image = $new_file_name;
-                        $update_image = true;
-
-                        // Delete old image if exists
-                        $select_image = "SELECT brand_image FROM brands WHERE brand_id = '$brand_id'";
-                        $image_result = mysqli_query($con, $select_image);
-                        if ($image_result && mysqli_num_rows($image_result) > 0) {
-                            $row = mysqli_fetch_assoc($image_result);
-                            if (!empty($row['brand_image'])) {
-                                $old_image_path = $upload_dir . $row['brand_image'];
-                                if (file_exists($old_image_path)) {
-                                    unlink($old_image_path); // Delete the old image file
-                                }
-                            }
-                        }
-                    } else {
-                        echo "<script>alert('Sorry, there was an error uploading your file.');</script>";
-                    }
-                } else {
-                    echo "<script>alert('Sorry, only JPG, JPEG, PNG, GIF, and SVG files are allowed.');</script>";
-                }
-            }
-
-            // Update brand (note: we don't update date_added to preserve creation date)
-            if ($update_image) {
-                $update_query = "UPDATE brands SET brand_title='$brand_title', brand_image='$brand_image' WHERE brand_id='$brand_id'";
-            } else {
-                $update_query = "UPDATE brands SET brand_title='$brand_title' WHERE brand_id='$brand_id'";
-            }
-
-            $result = mysqli_query($con, $update_query);
-
-            if ($result) {
-                echo "<script>alert('Brand updated successfully');</script>";
-                echo "<script>window.location.href='products.php';</script>";
-            } else {
-                echo "<script>alert('Error updating brand: " . mysqli_error($con) . "');</script>";
-            }
-        }
+        
+        // Delete images from database
+        $delete_images = "DELETE FROM product_images WHERE product_id = ?";
+        $stmt = mysqli_prepare($con, $delete_images);
+        mysqli_stmt_bind_param($stmt, "i", $product_id);
+        mysqli_stmt_execute($stmt);
+        
+        // Delete the product
+        $delete_product = "DELETE FROM products WHERE product_id = ?";
+        $stmt = mysqli_prepare($con, $delete_product);
+        mysqli_stmt_bind_param($stmt, "i", $product_id);
+        mysqli_stmt_execute($stmt);
+        
+        // Commit the transaction
+        mysqli_commit($con);
+        
+        echo "<script>alert('Product deleted successfully!'); window.location.href='products.php';</script>";
+    } catch (Exception $e) {
+        // Rollback the transaction if something failed
+        mysqli_rollback($con);
+        echo "<script>alert('Error deleting product: " . mysqli_error($con) . "');</script>";
     }
 }
 
+// Get total number of products for pagination
+$total_products = getTotalProducts($con, $category_filter, $status_filter, $date_filter, $search_query);
+$total_pages = ceil($total_products / $per_page);
 
+// Build and execute the main product query
+$query = buildProductQuery($con, $category_filter, $status_filter, $date_filter, $search_query);
+$result = mysqli_query($con, $query);
 ?>
 
 
@@ -375,7 +418,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isse
                                     <!-- The small menu  starts -->
                                     <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                                         <div class="flex flex-col gap-3">
-                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                                            <a href="../../products/show.php" class="text-[16px] font-medium text-[#262626]">View Details</a>
                                             <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Mark as unread</a>
                                         </div>
                                     </div>
@@ -395,7 +438,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isse
                                     <!-- The small menu  starts -->
                                     <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                                         <div class="flex flex-col gap-3">
-                                            <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                                            <a href="../../products/show.php" class="text-[16px] font-medium text-[#262626]">View Details</a>
                                             <a href="../products/show.php" class="text-[16px] font-medium text-[#E8B006]">Mark as unread</a>
                                         </div>
                                     </div>
@@ -551,95 +594,109 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isse
 
 
         <div class="w-full rounded-[16px] bg-white mx-auto p-3">
-            <div id="myBtn" class="w-full flex flex-col md:flex-row md:items-center gap-3 md:gap-5 justify-between">
-                <div class="flex items-center gap-0">
-                    <div class="w-full flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[24px] p-2">
-                        <img src="../assets/dash/search-normal (1).svg" alt="Search" class="w-[18px]" />
-                        <input type="text" placeholder="Search" class="w-full md:w-[250px] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
-                    </div>
+          <div class="w-full rounded-[16px] bg-white mx-auto p-3">
+    <form method="get" action="products.php" class="w-full flex flex-col md:flex-row md:items-center gap-3 md:gap-5 justify-between">
+        <div class="flex items-center gap-0">
+            <div class="w-full flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[24px] p-2">
+                <img src="../assets/dash/search-normal (1).svg" alt="Search" class="w-[18px]" />
+                <input type="text" name="search" placeholder="Search" value="<?php echo htmlspecialchars($search_query); ?>" class="w-full md:w-[250px] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
+                <input type="hidden" name="category" value="<?php echo htmlspecialchars($category_filter); ?>">
+                <input type="hidden" name="status" value="<?php echo htmlspecialchars($status_filter); ?>">
+                <input type="hidden" name="date" value="<?php echo htmlspecialchars($date_filter); ?>">
+            </div>
+        </div>
 
-                </div>
+        <div class="w-full flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-[#2c2c2c] text-[14px] md:text-[16px] font-Onest font-medium">Filter by:</span>
+                <img src="../assets/dash/filter-horizontal.svg" class="md:hidden" />
 
-                <div class="w-full flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <span class="text-[#2c2c2c] text-[14px] md:text-[16px] font-Onest font-medium">Filer by:</span>
-                        <img src="../assets/dash/filter-horizontal.svg" class="md:hidden" />
-
-                        <div class="hidden md:flex items-center gap-2 md:gap-3 lg:gap-4">
-                            <div class="custom-dropdown">
-                                <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
-                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Category</span>
-                                    <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                                </div>
-                                <div class="dropdown-content">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                            <div onclick="selectOption(this)">Duvet</div>
-                                            <div onclick="selectOption(this)">Pillows</div>
-                                            <div onclick="selectOption(this)">Lights</div>
-
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="custom-dropdown">
-                                <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
-                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Date</span>
-                                    <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                                </div>
-                                <div class="dropdown-content">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                            <div onclick="selectOption(this)">Today</div>
-                                            <div onclick="selectOption(this)">Last 7 days</div>
-                                            <div onclick="selectOption(this)">Last 28 days</div>
-                                            <div onclick="selectOption(this)">Custom date</div>
-
-
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="custom-dropdown">
-                                <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
-                                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Status</span>
-                                    <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                                </div>
-                                <div class="dropdown-content">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                            <div onclick="selectOption(this)">In Stock</div>
-                                            <div onclick="selectOption(this)">Out of Stock</div>
-                                            <div onclick="selectOption(this)">Low Stock</div>
-
-
-
-                                        </div>
-
-                                    </div>
+                <div class="hidden md:flex items-center gap-2 md:gap-3 lg:gap-4">
+                    <div class="custom-dropdown">
+                        <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
+                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular"><?php echo !empty($category_filter) ? $category_filter : 'Category'; ?></span>
+                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                        </div>
+                        <div class="dropdown-content">
+                            <div class="flex items-center gap-3">
+                                <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
+                                    <div onclick="setFilter('category', '')">All Categories</div>
+                                    <?php foreach ($categories as $category): ?>
+                                        <div onclick="setFilter('category', '<?php echo htmlspecialchars($category); ?>')"><?php echo htmlspecialchars($category); ?></div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
-                    <div class="flex items-center gap-1">
-                        <img src="../assets/dash/Path.svg" />
-                        <span class="text-[#262626] text-[14px] font-Onest font-regular">Clear filter</span>
+                    <div class="custom-dropdown">
+                        <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
+                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">
+                                <?php 
+                                    switch($status_filter) {
+                                        case 'inStock': echo 'In Stock'; break;
+                                        case 'outOfStock': echo 'Out of Stock'; break;
+                                        case 'lowStock': echo 'Low Stock'; break;
+                                        default: echo 'Status';
+                                    }
+                                ?>
+                            </span>
+                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                        </div>
+                        <div class="dropdown-content">
+                            <div class="flex items-center gap-3">
+                                <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
+                                    <div onclick="setFilter('status', '')">All Status</div>
+                                    <div onclick="setFilter('status', 'inStock')">In Stock</div>
+                                    <div onclick="setFilter('status', 'outOfStock')">Out of Stock</div>
+                                    <div onclick="setFilter('status', 'lowStock')">Low Stock</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <button class="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
-                        <img src="../assets/dash/send-square.svg" />
-                        Export as
-                    </button>
-
+                    <div class="custom-dropdown">
+                        <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
+                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">
+                                <?php 
+                                    switch($date_filter) {
+                                        case 'today': echo 'Today'; break;
+                                        case 'last7': echo 'Last 7 days'; break;
+                                        case 'last28': echo 'Last 28 days'; break;
+                                        default: echo 'Date';
+                                    }
+                                ?>
+                            </span>
+                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                        </div>
+                        <div class="dropdown-content">
+                            <div class="flex items-center gap-3">
+                                <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
+                                    <div onclick="setFilter('date', '')">All Time</div>
+                                    <div onclick="setFilter('date', 'today')">Today</div>
+                                    <div onclick="setFilter('date', 'last7')">Last 7 days</div>
+                                    <div onclick="setFilter('date', 'last28')">Last 28 days</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <div class="flex items-center gap-1">
+                <img src="../assets/dash/Path.svg" />
+                <a href="products.php" class="text-[#262626] text-[14px] font-Onest font-regular">Clear filter</a>
+            </div>
+
+            <a href="products.php?export=excel&category=<?php echo urlencode($category_filter); ?>&status=<?php echo urlencode($status_filter); ?>&date=<?php echo urlencode($date_filter); ?>&search=<?php echo urlencode($search_query); ?>" class="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
+                <img src="../assets/dash/send-square.svg" />
+                Export
+            </a>
+        </div>
+    </form>
+
+    <!-- Rest of your table code remains the same -->
+</div>
             <div class=" overflow-x-auto mt-3">
                 <table cols="" class="w-full shrink-0">
                     <thead class="w-full bg-[#E7E7E7] text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
@@ -659,83 +716,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isse
                             </th>
                         </thead>
 
-                        <tbody>
+            <tbody>
     <?php
-    // Fetch products with their main image, category, and stock status
-    $query = "
-        SELECT 
-            p.product_id,
-            p.product_name,
-            p.sku,
-            p.date_added,
-            c.category_title,
-            i.image_path AS main_image,
-            (SELECT SUM(quantity) FROM product_variants WHERE product_id = p.product_id) AS total_quantity,
-            (SELECT MIN(original_price) FROM product_variants WHERE product_id = p.product_id) AS min_price
-        FROM 
-            products p
-        LEFT JOIN 
-            categories c ON p.category_id = c.category_id
-        LEFT JOIN 
-            product_images i ON p.product_id = i.product_id AND i.is_main = 1
-        ORDER BY 
-            p.date_added DESC
-    ";
-
-    $result = mysqli_query($con, $query);
-
-    // Process product deletion if requested
-    if (isset($_GET['delete_product']) && is_numeric($_GET['delete_product'])) {
-        $product_id = $_GET['delete_product'];
-        
-        // Start transaction
-        mysqli_begin_transaction($con);
-        try {
-            // Delete variants
-            $delete_variants = "DELETE FROM product_variants WHERE product_id = ?";
-            $stmt = mysqli_prepare($con, $delete_variants);
-            mysqli_stmt_bind_param($stmt, "i", $product_id);
-            mysqli_stmt_execute($stmt);
-            
-            // Get images to delete files
-            $get_images = "SELECT image_path FROM product_images WHERE product_id = ?";
-            $stmt = mysqli_prepare($con, $get_images);
-            mysqli_stmt_bind_param($stmt, "i", $product_id);
-            mysqli_stmt_execute($stmt);
-            $image_result = mysqli_stmt_get_result($stmt);
-            
-            // Delete actual image files
-            while ($image = mysqli_fetch_assoc($image_result)) {
-                $image_path = "../../assets/products/" . $image['image_path'];
-                if (file_exists($image_path)) {
-                    unlink($image_path);
-                }
-            }
-            
-            // Delete images from database
-            $delete_images = "DELETE FROM product_images WHERE product_id = ?";
-            $stmt = mysqli_prepare($con, $delete_images);
-            mysqli_stmt_bind_param($stmt, "i", $product_id);
-            mysqli_stmt_execute($stmt);
-            
-            // Delete the product
-            $delete_product = "DELETE FROM products WHERE product_id = ?";
-            $stmt = mysqli_prepare($con, $delete_product);
-            mysqli_stmt_bind_param($stmt, "i", $product_id);
-            mysqli_stmt_execute($stmt);
-            
-            // Commit the transaction
-            mysqli_commit($con);
-            
-            echo "<script>alert('Product deleted successfully!'); window.location.href='products.php';</script>";
-        } catch (Exception $e) {
-            // Rollback the transaction if something failed
-            mysqli_rollback($con);
-            echo "<script>alert('Error deleting product: " . mysqli_error($con) . "');</script>";
-        }
-    }
-
-    // Check if we have products
+    // Check if we have products from the filtered query
     if ($result && mysqli_num_rows($result) > 0) {
         while ($product = mysqli_fetch_assoc($result)) {
             // Determine stock status
@@ -747,7 +730,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isse
                 $stock_status = "outOfStock";
                 $status_class = "bg-[#262626]";
                 $status_text = "Out of Stock";
-            } elseif ($product['total_quantity'] < 10) { // Assuming less than 10 is low stock
+            } elseif ($product['total_quantity'] < 10) {
                 $stock_status = "lowStock";
                 $status_class = "bg-[#E8B006]";
                 $status_text = "Low Stock";
@@ -792,7 +775,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isse
             <!-- Order Menu (specific to this row) -->
             <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                 <div class="flex flex-col gap-3">
-                    <a href="../products/show.php?id=<?php echo $product['product_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                    <a href="../../products/show.php?id=<?php echo $product['product_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
                     <a href="./reviews.php?product_id=<?php echo $product['product_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Review</a>
                     <a href="./edit-product.php?id=<?php echo $product['product_id']; ?>" class="text-[16px] font-medium text-[#262626]">Edit</a>
                     <a href="javascript:void(0);" onclick="confirmDelete(<?php echo $product['product_id']; ?>, '<?php echo addslashes($product['product_name']); ?>')" class="text-[16px] font-medium text-[#D93939]">Delete</a>
@@ -803,12 +786,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isse
     <?php
         }
     } else {
-        // No products found
-        echo '<tr><td colspan="8" class="text-center py-4 text-gray-500">No products found</td></tr>';
+        // No products found - show message based on whether filters are active
+        $filter_active = !empty($category_filter) || !empty($status_filter) || !empty($date_filter) || !empty($search_query);
+        
+        if ($filter_active) {
+            echo '<tr><td colspan="8" class="text-center py-4 text-gray-500">No products found matching your filters</td></tr>';
+        } else {
+            echo '<tr><td colspan="8" class="text-center py-4 text-gray-500">No products found</td></tr>';
+        }
     }
     ?>
 </tbody>
-
 <script>
     function confirmDelete(productId, productName) {
         if (confirm('Are you sure you want to delete "' + productName + '"? This action cannot be undone.')) {
@@ -821,34 +809,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isse
 
         </div>
 
-        <div class="w-[90%] md:w-full py-2 mx-auto flex flex-col gap-2 md:flex-row md:items-center justify-between">
-            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">Showing 10 results from 10,000</span>
-            <div class="w-full md:w-[fit-content] ml-auto flex items-center justify-between gap-5">
-                <div class="flex items-center gap-2 cursor-pointer">
-                    <img src="../assets/products/prev.svg" class="w-[6px] h-[11px]" />
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Prev</span>
-                </div>
-
-                <div class="w-full flex items-center justify-between md:gap-6">
-
-                    <span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#1A237E]">1</span>
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">2</span>
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">3</span>
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">4</span>
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">5</span>
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">...</span>
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">10</span>
-
-
-                </div>
-
-                <div class="flex items-center gap-2 cursor-pointer">
-                    <img src="../assets/products/next.svg" class="w-[6px] h-[11px]" />
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Next</span>
-                </div>
-
+       <div class="w-[90%] md:w-full py-2 mx-auto flex flex-col gap-2 md:flex-row md:items-center justify-between">
+    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">
+        Showing <?php echo min($per_page, $total_products - $start); ?> results from <?php echo $total_products; ?>
+    </span>
+    <div class="w-full md:w-[fit-content] ml-auto flex items-center justify-between gap-5">
+        <?php if ($page > 1): ?>
+            <div class="flex items-center gap-2 cursor-pointer">
+                <img src="../assets/products/prev.svg" class="w-[6px] h-[11px]" />
+                <a href="products.php?page=<?php echo $page-1; ?>&category=<?php echo urlencode($category_filter); ?>&status=<?php echo urlencode($status_filter); ?>&date=<?php echo urlencode($date_filter); ?>&search=<?php echo urlencode($search_query); ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Prev</a>
             </div>
+        <?php endif; ?>
+
+        <div class="w-full flex items-center justify-between md:gap-6">
+            <?php
+            // Show first page
+            if ($page > 3) {
+                echo '<a href="products.php?page=1&category='.urlencode($category_filter).'&status='.urlencode($status_filter).'&date='.urlencode($date_filter).'&search='.urlencode($search_query).'" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">1</a>';
+                if ($page > 4) echo '<span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">...</span>';
+            }
+            
+            // Show pages around current page
+            for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++) {
+                if ($i == $page) {
+                    echo '<span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#1A237E]">'.$i.'</span>';
+                } else {
+                    echo '<a href="products.php?page='.$i.'&category='.urlencode($category_filter).'&status='.urlencode($status_filter).'&date='.urlencode($date_filter).'&search='.urlencode($search_query).'" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">'.$i.'</a>';
+                }
+            }
+            
+            // Show last page
+            if ($page < $total_pages - 2) {
+                if ($page < $total_pages - 3) echo '<span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">...</span>';
+                echo '<a href="products.php?page='.$total_pages.'&category='.urlencode($category_filter).'&status='.urlencode($status_filter).'&date='.urlencode($date_filter).'&search='.urlencode($search_query).'" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">'.$total_pages.'</a>';
+            }
+            ?>
         </div>
+
+        <?php if ($page < $total_pages): ?>
+            <div class="flex items-center gap-2 cursor-pointer">
+                <a href="products.php?page=<?php echo $page+1; ?>&category=<?php echo urlencode($category_filter); ?>&status=<?php echo urlencode($status_filter); ?>&date=<?php echo urlencode($date_filter); ?>&search=<?php echo urlencode($search_query); ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Next</a>
+                <img src="../assets/products/next.svg" class="w-[6px] h-[11px]" />
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
 
     </div>
     </div>
@@ -857,98 +862,132 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isse
 
     <!-- The modals starts -->
     <div id="myModal" class="modal reg">
-        <!-- Modal content -->
-        <div class="modal-content overflow-hidden p-4">
-            <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Product Overview</h1>
-            <img src="../assets/global/close-circle.svg" alt="close" id="closeauth" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+    <!-- Modal content -->
+    <div class="modal-content overflow-hidden p-4">
+        <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Product Overview</h1>
+        <img src="../assets/global/close-circle.svg" alt="close" id="closmyModalhere" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
 
-            <div class="grid grid-cols-1 md:grid-cols-2  p-2 gap-4 mt-2">
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
+        <div class="grid grid-cols-1 md:grid-cols-2 p-2 gap-4 mt-2">
+            <?php
+            // Get product statistics from database
+            $stats_query = "SELECT 
+                COUNT(*) as total_products,
+                SUM(CASE WHEN (SELECT SUM(quantity) FROM product_variants WHERE product_id = products.product_id) <= 0 THEN 1 ELSE 0 END) as out_of_stock,
+                SUM(CASE WHEN (SELECT SUM(quantity) FROM product_variants WHERE product_id = products.product_id) > 0 THEN 1 ELSE 0 END) as in_stock,
+                SUM(CASE WHEN (SELECT SUM(quantity) FROM product_variants WHERE product_id = products.product_id) BETWEEN 1 AND 9 THEN 1 ELSE 0 END) as low_stock,
+                (SELECT COUNT(*) FROM products WHERE date_added >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)) as new_last_28_days,
+                (SELECT COUNT(*) FROM products WHERE date_added >= DATE_SUB(CURDATE(), INTERVAL 56 DAY) AND date_added < DATE_SUB(CURDATE(), INTERVAL 28 DAY)) as previous_28_days
+            FROM products";
+            
+            $stats_result = mysqli_query($con, $stats_query);
+            $stats = mysqli_fetch_assoc($stats_result);
+            
+            // Calculate percentage changes
+            $total_change = $stats['new_last_28_days'] - $stats['previous_28_days'];
+            $total_percentage = $stats['previous_28_days'] != 0 
+                ? round(($total_change / $stats['previous_28_days']) * 100) 
+                : 100;
+            
+            $out_of_stock_change = 0; // You would need to track this over time
+            $out_of_stock_percentage = 12; // Example value - implement tracking
+            
+            $in_stock_change = 0; // You would need to track this over time
+            $in_stock_percentage = 12; // Example value - implement tracking
+            
+            $low_stock_change = 0; // You would need to track this over time
+            $low_stock_percentage = 12; // Example value - implement tracking
+            ?>
+            
+            <!-- Total Products Card -->
+            <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                    <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
+                </div>
+                <div class="flex flex-col gap-[1px]">
+                    <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Products</span>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($stats['total_products']); ?></h2>
+                        <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">Listed items</p>
                     </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Products</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">500</h2>
-                            <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">Listed items</p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/decrease.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#D93939]">+12%</span> from last 28 days</p>
-                        </div>
-
+                    <div class="flex items-center gap-1">
+                        <img src="../assets/dash/<?php echo $total_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
+                            <span class="text-<?php echo $total_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
+                                <?php echo abs($total_percentage); ?>%
+                            </span> from last 28 days
+                        </p>
                     </div>
                 </div>
-
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
-                    </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Out-of-Stock Products</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">52</h2>
-                            <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">items need restocking</p>
-                        </div>
-
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#39D959]">+12%</span> from last 28 days</p>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
-                    </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">In-Stock Products</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">450</h2>
-                            <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">available for purchase</p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/decrease.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#D93939]">+12%</span> from last 28 days</p>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
-                    <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
-                        <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
-                    </div>
-
-                    <div class="flex flex-col gap-[1px]">
-                        <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Low Stock Warnings</span>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">2</h2>
-                            <p class="text-[#1A237E] text-[14px] text-[15px] font-regular font-['Open Sans']">products have less than 5 items left</p>
-                        </div>
-
-                        <div class="flex items-center gap-1">
-                            <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
-                            <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']"><span class="text-[#39D959]">+12%</span> from last 28 days</p>
-                        </div>
-
-                    </div>
-                </div>
-
-
             </div>
 
-            ​
+            <!-- Out-of-Stock Products Card -->
+            <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                    <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
+                </div>
+                <div class="flex flex-col gap-[1px]">
+                    <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Out-of-Stock Products</span>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($stats['out_of_stock']); ?></h2>
+                        <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">items need restocking</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <img src="../assets/dash/<?php echo $out_of_stock_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
+                            <span class="text-<?php echo $out_of_stock_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
+                                <?php echo abs($out_of_stock_percentage); ?>%
+                            </span> from last 28 days
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In-Stock Products Card -->
+            <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                    <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
+                </div>
+                <div class="flex flex-col gap-[1px]">
+                    <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">In-Stock Products</span>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($stats['in_stock']); ?></h2>
+                        <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">available for purchase</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <img src="../assets/dash/<?php echo $in_stock_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
+                            <span class="text-<?php echo $in_stock_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
+                                <?php echo abs($in_stock_percentage); ?>%
+                            </span> from last 28 days
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Low Stock Warnings Card -->
+            <div class="w-full flex items-start gap-2 px-6 py-3 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[8px]">
+                <div class="w-[32px] h-[32px] md:w-[50px] md:h-[50px] rounded-[50%] overflow-hidden">
+                    <img src="../assets/dash/Frame 1171276632 (2).svg" class="w-full h-full" />
+                </div>
+                <div class="flex flex-col gap-[1px]">
+                    <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Low Stock Warnings</span>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($stats['low_stock']); ?></h2>
+                        <p class="text-[#1A237E] text-[14px] text-[15px] font-regular font-['Open Sans']">products have less than 10 items left</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <img src="../assets/dash/<?php echo $low_stock_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
+                            <span class="text-<?php echo $low_stock_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
+                                <?php echo abs($low_stock_percentage); ?>%
+                            </span> from last 28 days
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-
     </div>
-
+</div>
     <?php
     include('../../includes/admin/create_category.php');
     include('../../includes/admin/categories.php');
@@ -1295,6 +1334,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title']) && isse
             window.location.href = 'products.php?delete_product=' + productId;
         }
     }
+
+
+
+    function setFilter(type, value) {
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+    
+    // Update the specific filter
+    if (value) {
+        params.set(type, value);
+    } else {
+        params.delete(type);
+    }
+    
+    // Reset to page 1 when changing filters
+    params.set('page', '1');
+    
+    // Submit the form
+    window.location.href = 'products.php?' + params.toString();
+}
+
+
+const closmyModalhere = document.getElementById("closmyModalhere");
+const mymodalhere = document.getElementById("myModal");
+
+closmyModalhere.onclick = function () {
+    mymodalhere.style.display = "none";
+}
     </script>
 
 
