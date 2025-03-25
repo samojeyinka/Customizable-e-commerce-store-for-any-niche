@@ -138,7 +138,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } else {
             // Email not found - for security, don't reveal this
-            $success_message = "If your email exists in our system, you will receive a password reset link shortly.";
+            $error_message = "Your email address is not recognized as an administrator.";
         }
         
         $conn->close();

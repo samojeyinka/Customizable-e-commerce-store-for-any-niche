@@ -115,15 +115,15 @@ if (!defined('DOMAIN')) {
                     <div class="flex flex-col gap-2">
                         <div class="flex items-center gap-1">
                             <img src="<?php echo DOMAIN; ?>/assets/global/location.svg" class="w-[24px] h-[24px]" />
-                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">Location</p>
+                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">Tejuosho Main Complex Yaba.</p>
                         </div>
                         <div class="flex items-center gap-1">
                             <img src="<?php echo DOMAIN; ?>/assets/global/call.svg" class="w-[24px] h-[24px]" />
-                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">09090909090</p>
+                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">09125559982</p>
                         </div>
                         <div class="flex items-center gap-1">
                             <img src="<?php echo DOMAIN; ?>/assets/global/mail.svg" class="w-[24px] h-[24px]" />
-                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">supportvictosah@gmail.com</p>
+                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">support@victosah.com</p>
                         </div>
 
                     </div>
@@ -162,12 +162,12 @@ if (!defined('DOMAIN')) {
                 <div class="flex flex-col gap-2">
                     <h1 class="text-[#262626] text-[20px] md:text-[24px] font-['Montserrat'] font-medium">Connect with us on:</h1>
                     <div class="flex items-center gap-7">
-                        <a href="#"><img src="<?php echo DOMAIN; ?>/assets/global/e1.svg" alt="Search" class="w-[13.83px]" /></a>
-                        <a href="#"><img src="<?php echo DOMAIN; ?>/assets/global/e2.svg" alt="Search" class="w-[21.83px]" /></a>
-                        <a href="#"><img src="<?php echo DOMAIN; ?>/assets/global/e3.svg" alt="Search" class="w-[21.83px]" /></a>
+                        <a href="https://www.facebook.com/victosahsols/" target="_blank"><img src="<?php echo DOMAIN; ?>/assets/global/e1.svg" alt="Search" class="w-[13.83px]" /></a>
+                        <a href="https://www.instagram.com/victosahsols/" target="_blank"><img src="<?php echo DOMAIN; ?>/assets/global/e2.svg" alt="Search" class="w-[21.83px]" /></a>
+                        <a href="https://wa.me/09125559982" target="_blank"><img src="<?php echo DOMAIN; ?>/assets/global/e3.svg" alt="Search" class="w-[21.83px]" /></a>
                         <a href="#"><img src="<?php echo DOMAIN; ?>/assets/global/e4.svg" alt="Search" class="w-[21.83px]" /></a>
                         <a href="#"><img src="<?php echo DOMAIN; ?>/assets/global/e5.svg" alt="Search" class="w-[17.83px]" /></a>
-                        <a href="#"><img src="<?php echo DOMAIN; ?>/assets/global/e6.svg" alt="Search" class="w-[30.22px]" /></a>
+                        <a href="https://www.x.com/victosahsols/" target="_blank"><img src="<?php echo DOMAIN; ?>/assets/global/e6.svg" alt="Search" class="w-[30.22px]" /></a>
                     </div>
                 </div>
                 <div class="flex md:items-center flex-col gap-3 md:gap-0 md:flex-row justify-between mt-10">
@@ -179,6 +179,10 @@ if (!defined('DOMAIN')) {
 
                 </div>
             </div>
+
+            <a href="https://wa.me/09125559982" target="_blank" class="fixed top-[55%] md:top-[70%] right-5 md:right-10">
+            <img src="<?php echo DOMAIN; ?>/assets/global/whatsapp.svg" class="w-[50px] md:w-[60px] rounded-[50%] shadow-lg" />
+        </a>
         </footer>
         <!-- ========================  The Footer section ends ======================== -->
 

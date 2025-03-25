@@ -39,19 +39,19 @@
                         <div class="flex flex-col gap-2 md:gap-4">
                             <!-- <img src="../assets/products/h1.svg" class="w-[25px] md:w-[35px] cursor-pointer add-to-favourite" />-->
                               <img src="<?php echo DOMAIN; ?>/assets/products/<?php echo isset($favorites[$product['product_id']]) ? 'addtofav.svg' : 'addedtofav.svg'; ?>" 
-             class="w-[25px] md:w-[35px] cursor-pointer add-to-favourite <?php echo isset($favorites[$product['product_id']]) ? 'favorite-active' : ''; ?>" 
+             class="w-[30px] md:w-[35px] cursor-pointer add-to-favourite <?php echo isset($favorites[$product['product_id']]) ? 'favorite-active' : ''; ?>" 
              data-product-id="<?php echo $product['product_id']; ?>" />
        
                            
 <img src="<?php echo array_key_exists($product['product_id'], $cart_items) ? DOMAIN . '/assets/products/addedtocart.svg' : DOMAIN . '/assets/products/addtocart.svg'; ?>" 
      alt="<?php echo array_key_exists($product['product_id'], $cart_items) ? 'Remove from Cart' : 'Add to Cart'; ?>" 
-     class="cart-toggle-icon w-[25px] md:w-[35px] cursor-pointer <?php echo array_key_exists($product['product_id'], $cart_items) ? 'in-cart' : ''; ?>" 
+     class="cart-toggle-icon w-[30px] md:w-[35px] cursor-pointer <?php echo array_key_exists($product['product_id'], $cart_items) ? 'in-cart' : ''; ?>" 
      data-product-id="<?php echo $product['product_id']; ?>"
      data-cart-id="<?php echo array_key_exists($product['product_id'], $cart_items) ? $cart_items[$product['product_id']] : ''; ?>"
      data-in-cart-image="<?php echo DOMAIN; ?>/assets/products/addedtocart.svg"
      data-default-image="<?php echo DOMAIN; ?>/assets/products/addtocart.svg"
 />
-                            <img src="<?php echo DOMAIN; ?>/assets/products/go.svg" class="w-[25px] md:w-[35px] cursor-pointer" />
+                            <img src="<?php echo DOMAIN; ?>/assets/products/go.svg" class="w-[30px] md:w-[35px] cursor-pointer" />
                         </div>
                     </div>
                 </a>

@@ -245,6 +245,10 @@ $paystack_data = [
 z-index: 10;
     transition: top 0.3s ease-in-out;
   }
+
+  #paysuccess{
+    z-index: 40 !important;
+  }
   
   .shadow-md {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -684,11 +688,11 @@ z-index: 10;
         By proceeding with your purchase you agree to our Terms and Conditions and Privacy Policy
     </label>
     <button 
-        type="button" 
-        id="pay-button"
-        class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex">
-        Pay Now ₦<?php echo number_format($total); ?>
-    </button>
+    type="button" 
+    id="pay-button-desktop"
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex">
+    Pay Now ₦<?php echo number_format($total); ?>
+</button>
 </div>
                 </form>
             </div>
@@ -713,11 +717,11 @@ z-index: 10;
         </div>
     </div>
     <button 
-        type="button" 
-        id="pay-button"
-        class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
-        Pay Now ₦<?php echo number_format($total); ?>
-    </button>
+    type="button" 
+    id="pay-button-mobile"
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+    Pay Now ₦<?php echo number_format($total); ?>
+</button>
 </div>
                 
 
@@ -862,47 +866,50 @@ document.addEventListener('DOMContentLoaded', function() {
     let total = subtotal;
     
     // Function to update totals
+
     function updateTotals(isExpress) {
-        // Calculate shipping fee based on delivery method and product count
-        const shippingFee = isExpress ? (baseShippingFee * productCount) : 0;
-        
-        // Update shipping fee displays
-        document.getElementById('mobile-shipping').textContent = shippingFee.toLocaleString();
-        document.getElementById('desktop-shipping').textContent = shippingFee.toLocaleString();
-        
-        // Update the shipping fee label text based on delivery method
-        const shippingLabels = document.querySelectorAll('.shipping-fee-label');
-        shippingLabels.forEach(label => {
-            if (isExpress) {
-                label.textContent = `Shipping fee (₦${baseShippingFee.toLocaleString()} x ${productCount} products)`;
-            } else {
-                label.textContent = 'Shipping fee';
-            }
-        });
-        
-        if (document.getElementById('delivery-fee')) {
-            document.getElementById('delivery-fee').textContent = shippingFee.toLocaleString();
+    // Calculate shipping fee based on delivery method and product count
+    const shippingFee = isExpress ? (baseShippingFee * productCount) : 0;
+    
+    // Update shipping fee displays
+    document.getElementById('mobile-shipping').textContent = shippingFee.toLocaleString();
+    document.getElementById('desktop-shipping').textContent = shippingFee.toLocaleString();
+    
+    // Update the shipping fee label text based on delivery method
+    const shippingLabels = document.querySelectorAll('.shipping-fee-label');
+    shippingLabels.forEach(label => {
+        if (isExpress) {
+            label.textContent = `Shipping fee (₦${baseShippingFee.toLocaleString()} x ${productCount} products)`;
+        } else {
+            label.textContent = 'Shipping fee';
         }
-        
-        // Calculate new total
-        total = subtotal + shippingFee;
-        
-        // Update total displays
-        document.getElementById('mobile-total').textContent = total.toLocaleString();
-        document.getElementById('desktop-total').textContent = total.toLocaleString();
-        
-        // Update the Pay Now button text with the new total
-        if (payButton) {
-            payButton.innerHTML = `Pay Now ₦${total.toLocaleString()}`;
-        }
-        
-        // Update the hidden amount field for Paystack
-        const amountField = document.getElementById('amount');
-        if (amountField) {
-            amountField.value = total;
-        }
+    });
+    
+    if (document.getElementById('delivery-fee')) {
+        document.getElementById('delivery-fee').textContent = shippingFee.toLocaleString();
     }
     
+    // Calculate new total
+    total = subtotal + shippingFee;
+    
+    // Update total displays
+    document.getElementById('mobile-total').textContent = total.toLocaleString();
+    document.getElementById('desktop-total').textContent = total.toLocaleString();
+    
+    // Update both Pay Now buttons with the new total using their new IDs
+    const mobileButton = document.getElementById('pay-button-mobile');
+    const desktopButton = document.getElementById('pay-button-desktop');
+    const buttonText = `Pay Now ₦${total.toLocaleString()}`;
+    
+    if (mobileButton) mobileButton.innerHTML = buttonText;
+    if (desktopButton) desktopButton.innerHTML = buttonText;
+    
+    // Update the hidden amount field for Paystack
+    const amountField = document.getElementById('amount');
+    if (amountField) {
+        amountField.value = total;
+    }
+}
     // Handle delivery method change
     deliveryRadios.forEach(radio => {
         radio.addEventListener('change', function() {
@@ -962,63 +969,83 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// Paystack Payment Handler
+
+// Modified payment handler to support both mobile and desktop buttons
 document.addEventListener('DOMContentLoaded', function() {
-    const payButton = document.getElementById('pay-button');
+    // Get both pay buttons (mobile and desktop)
+    const payButtons = document.querySelectorAll('#pay-button');
     
-    if (payButton) {
-        payButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Add loading animation or indicator
-            this.innerHTML = '<span class="spinner">Processing...</span>';
-            
-            // Use the current total variable which is maintained in the script
-            // instead of relying on the hidden field
-            const amount = total;
-            
-            // Get other payment details
-            const email = '<?php echo htmlspecialchars($user['email']); ?>';
-            const firstName = '<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>';
-            const lastName = '<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>';
-            const ref = 'ORDER-' + Date.now() + Math.floor(Math.random() * 10000);
-            
-            let handler = PaystackPop.setup({
-                key: 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41',
-                email: email,
-                amount: amount * 100, // Convert to kobo
-                currency: "NGN",
-                ref: ref,
-                metadata: {
-                    custom_fields: [
-                        {
-                            display_name: "First Name",
-                            variable_name: "first_name",
-                            value: firstName
-                        },
-                        {
-                            display_name: "Last Name",
-                            variable_name: "last_name",
-                            value: lastName
-                        }
-                    ]
-                },
-                onClose: function() {
-                    console.log('Payment window closed');
-                },
-                callback: function(response) {
-                    console.log('Payment complete! Reference:', response.reference);
-                    processOrder(response.reference, response.transaction);
-                }
+    if (payButtons.length > 0) {
+        // Add event listener to each button
+        payButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Add loading animation to the clicked button
+                this.innerHTML = '<span class="spinner">Processing...</span>';
+                
+                // Dynamically get the current total from the display elements
+                const totalText = document.getElementById('desktop-total').textContent;
+                const amount = parseFloat(totalText.replace(/,/g, ''));
+                
+                // Get user data
+                const email = '<?php echo htmlspecialchars($user['email']); ?>';
+                const firstName = '<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>';
+                const lastName = '<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>';
+                const ref = 'ORDER-' + Date.now() + Math.floor(Math.random() * 10000);
+                
+                console.log('Processing payment for amount:', amount);
+                
+                let handler = PaystackPop.setup({
+                    key: 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41',
+                    email: email,
+                    amount: amount * 100, // Convert to kobo
+                    currency: "NGN",
+                    ref: ref,
+                    metadata: {
+                        custom_fields: [
+                            {
+                                display_name: "First Name",
+                                variable_name: "first_name",
+                                value: firstName
+                            },
+                            {
+                                display_name: "Last Name",
+                                variable_name: "last_name",
+                                value: lastName
+                            }
+                        ]
+                    },
+                    onClose: function() {
+                        console.log('Payment window closed');
+                        // Reset all button texts
+                        resetButtonTexts();
+                    },
+                    callback: function(response) {
+                        console.log('Payment complete! Reference:', response.reference);
+                        processOrder(response.reference, response.transaction);
+                    }
+                });
+                
+                // Reset the clicked button text before opening Paystack iframe
+                const buttonText = `Pay Now ₦${amount.toLocaleString()}`;
+                this.innerHTML = buttonText;
+                
+                // Small delay to ensure DOM updates before opening Paystack
+                setTimeout(() => {
+                    handler.openIframe();
+                }, 100);
             });
-            
-            // Reset button text before opening Paystack iframe
-            payButton.innerHTML = `Pay Now ₦${total.toLocaleString()}`;
-            
-            // Small delay to ensure DOM updates before opening Paystack
-            setTimeout(() => {
-                handler.openIframe();
-            }, 100);
+        });
+    }
+    
+    // Function to reset all button texts
+    function resetButtonTexts() {
+        const totalText = document.getElementById('desktop-total').textContent;
+        const buttonText = `Pay Now ₦${totalText}`;
+        
+        payButtons.forEach(button => {
+            button.innerHTML = buttonText;
         });
     }
     
@@ -1113,63 +1140,110 @@ document.addEventListener('DOMContentLoaded', function() {
                 stack: error.stack
             });
             
+            // Reset all button texts in case of error
+            resetButtonTexts();
+            
             // User-friendly error notification
             alert('Order Processing Failed: ' + error.message);
         });
     }
+    
+    // Function to update all pay buttons when total changes
+    function updatePayButtons(total) {
+        const formattedTotal = total.toLocaleString();
+        const buttonText = `Pay Now ₦${formattedTotal}`;
+        
+        payButtons.forEach(button => {
+            button.innerHTML = buttonText;
+        });
+    }
+    
+    // Make this function available globally so other scripts can access it
+    window.updatePayButtons = updatePayButtons;
 });
 
 // Paystack payment handler - standalone script
+// Final solution for handling both mobile and desktop payment buttons
 document.addEventListener('DOMContentLoaded', function() {
-    const payButton = document.getElementById('pay-button');
+    // Get both pay buttons (mobile and desktop) with unique IDs
+    const mobilePayButton = document.getElementById('pay-button-mobile');
+    const desktopPayButton = document.getElementById('pay-button-desktop');
+    const payButtons = [mobilePayButton, desktopPayButton].filter(button => button !== null);
     
-    if (payButton) {
-        payButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Dynamically get the current total from the display elements
-            // This ensures we're using the current value after shipping calculations
-            const totalText = document.getElementById('desktop-total').textContent;
-            const amount = parseFloat(totalText.replace(/,/g, ''));
-            
-            // Get user data
-            const email = '<?php echo htmlspecialchars($user['email']); ?>';
-            const firstName = '<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>';
-            const lastName = '<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>';
-            const ref = 'ORDER-' + Date.now() + Math.floor(Math.random() * 10000);
-            
-            console.log('Processing payment for amount:', amount);
-            
-            let handler = PaystackPop.setup({
-                key: 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41',
-                email: email,
-                amount: amount * 100, // Convert to kobo
-                currency: "NGN",
-                ref: ref,
-                metadata: {
-                    custom_fields: [
-                        {
-                            display_name: "First Name",
-                            variable_name: "first_name",
-                            value: firstName
-                        },
-                        {
-                            display_name: "Last Name",
-                            variable_name: "last_name",
-                            value: lastName
-                        }
-                    ]
-                },
-                onClose: function() {
-                    console.log('Payment window closed');
-                },
-                callback: function(response) {
-                    console.log('Payment complete! Reference:', response.reference);
-                    processOrder(response.reference, response.transaction);
-                }
-            });
-            
+    if (payButtons.length > 0) {
+        // Add event listener to each button
+        payButtons.forEach(button => {
+            button.addEventListener('click', handlePaymentClick);
+        });
+    }
+    
+    function handlePaymentClick(e) {
+        e.preventDefault();
+        
+        // Add loading animation to the clicked button
+        this.innerHTML = '<span class="spinner">Processing...</span>';
+        
+        // Dynamically get the current total from the display elements
+        const totalText = document.getElementById('desktop-total').textContent;
+        const amount = parseFloat(totalText.replace(/,/g, ''));
+        
+        // Get user data
+        const email = '<?php echo htmlspecialchars($user['email']); ?>';
+        const firstName = '<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>';
+        const lastName = '<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>';
+        const ref = 'ORDER-' + Date.now() + Math.floor(Math.random() * 10000);
+        
+        console.log('Processing payment for amount:', amount);
+        
+        let handler = PaystackPop.setup({
+            key: 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41',
+            email: email,
+            amount: amount * 100, // Convert to kobo
+            currency: "NGN",
+            ref: ref,
+            metadata: {
+                custom_fields: [
+                    {
+                        display_name: "First Name",
+                        variable_name: "first_name",
+                        value: firstName
+                    },
+                    {
+                        display_name: "Last Name",
+                        variable_name: "last_name",
+                        value: lastName
+                    }
+                ]
+            },
+            onClose: function() {
+                console.log('Payment window closed');
+                // Reset button texts
+                resetButtonTexts();
+            },
+            callback: function(response) {
+                console.log('Payment complete! Reference:', response.reference);
+                processOrder(response.reference, response.transaction);
+            }
+        });
+        
+        // Reset the clicked button text before opening Paystack iframe
+        const clickedButton = this;
+        const buttonText = `Pay Now ₦${amount.toLocaleString()}`;
+        
+        // Small delay to ensure DOM updates before opening Paystack
+        setTimeout(() => {
+            clickedButton.innerHTML = buttonText;
             handler.openIframe();
+        }, 100);
+    }
+    
+    // Function to reset all button texts
+    function resetButtonTexts() {
+        const totalText = document.getElementById('desktop-total').textContent;
+        const buttonText = `Pay Now ₦${totalText}`;
+        
+        payButtons.forEach(button => {
+            button.innerHTML = buttonText;
         });
     }
     
@@ -1211,7 +1285,7 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('billing_same', billingCheckbox && billingCheckbox.checked ? '1' : '0');
             
             // If billing is different
-            if (!billingCheckbox.checked) {
+            if (!billingCheckbox || !billingCheckbox.checked) {
                 const billingFields = [
                     'billing_country', 'billing_first_name', 'billing_last_name', 
                     'billing_phone', 'billing_address', 'billing_state', 
@@ -1264,12 +1338,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 stack: error.stack
             });
             
+            // Reset all button texts in case of error
+            resetButtonTexts();
+            
             // User-friendly error notification
             alert('Order Processing Failed: ' + error.message);
         });
     }
+    
+    // Function to update both pay buttons when total changes
+    function updatePayButtons(total) {
+        const formattedTotal = total.toLocaleString();
+        const buttonText = `Pay Now ₦${formattedTotal}`;
+        
+        if (mobilePayButton) mobilePayButton.innerHTML = buttonText;
+        if (desktopPayButton) desktopPayButton.innerHTML = buttonText;
+    }
+    
+    // Make this function available for the updateTotals function
+    window.updatePayButtons = updatePayButtons;
+    
+    // Modified updateTotals function to update both buttons
+    const originalUpdateTotals = window.updateTotals;
+    if (typeof originalUpdateTotals === 'function') {
+        window.updateTotals = function(isExpress) {
+            // Call the original function
+            originalUpdateTotals(isExpress);
+            
+            // Also update the pay buttons
+            if (window.total) {
+                updatePayButtons(window.total);
+            }
+        };
+    }
 });
-
 
 // Profile update functionality
 document.addEventListener('DOMContentLoaded', function() {

@@ -54,9 +54,7 @@ if(isset($_GET['logout'])) {
       include(__DIR__ . '/includes/reviews.php');
       include(__DIR__ . '/includes/footer.php');
         ?>
-        <a href="#" class="fixed top-[55%] md:top-[70%] right-5 md:right-10">
-            <img src="<?php echo DOMAIN; ?>/assets/global/whatsapp.svg" class="w-[50px] md:w-[60px] rounded-[50%] shadow-lg" />
-        </a>
+     
     </main>
 
 

@@ -27,7 +27,7 @@ if (!$order_id) {
 // Get the order details
 $sql = "SELECT o.id, o.order_total, o.delivery_method, o.pickup_location, 
                o.payment_reference, o.order_status, o.created_at, o.updated_at,
-               o.payment_transaction_id, o.delivery_email, o.order_note,
+               o.payment_transaction_id, o.delivery_email, o.order_note,o.status_notes,o.dispatcher_details,
                o.processed_at, o.shipped_at, o.delivered_at, o.cancelled_at
         FROM orders o
         WHERE o.id = ? AND o.user_id = ?";
@@ -192,11 +192,11 @@ $is_cancelled = ($current_status == 'Cancelled');
 
         <div class="w-[90%] mx-auto bg-[#FFFFFF] py-5">
             <div class="w-full md:w-[80%] lg:w-[70%] mx-auto">
-                <h1 class="text-[24px] md:text-[28px] font-['Open Sans'] font-bold mb-6">Track Your Order</h1>
+                <h1 class="text-[24px] md:text-[28px] text-[#2C2C2C] font-['Open Sans'] font-medium mb-6 text-center">Track Your Order</h1>
                 
                 <!-- Order Details Card -->
-                <div class="order-details bg-[#F8F9FB] p-4 md:p-6 rounded-[8px] mb-6">
-                    <div class="flex flex-col md:flex-row justify-between mb-4">
+                <div class="order-details bg-[#FBFBFB] p-4 md:p-6 rounded-[8px] mb-6 border-[1px] border-[#F3F3F3]">
+                    <!-- <div class="flex flex-col md:flex-row justify-between mb-4">
                         <div>
                             <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">Order ID: <span class="font-medium">#<?php echo $order['id']; ?></span></p>
                             <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">Order Date: <span class="font-medium"><?php echo formatDate($order['created_at']); ?></span></p>
@@ -205,28 +205,49 @@ $is_cancelled = ($current_status == 'Cancelled');
                             <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">Payment Ref: <span class="font-medium"><?php echo $order['payment_reference']; ?></span></p>
                             <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">Delivery Method: <span class="font-medium"><?php echo ucfirst($order['delivery_method']); ?></span></p>
                         </div>
+                    </div> -->
+
+                    <div class="flex justify-between mb-4">
+                        <div>
+                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#777777]">Status</p>
+                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#777777]">Order ID</p>
+                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#777777]">Delivery Time</p>
+                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#777777]">Order Type</p>
+                                                        <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#777777]">Order Type</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#262626] font-medium"> <div class="py-1 px-4 <?php echo $status_color; ?> text-white text-[14px] md:text-[16px] font-['Open Sans'] rounded-[28px]"><?php echo $current_status; ?></div></p>
+                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#262626] font-medium">#<?php echo $order['id']; ?></p>
+                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#262626] font-medium">2-4 days</p>
+                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#262626] font-medium"><?php echo ucfirst($order['delivery_method']); ?></p>
+                        </div>
                     </div>
+
+
                     
                     <?php if ($order['pickup_location']): ?>
                     <div class="mb-4">
-                        <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">Pickup Location: <span class="font-medium"><?php echo $order['pickup_location']; ?></span></p>
+                        <p class="text-[14px] md:text-[16px] text-[#777777] font-['Open Sans']">Pickup Location: <span class="font-medium text-[#262626]"><?php echo $order['pickup_location']; ?></span></p>
                     </div>
                     <?php endif; ?>
                     
-                    <?php if (isset($order['order_note']) && !empty($order['order_note'])): ?>
-                    <div class="mb-4">
-                        <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] font-medium">Order Notes:</p>
-                        <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] bg-white p-2 rounded-[4px] mt-1"><?php echo $order['order_note']; ?></p>
-                    </div>
-                    <?php endif; ?>
+                    <?php if (isset($order['order_note']) && !empty($order['status_notes'])): ?>
+    <div class="mb-4 bg-blue-100 border-l-4 border-blue-700 p-3 rounded-lg flex items-start gap-2">
+        <img src="../assets/user/info.svg" alt="Note Icon" class="w-6 h-6 mt-1"> 
+        <div>
+            <p class="text-[14px] md:text-[16px] text-[#1A237E] font-['Open Sans'] font-semibold">Order Notes:</p>
+            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">
+                <?php echo $order['status_notes']; ?>
+            </p>
+        </div>
+    </div>
+<?php endif; ?>
+
                 </div>
                 
                 <!-- Status Tracker -->
                 <div class="status-tracker p-4 md:p-6 border-[1px] border-[#E1E1E1] rounded-[8px] mb-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-[18px] md:text-[20px] font-['Open Sans'] font-semibold">Order Status</h3>
-                        <div class="py-1 px-4 <?php echo $status_color; ?> text-white text-[14px] md:text-[16px] font-['Open Sans'] rounded-[28px]"><?php echo $current_status; ?></div>
-                    </div>
+                  
                     
                     <div class="tracker-timeline mt-8">
                         <div class="relative">
@@ -237,9 +258,10 @@ $is_cancelled = ($current_status == 'Cancelled');
                             <!-- Processing Status -->
                             <div class="status-item relative flex mb-12">
                                 <div class="status-icon w-[40px] h-[40px] rounded-full <?php echo ($current_status_index >= 0) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> flex items-center justify-center z-10">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M9 16.2L4.8 12L3.4 13.4L9 19L21 7L19.6 5.6L9 16.2Z" fill="white"/>
-                                    </svg>
+                                    </svg> -->
+                                    <img src="../assets/user/processed.svg" alt="processing"/>
                                 </div>
                                 <div class="status-content ml-4">
                                     <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Processing</h4>
@@ -249,24 +271,40 @@ $is_cancelled = ($current_status == 'Cancelled');
                             
                             <!-- Shipped Status -->
                             <div class="status-item relative flex mb-12">
-                                <div class="status-icon w-[40px] h-[40px] rounded-full <?php echo ($current_status_index >= 1) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> flex items-center justify-center z-10">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M20 8H17V4H3C1.9 4 1 4.9 1 6V17H3C3 18.66 4.34 20 6 20C7.66 20 9 18.66 9 17H15C15 18.66 16.34 20 18 20C19.66 20 21 18.66 21 17H23V12L20 8ZM6 18.5C5.17 18.5 4.5 17.83 4.5 17C4.5 16.17 5.17 15.5 6 15.5C6.83 15.5 7.5 16.17 7.5 17C7.5 17.83 6.83 18.5 6 18.5ZM19.5 9.5L21.46 12H17V9.5H19.5ZM18 18.5C17.17 18.5 16.5 17.83 16.5 17C16.5 16.17 17.17 15.5 18 15.5C18.83 15.5 19.5 16.17 19.5 17C19.5 17.83 18.83 18.5 18 18.5Z" fill="white"/>
-                                    </svg>
-                                </div>
+                            <div class="status-icon w-[40px] h-[40px] rounded-full 
+    <?php echo ($current_status_index >= 1) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> 
+    flex items-center justify-center z-10">
+    
+    <img src="../assets/user/<?php echo ($current_status_index >= 1) ? 'shipped.svg' : 'not-shipped.svg'; ?>" 
+         alt="Shipping Status" 
+         class="min-w-[50px] h-[20px]" />
+</div>
+
                                 <div class="status-content ml-4">
                                     <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Shipped</h4>
                                     <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $shipped_date; ?></p>
+                                    <?php if (isset($order['dispatcher_details']) && !empty($order['dispatcher_details'])): ?>
+                    <div class="mb-4">
+      <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] bg-white p-2 rounded-[4px] mt-1"><?php echo $order['dispatcher_details']; ?></p>
+                    </div>
+                    <?php endif; ?>
                                 </div>
+
+                             
+                    
                             </div>
                             
                             <!-- Delivered Status -->
                             <div class="status-item relative flex">
-                                <div class="status-icon w-[40px] h-[40px] rounded-full <?php echo ($current_status_index >= 2) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> flex items-center justify-center z-10">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M19 3H5C3.89 3 3 3.9 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM17 17H7V16H17V17ZM12 7C13.1 7 14 7.9 14 9C14 10.1 13.1 11 12 11C10.9 11 10 10.1 10 9C10.02 7.9 10.9 7 12 7ZM16 13H8V12C8 10.9 10.03 10 12 10C13.97 10 16 10.9 16 12V13Z" fill="white"/>
-                                    </svg>
-                                </div>
+                            <div class="status-icon w-[40px] h-[40px] rounded-full 
+    <?php echo ($current_status_index >= 2) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> 
+    flex items-center justify-center z-10">
+
+    <img src="../assets/user/<?php echo ($current_status_index >= 2) ? 'shipped.svg' : 'not-shipped.svg'; ?>" 
+         alt="Delivery Status" 
+         class="w-[20px] h-[20px]" />
+</div>
+
                                 <div class="status-content ml-4">
                                     <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Delivered</h4>
                                     <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $delivered_date; ?></p>
@@ -331,11 +369,13 @@ $is_cancelled = ($current_status == 'Cancelled');
                 <div class="actions mt-6 flex flex-col md:flex-row gap-3 justify-end">
                     <a href="./orders.php" class="py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
                     
+                    <div class="flex items-center gap-3">
                     <?php if ($current_status != 'Cancelled' && $current_status != 'Delivered'): ?>
-                    <a href="./report-issue.php?id=<?php echo $order_id; ?>" class="py-2 px-4 bg-[#E8B006] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Report an Issue</a>
+                    <a href="./report-issue.php?id=<?php echo $order_id; ?>" class="w-full py-2 px-4 bg-[#E8B006] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px] text-nowrap">Report an Issue</a>
                     <?php endif; ?>
                     
-                    <a href="../products/show.php?id=<?php echo $order_items[0]['product_id']; ?>" class="py-2 px-4 bg-[#1A237E] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Re-Order</a>
+                    <a href="../products/show.php?id=<?php echo $order_items[0]['product_id']; ?>" class="w-full py-2 px-4 bg-[#1A237E] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Re-Order</a>
+                    </div>
                 </div>
             </div>
         </div>
