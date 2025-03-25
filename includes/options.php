@@ -103,6 +103,10 @@ $topCategoriesJson = json_encode($topCategories);
         transform: rotate(180deg);
     }
     
+
+    .mobileOnlySearchResults{
+        z-index: 100 !important;
+    }
     /* Add any additional styles you need */
  </style>
 </head>

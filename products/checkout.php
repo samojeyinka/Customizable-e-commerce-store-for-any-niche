@@ -236,6 +236,22 @@ $paystack_data = [
     <script src="./paystack-checkout.js"></script>
 
 
+    <style>
+        /* CSS for the sticky order summary on mobile */
+@media (max-width: 768px) {
+  .mobile-order-summary {
+    position: fixed;
+    width: 100%;
+z-index: 10;
+    transition: top 0.3s ease-in-out;
+  }
+  
+  .shadow-md {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+}
+    </style>
+
 </head>
 
 <body>
@@ -670,7 +686,7 @@ $paystack_data = [
     <button 
         type="button" 
         id="pay-button"
-        class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+        class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex">
         Pay Now ₦<?php echo number_format($total); ?>
     </button>
 </div>
@@ -678,25 +694,31 @@ $paystack_data = [
             </div>
 
             <div class="w-full md:w-[45%] flex flex-col gap-3">
-                <div class="w-full flex flex-col gap-2 bg-[#E8E9F2] p-2 z-0 fixed top-[120px] right-0 md:hidden">
-                    <div class="w-[95%] mx-auto flex flex-col gap-2 rounded-[4px] border-[1px] border-[#E1E1E1] p-2">
-                        <div class="flex items-center justify-between">
-                            <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Subtotal</p>
-                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="mobile-subtotal"><?php echo number_format($subtotal); ?></span></p>
-                        </div>
+               <!-- Replace the existing mobile order summary div with this one -->
+<div class="w-full flex flex-col gap-2 bg-[#E8E9F2] p-2 z-50 fixed top-[120px] right-0 md:hidden mobile-order-summary">
+    <div class="w-[95%] mx-auto flex flex-col gap-2 rounded-[4px] border-[1px] border-[#E1E1E1] p-2">
+        <div class="flex items-center justify-between">
+            <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Subtotal</p>
+            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="mobile-subtotal"><?php echo number_format($subtotal); ?></span></p>
+        </div>
 
-                        <div class="flex items-center justify-between">
-                            <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Shipping fee</p>
-                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="mobile-shipping"><?php echo number_format($shipping_fee); ?></span></p>
-                        </div>
+        <div class="flex items-center justify-between">
+            <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Shipping fee</p>
+            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="mobile-shipping"><?php echo number_format($shipping_fee); ?></span></p>
+        </div>
 
-                        <div class="flex items-center justify-between">
-                            <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Total</p>
-                            <p class="text-[#484F98] text-[18px] md:text-[22px] font-['Open Sans'] font-bold">₦<span id="mobile-total"><?php echo number_format($total); ?></span></p>
-                        </div>
-                    </div>
-                </div>
-
+        <div class="flex items-center justify-between">
+            <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Total</p>
+            <p class="text-[#484F98] text-[18px] md:text-[22px] font-['Open Sans'] font-bold">₦<span id="mobile-total"><?php echo number_format($total); ?></span></p>
+        </div>
+    </div>
+    <button 
+        type="button" 
+        id="pay-button"
+        class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+        Pay Now ₦<?php echo number_format($total); ?>
+    </button>
+</div>
                 
 
              
@@ -829,6 +851,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const billingSection = document.getElementById('billing-section');
     const billingCheckbox = document.getElementById('billing_same');
     const deliveryStatusSection = document.getElementById('delivery-status');
+    const payButton = document.getElementById('pay-button');
     
     // Define shipping fee parameters
     const baseShippingFee = 2000;
@@ -867,6 +890,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update total displays
         document.getElementById('mobile-total').textContent = total.toLocaleString();
         document.getElementById('desktop-total').textContent = total.toLocaleString();
+        
+        // Update the Pay Now button text with the new total
+        if (payButton) {
+            payButton.innerHTML = `Pay Now ₦${total.toLocaleString()}`;
+        }
+        
+        // Update the hidden amount field for Paystack
+        const amountField = document.getElementById('amount');
+        if (amountField) {
+            amountField.value = total;
+        }
     }
     
     // Handle delivery method change
@@ -912,23 +946,6 @@ document.addEventListener('DOMContentLoaded', function() {
         billingCheckbox.dispatchEvent(new Event('change'));
     }
     
-    // Check if there's a buy-now item in session storage
-    const buyNowData = sessionStorage.getItem('checkoutData');
-    if (buyNowData) {
-        try {
-            const productData = JSON.parse(buyNowData);
-            console.log('Buy Now Product:', productData);
-            
-            // You can use this data to populate the checkout form if needed
-            // This is already handled server-side in this implementation
-            
-            // Clear the session storage data once used
-            // sessionStorage.removeItem('checkoutData');
-        } catch (e) {
-            console.error('Error parsing buy now data:', e);
-        }
-    }
-    
     // Initialize the page based on current delivery method
     const currentMethod = document.querySelector('.delivery-method-radio:checked').value;
     if (currentMethod === 'express') {
@@ -945,8 +962,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-
-
+// Paystack Payment Handler
 document.addEventListener('DOMContentLoaded', function() {
     const payButton = document.getElementById('pay-button');
     
@@ -954,12 +970,175 @@ document.addEventListener('DOMContentLoaded', function() {
         payButton.addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Use paystackData passed from PHP
+            // Add loading animation or indicator
+            this.innerHTML = '<span class="spinner">Processing...</span>';
+            
+            // Use the current total variable which is maintained in the script
+            // instead of relying on the hidden field
+            const amount = total;
+            
+            // Get other payment details
             const email = '<?php echo htmlspecialchars($user['email']); ?>';
-            const amount = <?php echo $total; ?>;
             const firstName = '<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>';
             const lastName = '<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>';
             const ref = 'ORDER-' + Date.now() + Math.floor(Math.random() * 10000);
+            
+            let handler = PaystackPop.setup({
+                key: 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41',
+                email: email,
+                amount: amount * 100, // Convert to kobo
+                currency: "NGN",
+                ref: ref,
+                metadata: {
+                    custom_fields: [
+                        {
+                            display_name: "First Name",
+                            variable_name: "first_name",
+                            value: firstName
+                        },
+                        {
+                            display_name: "Last Name",
+                            variable_name: "last_name",
+                            value: lastName
+                        }
+                    ]
+                },
+                onClose: function() {
+                    console.log('Payment window closed');
+                },
+                callback: function(response) {
+                    console.log('Payment complete! Reference:', response.reference);
+                    processOrder(response.reference, response.transaction);
+                }
+            });
+            
+            // Reset button text before opening Paystack iframe
+            payButton.innerHTML = `Pay Now ₦${total.toLocaleString()}`;
+            
+            // Small delay to ensure DOM updates before opening Paystack
+            setTimeout(() => {
+                handler.openIframe();
+            }, 100);
+        });
+    }
+    
+    function processOrder(paymentRef, transactionId) {
+        // Create comprehensive FormData
+        const formData = new FormData();
+        
+        // Payment details
+        formData.append('payment_reference', paymentRef);
+        formData.append('transaction_id', transactionId);
+        
+        // Collect delivery method
+        const deliveryMethod = document.querySelector('input[name="delivery_method"]:checked').value;
+        formData.append('delivery_method', deliveryMethod);
+        
+        // Basic order details
+        formData.append('email', document.getElementById('email').value);
+        formData.append('note', document.getElementById('note').value || '');
+        
+        // Pickup or delivery specifics
+        if (deliveryMethod === 'pickup') {
+            formData.append('pickup_location', 
+                document.querySelector('input[name="pickup_location"]:checked').value
+            );
+        } else {
+            // Shipping fields collection
+            const shippingFields = [
+                'country', 'first_name', 'last_name', 'phone', 
+                'address', 'state', 'city', 'zip_code'
+            ];
+            
+            shippingFields.forEach(field => {
+                const element = document.getElementById(field);
+                formData.append(field, element ? element.value : '');
+            });
+            
+            // Billing details handling
+            const billingCheckbox = document.getElementById('billing_same');
+            formData.append('billing_same', billingCheckbox && billingCheckbox.checked ? '1' : '0');
+            
+            // If billing is different
+            if (!billingCheckbox || !billingCheckbox.checked) {
+                const billingFields = [
+                    'billing_country', 'billing_first_name', 'billing_last_name', 
+                    'billing_phone', 'billing_address', 'billing_state', 
+                    'billing_city', 'billing_zip_code'
+                ];
+                
+                billingFields.forEach(field => {
+                    const element = document.getElementById(field);
+                    formData.append(field, element ? element.value : '');
+                });
+            }
+        }
+        
+        // Enhanced fetch with comprehensive error handling
+        fetch('process-order.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            // Log response details for debugging
+            console.log('Response Status:', response.status);
+            
+            // Try to parse response as JSON
+            return response.json().then(data => {
+                if (!response.ok) {
+                    // Throw error with message from server
+                    throw new Error(data.message || 'Order processing failed');
+                }
+                return data;
+            });
+        })
+        .then(data => {
+            console.log('Order processed successfully:', data);
+            
+            // Show success modal
+            const successModal = document.getElementById('paysuccess');
+            if (successModal) {
+                successModal.style.display = 'block';
+            }
+            
+            // Redirect to order success page
+            setTimeout(() => {
+                window.location.href = 'order-success.php?ref=' + paymentRef;
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Order Processing Error:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
+            
+            // User-friendly error notification
+            alert('Order Processing Failed: ' + error.message);
+        });
+    }
+});
+
+// Paystack payment handler - standalone script
+document.addEventListener('DOMContentLoaded', function() {
+    const payButton = document.getElementById('pay-button');
+    
+    if (payButton) {
+        payButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Dynamically get the current total from the display elements
+            // This ensures we're using the current value after shipping calculations
+            const totalText = document.getElementById('desktop-total').textContent;
+            const amount = parseFloat(totalText.replace(/,/g, ''));
+            
+            // Get user data
+            const email = '<?php echo htmlspecialchars($user['email']); ?>';
+            const firstName = '<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>';
+            const lastName = '<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>';
+            const ref = 'ORDER-' + Date.now() + Math.floor(Math.random() * 10000);
+            
+            console.log('Processing payment for amount:', amount);
             
             let handler = PaystackPop.setup({
                 key: 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41',
@@ -1092,7 +1271,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-
 // Profile update functionality
 document.addEventListener('DOMContentLoaded', function() {
     const updateProfileBtn = document.getElementById('update-profile-btn');
@@ -1158,6 +1336,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Please select Express Delivery to save a delivery address to your profile.');
             }
         });
+    }
+});
+
+
+
+// Script to handle the sticky order summary on mobile
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the order summary element
+    const orderSummary = document.querySelector('.fixed.top-\\[120px\\]');
+    
+    if (orderSummary) {
+        // Initial position - we want to start at 120px, then go to 0
+        const initialTopPosition = 120;
+        
+        // Function to update position based on scroll
+        function updatePosition() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > initialTopPosition) {
+                // Once scrolled past initial position, stick to top
+                orderSummary.style.top = '0px';
+                orderSummary.classList.add('shadow-md');
+            } else {
+                // Otherwise, keep initial position
+                orderSummary.style.top = (initialTopPosition - scrollTop) + 'px';
+                orderSummary.classList.remove('shadow-md');
+            }
+        }
+        
+        // Update immediately on load
+        updatePosition();
+        
+        // Update on scroll
+        window.addEventListener('scroll', updatePosition);
     }
 });
 
