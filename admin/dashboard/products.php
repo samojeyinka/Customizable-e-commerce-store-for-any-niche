@@ -762,7 +762,7 @@ $result = mysqli_query($con, $query);
         <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">₦<?php echo number_format($product['min_price']); ?></td>
 
         <td>
-            <button type="button" class="py-1 px-4 <?php echo $status_class; ?> text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px] <?php if ($stock_status !== 'available') echo 'text-nowrap'; ?>">
+            <button type="button" class="py-1 px-4 text-nowrap <?php echo $status_class; ?> text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px] <?php if ($stock_status !== 'available') echo 'text-nowrap'; ?>">
                 <?php echo $status_text; ?>
             </button>
         </td>
