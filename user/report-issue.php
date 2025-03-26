@@ -145,6 +145,8 @@ function getStatusBadgeClass($status) {
             return 'bg-[#39D959]';
         case 'Cancelled':
             return 'bg-red-500';
+        case 'Returned':
+            return 'bg-[#9C27B0]';
         default:
             return 'bg-gray-500';
     }

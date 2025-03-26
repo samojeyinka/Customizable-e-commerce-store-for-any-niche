@@ -57,10 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
                 case 'Cancelled':
                     $timestamp_column = 'cancelled_at';
                     break;
+                case 'Returned':
+                    $timestamp_column = 'returned_at';
+                    break;
                 default:
                     $timestamp_column = ''; // Invalid status
             }
-            
             $now = date('Y-m-d H:i:s');
             
             // Check if the columns exist in the orders table
@@ -229,7 +231,8 @@ $status_classes = [
     'Processing' => 'bg-[#E8B006]',
     'Shipped' => 'bg-[#1A237E]',
     'Delivered' => 'bg-[#39D959]',
-    'Cancelled' => 'bg-red-500'
+    'Cancelled' => 'bg-red-500',
+    'Returned' => 'bg-[#9C27B0]'
 ];
 
 // Get status class
@@ -411,15 +414,18 @@ include "./sidebar.php"
                     </div>
                 </div>
 
+              
+
                 <div class="space-y-2">
-                    <label for="new_status" class="block text-[14px] text-gray-700">New Status</label>
-                    <select name="new_status" id="new_status" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="Processing" <?php echo $order['order_status'] === 'Processing' ? 'selected' : ''; ?>>Processing</option>
-                        <option value="Shipped" <?php echo $order['order_status'] === 'Shipped' ? 'selected' : ''; ?>>Shipped</option>
-                        <option value="Delivered" <?php echo $order['order_status'] === 'Delivered' ? 'selected' : ''; ?>>Delivered</option>
-                        <option value="Cancelled" <?php echo $order['order_status'] === 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
-                    </select>
-                </div>
+    <label for="new_status" class="block text-[14px] text-gray-700">New Status</label>
+    <select name="new_status" id="new_status" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="Processing" <?php echo $order['order_status'] === 'Processing' ? 'selected' : ''; ?>>Processing</option>
+        <option value="Shipped" <?php echo $order['order_status'] === 'Shipped' ? 'selected' : ''; ?>>Shipped</option>
+        <option value="Delivered" <?php echo $order['order_status'] === 'Delivered' ? 'selected' : ''; ?>>Delivered</option>
+        <option value="Cancelled" <?php echo $order['order_status'] === 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
+        <option value="Returned" <?php echo $order['order_status'] === 'Returned' ? 'selected' : ''; ?>>Returned</option>
+    </select>
+</div>
 
                 <div class="space-y-2">
                     <label for="status_notes" class="block text-[14px] text-gray-700">Status Update Notes (Optional)</label>

@@ -83,10 +83,9 @@ $status_classes = [
     'Confirmed' => 'bg-[#1A7E79]',
     'Processing' => 'bg-[#E8B006]',
     'Shipped' => 'bg-[#1A237E]',
-    'Dispatched' => 'bg-[#D51E5E]',
     'Delivered' => 'bg-[#39D959]',
-    'Refunded' => 'bg-[#D93939]',
-    'Cancelled' => 'bg-red-500'
+    'Cancelled' => 'bg-red-500',
+    'Returned' => 'bg-[#9C27B0]'
 ];
 ?>
 

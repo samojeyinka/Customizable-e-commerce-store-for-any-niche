@@ -141,12 +141,10 @@ $status_classes = [
     'Confirmed' => 'bg-[#1A7E79]',
     'Processing' => 'bg-[#E8B006]',
     'Shipped' => 'bg-[#1A237E]',
-    'Dispatched' => 'bg-[#D51E5E]',
     'Delivered' => 'bg-[#39D959]',
-    'Refunded' => 'bg-[#D93939]',
-    'Cancelled' => 'bg-red-500'
+    'Cancelled' => 'bg-red-500',
+    'Returned' => 'bg-[#9C27B0]'
 ];
-
 
 
 // Get order statistics for the modal
@@ -154,7 +152,7 @@ $stats_query = "SELECT
     COUNT(*) as total_orders,
     SUM(CASE WHEN order_status = 'Delivered' THEN 1 ELSE 0 END) as completed_orders,
     SUM(CASE WHEN order_status IN ('Processing', 'Shipped') THEN 1 ELSE 0 END) as pending_orders,
-    SUM(CASE WHEN order_status IN ('Refunded', 'Cancelled') THEN 1 ELSE 0 END) as returned_orders,
+    SUM(CASE WHEN order_status IN ('Returned', 'Cancelled') THEN 1 ELSE 0 END) as returned_orders,
     (SELECT COUNT(*) FROM orders WHERE $date_column >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)) as last_28_days,
     (SELECT COUNT(*) FROM orders WHERE $date_column >= DATE_SUB(CURDATE(), INTERVAL 56 DAY) AND $date_column < DATE_SUB(CURDATE(), INTERVAL 28 DAY)) as previous_28_days
 FROM orders";
@@ -392,9 +390,9 @@ include "./sidebar.php"
                                         <div class="adminordersMenu h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
     <div class="flex flex-col gap-3">
         <a href="./order-details.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-        <a href="../products/show.php?reorder=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">Update Order Status</a>
-        <a href="./track-order.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#E8B006]">Issue a Refund</a>
-        <a href="./report-issue.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#D93939]">Cancel Order</a>
+        <a href="./order-details.php?id=<?php echo $order['order_id']; ?>&tab=update-status" class="text-[16px] font-medium text-[#262626]">Update Order Status</a>
+
+        <a href="./order-details.php?id=<?php echo $order['order_id']; ?>&tab=update-status" class="text-[16px] font-medium text-[#D93939]">Cancel Order</a>
     </div>
 </div>
 

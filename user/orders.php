@@ -214,6 +214,7 @@ $search_query = isset($_GET['search']) ? $_GET['search'] : '';
                 <a href="?status=Processing" class="py-1 px-4 bg-[<?php echo $status_filter == 'Processing' ? '#1A237E' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Processing' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Processing</a>
                 <a href="?status=Shipped" class="py-1 px-4 bg-[<?php echo $status_filter == 'Shipped' ? '#1A237E' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Shipped' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Shipped</a>
                 <a href="?status=Delivered" class="py-1 px-4 bg-[<?php echo $status_filter == 'Delivered' ? '#1A237E' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Delivered' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Delivered</a>
+                <a href="?status=Returned" class="py-1 px-4 bg-[<?php echo $status_filter == 'Returned' ? '#1A237E' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Returned' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Returned</a>
                 <a href="?status=Cancelled" class="py-1 px-4 bg-[<?php echo $status_filter == 'Cancelled' ? '#1A237E' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Cancelled' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Cancelled</a>
             </div>
 
@@ -275,12 +276,12 @@ $search_query = isset($_GET['search']) ? $_GET['search'] : '';
                                     
                                     if ($status_text == 'Processing') {
                                         $status_color = 'bg-[#E8B006]';
-                                    } elseif($status_text == 'Shipped'){
+                                    } elseif ($status_text == 'Shipped') {
                                         $status_color = 'bg-[#1A237E]';
-                                    }
-                                    
-                                    elseif ($status_text == 'Delivered') {
+                                    } elseif ($status_text == 'Delivered') {
                                         $status_color = 'bg-[#39D959]';
+                                    } elseif ($status_text == 'Returned') {
+                                        $status_color = 'bg-[#9C27B0]';
                                     } else {
                                         $status_color = 'bg-red-500';
                                     }

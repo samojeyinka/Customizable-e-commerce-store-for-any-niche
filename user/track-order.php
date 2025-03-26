@@ -28,7 +28,7 @@ if (!$order_id) {
 $sql = "SELECT o.id, o.order_total, o.delivery_method, o.pickup_location, 
                o.payment_reference, o.order_status, o.created_at, o.updated_at,
                o.payment_transaction_id, o.delivery_email, o.order_note,o.status_notes,o.dispatcher_details,
-               o.processed_at, o.shipped_at, o.delivered_at, o.cancelled_at
+               o.processed_at, o.shipped_at, o.delivered_at, o.cancelled_at, o.returned_at
         FROM orders o
         WHERE o.id = ? AND o.user_id = ?";
 
@@ -86,6 +86,7 @@ $status_timestamps = [];
 $status_timestamps['Processing'] = !empty($order['processed_at']) ? $order['processed_at'] : $order['created_at'];
 $status_timestamps['Shipped'] = !empty($order['shipped_at']) ? $order['shipped_at'] : null;
 $status_timestamps['Delivered'] = !empty($order['delivered_at']) ? $order['delivered_at'] : null;
+$status_timestamps['Returned'] = !empty($order['returned_at']) ? $order['returned_at'] : null;
 $status_timestamps['Cancelled'] = !empty($order['cancelled_at']) ? $order['cancelled_at'] : null;
 
 // Get the current order status
@@ -96,7 +97,8 @@ $status_colors = [
     'Processing' => 'bg-[#E8B006]',
     'Shipped' => 'bg-[#1A237E]',
     'Delivered' => 'bg-[#39D959]',
-    'Cancelled' => 'bg-red-500'
+    'Cancelled' => 'bg-red-500',
+    'Returned' => 'bg-[#9C27B0]'
 ];
 
 // Get the color for the current status
@@ -111,6 +113,7 @@ function formatDate($date) {
 $processing_date = formatDate($status_timestamps['Processing']);
 $shipped_date = formatDate($status_timestamps['Shipped']);
 $delivered_date = formatDate($status_timestamps['Delivered']);
+$returned_date = formatDate($status_timestamps['Returned']);
 $cancelled_date = formatDate($status_timestamps['Cancelled']);
 
 // Define the status sequence and determine current progress
@@ -249,89 +252,104 @@ $is_cancelled = ($current_status == 'Cancelled');
                 <div class="status-tracker p-4 md:p-6 border-[1px] border-[#E1E1E1] rounded-[8px] mb-6">
                   
                     
-                    <div class="tracker-timeline mt-8">
-                        <div class="relative">
-                            <?php if (!$is_cancelled): ?>
-                            <!-- Status Progress Line -->
-                            <div class="status-line"></div>
-                            
-                            <!-- Processing Status -->
-                            <div class="status-item relative flex mb-12">
-                                <div class="status-icon w-[40px] h-[40px] rounded-full <?php echo ($current_status_index >= 0) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> flex items-center justify-center z-10">
-                                    <!-- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M9 16.2L4.8 12L3.4 13.4L9 19L21 7L19.6 5.6L9 16.2Z" fill="white"/>
-                                    </svg> -->
-                                    <img src="../assets/user/processed.svg" alt="processing"/>
-                                </div>
-                                <div class="status-content ml-4">
-                                    <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Processing</h4>
-                                    <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $processing_date; ?></p>
-                                </div>
-                            </div>
-                            
-                            <!-- Shipped Status -->
-                            <div class="status-item relative flex mb-12">
-                            <div class="status-icon w-[40px] h-[40px] rounded-full 
-    <?php echo ($current_status_index >= 1) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> 
-    flex items-center justify-center z-10">
-    
-    <img src="../assets/user/<?php echo ($current_status_index >= 1) ? 'shipped.svg' : 'not-shipped.svg'; ?>" 
-         alt="Shipping Status" 
-         class="min-w-[50px] h-[20px]" />
+                  <div class="tracker-timeline mt-8">
+                      <div class="relative">
+                          <?php if (!$is_cancelled && $order['order_status'] !== 'Returned'): ?>
+                          <!-- Status Progress Line -->
+                          <div class="status-line"></div>
+                          
+                          <!-- Processing Status -->
+                          <div class="status-item relative flex mb-12">
+                              <div class="status-icon w-[40px] h-[40px] rounded-full <?php echo ($current_status_index >= 0) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> flex items-center justify-center z-10">
+                                  <!-- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M9 16.2L4.8 12L3.4 13.4L9 19L21 7L19.6 5.6L9 16.2Z" fill="white"/>
+                                  </svg> -->
+                                  <img src="../assets/user/processed.svg" alt="processing"/>
+                              </div>
+                              <div class="status-content ml-4">
+                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Processing</h4>
+                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $processing_date; ?></p>
+                              </div>
+                          </div>
+                          
+                          <!-- Shipped Status -->
+                          <div class="status-item relative flex mb-12">
+                          <div class="status-icon w-[40px] h-[40px] rounded-full 
+  <?php echo ($current_status_index >= 1) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> 
+  flex items-center justify-center z-10">
+  
+  <img src="../assets/user/<?php echo ($current_status_index >= 1) ? 'shipped.svg' : 'not-shipped.svg'; ?>" 
+       alt="Shipping Status" 
+       class="min-w-[50px] h-[20px]" />
 </div>
 
-                                <div class="status-content ml-4">
-                                    <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Shipped</h4>
-                                    <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $shipped_date; ?></p>
-                                    <?php if (isset($order['dispatcher_details']) && !empty($order['dispatcher_details'])): ?>
-                    <div class="mb-4">
-      <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] bg-white p-2 rounded-[4px] mt-1"><?php echo $order['dispatcher_details']; ?></p>
-                    </div>
-                    <?php endif; ?>
-                                </div>
+                              <div class="status-content ml-4">
+                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Shipped</h4>
+                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $shipped_date; ?></p>
+                                  <?php if (isset($order['dispatcher_details']) && !empty($order['dispatcher_details'])): ?>
+                  <div class="mb-4">
+    <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] bg-white p-2 rounded-[4px] mt-1"><?php echo $order['dispatcher_details']; ?></p>
+                  </div>
+                  <?php endif; ?>
+                              </div>
 
-                             
-                    
-                            </div>
-                            
-                            <!-- Delivered Status -->
-                            <div class="status-item relative flex">
-                            <div class="status-icon w-[40px] h-[40px] rounded-full 
-    <?php echo ($current_status_index >= 2) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> 
-    flex items-center justify-center z-10">
+                           
+                  
+                          </div>
+                          
+                          <!-- Delivered Status -->
+                          <div class="status-item relative flex">
+                          <div class="status-icon w-[40px] h-[40px] rounded-full 
+  <?php echo ($current_status_index >= 2) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> 
+  flex items-center justify-center z-10">
 
-    <img src="../assets/user/<?php echo ($current_status_index >= 2) ? 'shipped.svg' : 'not-shipped.svg'; ?>" 
-         alt="Delivery Status" 
-         class="w-[20px] h-[20px]" />
+  <img src="../assets/user/<?php echo ($current_status_index >= 2) ? 'shipped.svg' : 'not-shipped.svg'; ?>" 
+       alt="Delivery Status" 
+       class="w-[20px] h-[20px]" />
 </div>
 
-                                <div class="status-content ml-4">
-                                    <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Delivered</h4>
-                                    <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $delivered_date; ?></p>
-                                </div>
-                            </div>
-                            
-                            <?php else: ?>
-                            <!-- Cancelled Order Status -->
-                            <div class="status-cancelled relative flex">
-                                <div class="status-icon w-[40px] h-[40px] rounded-full bg-red-500 flex items-center justify-center z-10">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="white"/>
-                                    </svg>
-                                </div>
-                                <div class="status-content ml-4">
-                                    <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Cancelled</h4>
-                                    <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo formatDate($status_timestamps['Cancelled'] ?? $order['updated_at']); ?></p>
-                                    <?php if (isset($order['order_note']) && !empty($order['order_note'])): ?>
-                                    <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] mt-2 max-w-[300px] md:max-w-[500px]"><?php echo $order['order_note']; ?></p>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-                
+                              <div class="status-content ml-4">
+                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Delivered</h4>
+                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $delivered_date; ?></p>
+                              </div>
+                          </div>
+                          
+                          <?php elseif ($order['order_status'] === 'Returned'): ?>
+                          <!-- Returned Order Status -->
+                          <div class="status-returned relative flex">
+                              <div class="status-icon w-[40px] h-[40px] rounded-full bg-[#9C27B0] flex items-center justify-center z-10">
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="white"/>
+                                  </svg>
+                              </div>
+                              <div class="status-content ml-4">
+                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Returned</h4>
+                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo formatDate($status_timestamps['Returned'] ?? $order['updated_at']); ?></p>
+                                  <?php if (isset($order['order_note']) && !empty($order['order_note'])): ?>
+                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] mt-2 max-w-[300px] md:max-w-[500px]"><?php echo $order['order_note']; ?></p>
+                                  <?php endif; ?>
+                              </div>
+                          </div>
+                          <?php else: ?>
+                          <!-- Cancelled Order Status -->
+                          <div class="status-cancelled relative flex">
+                              <div class="status-icon w-[40px] h-[40px] rounded-full bg-red-500 flex items-center justify-center z-10">
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="white"/>
+                                  </svg>
+                              </div>
+                              <div class="status-content ml-4">
+                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Cancelled</h4>
+                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo formatDate($status_timestamps['Cancelled'] ?? $order['updated_at']); ?></p>
+                                  <?php if (isset($order['order_note']) && !empty($order['order_note'])): ?>
+                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] mt-2 max-w-[300px] md:max-w-[500px]"><?php echo $order['order_note']; ?></p>
+                                  <?php endif; ?>
+                              </div>
+                          </div>
+                          <?php endif; ?>
+                      </div>
+                  </div>
+              </div>
                 <!-- Order Items -->
                 <div class="order-items border-[1px] border-[#E1E1E1] rounded-[8px] p-4 md:p-6">
                     <h3 class="text-[18px] md:text-[20px] font-['Open Sans'] font-semibold mb-4">Order Items</h3>
