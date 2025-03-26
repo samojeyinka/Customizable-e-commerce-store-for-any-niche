@@ -432,6 +432,11 @@ include "./sidebar.php"
                     <textarea name="status_notes" id="status_notes" rows="4" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                 </div>
 
+                <div class="space-y-2">
+                    <label for="status_notes" class="block text-[14px] text-gray-700">Please enter the dispatcher details or shipping information (only required if order status is "Shipped")</label>
+                    <textarea name="dispatcher_details" id="dispatcher_details" rows="4" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+
                 <button type="submit" name="update_status" class="px-4 py-2 bg-[#1A237E] text-white rounded-md hover:bg-blue-800 transition duration-200">
                     Update Status
                 </button>
@@ -597,10 +602,7 @@ include "./sidebar.php"
     });
 </script>
 
-<?php
-// Close database connection
-$conn->close();
-?>
+
 
 </body>
 </html>

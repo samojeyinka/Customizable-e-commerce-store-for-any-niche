@@ -4,14 +4,16 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Include authentication utility
-require_once '../../includes/auth/auth.php';
-require_once "../../config/config.php";
+
 
 // Database connection
 $conn = mysqli_connect('localhost', 'root', '', 'victosah');
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
+
+require_once '../../includes/auth/auth.php';
+require_once "../../config/config.php";
 
 // Get valid columns from orders table
 $available_columns = [];

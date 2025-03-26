@@ -328,6 +328,7 @@ if ($status_text == 'Delivered') {
 
 echo "
                 <a href='./report-issue.php?id={$order['id']}' class='text-[16px] font-medium text-[#E8B006]'>Report an issue</a>
+                <a href='./r.php?id={$order['id']}' class='text-[16px] font-medium text-[#E8B006]'>Report an issue</a>
             </div>
         </div>
     </td>

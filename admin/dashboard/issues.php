@@ -121,6 +121,17 @@ $stmt->execute();
 $issues_result = $stmt->get_result();
 $issues = $issues_result->fetch_all(MYSQLI_ASSOC);
 
+// Get issue counts by status - MOVED THIS CODE BEFORE ENDING THE CONNECTION
+$count_pending_sql = "SELECT COUNT(*) as count FROM order_issues WHERE status = 'pending'";
+$count_inprogress_sql = "SELECT COUNT(*) as count FROM order_issues WHERE status = 'in_progress'";
+$count_resolved_sql = "SELECT COUNT(*) as count FROM order_issues WHERE status = 'resolved'";
+$count_closed_sql = "SELECT COUNT(*) as count FROM order_issues WHERE status = 'closed'";
+
+$pending_count = $conn->query($count_pending_sql)->fetch_assoc()['count'];
+$inprogress_count = $conn->query($count_inprogress_sql)->fetch_assoc()['count'];
+$resolved_count = $conn->query($count_resolved_sql)->fetch_assoc()['count'];
+$closed_count = $conn->query($count_closed_sql)->fetch_assoc()['count'];
+
 // Function to get status badge class
 function getStatusBadgeClass($status) {
     switch ($status) {
@@ -138,21 +149,6 @@ function getStatusBadgeClass($status) {
 }
 
 // Function to get order status badge class
-// function getOrderStatusBadgeClass($status) {
-//     switch ($status) {
-//         case 'Processing':
-//             return 'bg-[#E8B006] text-white';
-//         case 'Shipped':
-//             return 'bg-[#1A237E] text-white';
-//         case 'Delivered':
-//             return 'bg-[#39D959] text-white';
-//         case 'Cancelled':
-//             return 'bg-red-500 text-white';
-//         default:
-//             return 'bg-gray-500 text-white';
-//     }
-// }
-
 function getOrderStatusBadgeClass($status) {
     switch ($status) {
         case 'Processing':
@@ -299,32 +295,23 @@ include "./sidebar.php"
             </form>
         </div>
 
+        
         <!-- Issues Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <?php
-            // Get issue counts by status
-            $count_pending_sql = "SELECT COUNT(*) as count FROM order_issues WHERE status = 'pending'";
-            $count_inprogress_sql = "SELECT COUNT(*) as count FROM order_issues WHERE status = 'in_progress'";
-            $count_resolved_sql = "SELECT COUNT(*) as count FROM order_issues WHERE status = 'resolved'";
-            $count_closed_sql = "SELECT COUNT(*) as count FROM order_issues WHERE status = 'closed'";
-            
-            $pending_count = $conn->query($count_pending_sql)->fetch_assoc()['count'];
-            $inprogress_count = $conn->query($count_inprogress_sql)->fetch_assoc()['count'];
-            $resolved_count = $conn->query($count_resolved_sql)->fetch_assoc()['count'];
-            $closed_count = $conn->query($count_closed_sql)->fetch_assoc()['count'];
-            ?>
-            
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">            
             <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                 <h3 class="text-yellow-800 font-semibold">Pending</h3>
                 <p class="text-2xl font-bold"><?php echo $pending_count; ?></p>
-                <a href="?status=pending" class="text-yellow-700 text-sm hover:underline">View all</a>
+                <a href="?status=pending" class="text-blue-700 text-sm hover:underline">View all</a>
             </div>
-            
+
+
             <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
                 <h3 class="text-blue-800 font-semibold">In Progress</h3>
                 <p class="text-2xl font-bold"><?php echo $inprogress_count; ?></p>
                 <a href="?status=in_progress" class="text-blue-700 text-sm hover:underline">View all</a>
             </div>
+
+         
             
             <div class="bg-green-50 p-4 rounded-lg border border-green-200">
                 <h3 class="text-green-800 font-semibold">Resolved</h3>
@@ -504,10 +491,6 @@ include "./sidebar.php"
     }
 </script>
 
-<?php
-// Close database connection
-$conn->close();
-?>
 
 </body>
-</html>
+</html> 

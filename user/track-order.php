@@ -351,7 +351,7 @@ $is_cancelled = ($current_status == 'Cancelled');
                   </div>
               </div>
                 <!-- Order Items -->
-                <div class="order-items border-[1px] border-[#E1E1E1] rounded-[8px] p-4 md:p-6">
+                <!-- <div class="order-items border-[1px] border-[#E1E1E1] rounded-[8px] p-4 md:p-6">
                     <h3 class="text-[18px] md:text-[20px] font-['Open Sans'] font-semibold mb-4">Order Items</h3>
                     
                     <div class="flex flex-col gap-4">
@@ -381,8 +381,65 @@ $is_cancelled = ($current_status == 'Cancelled');
                         <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Total Amount:</p>
                         <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-bold">₦<?php echo number_format($order['order_total']); ?></p>
                     </div>
-                </div>
+                </div> -->
                 
+              <!-- Modification for the Order Items section in track-order.php -->
+<!-- Replace the existing Order Items section with this code -->
+
+<!-- Order Items -->
+<div class="order-items border-[1px] border-[#E1E1E1] rounded-[8px] p-4 md:p-6">
+    <h3 class="text-[18px] md:text-[20px] font-['Open Sans'] font-semibold mb-4">Order Items</h3>
+    
+    <div class="flex flex-col gap-4">
+        <?php foreach ($order_items as $item): 
+            $color = getProductColor($conn, $item['product_id']);
+            $image_path = isset($item['image_path']) ? "../assets/products/" . $item['image_path'] : "../assets/products/img1.svg";
+            
+            // Check if return is possible for this order and item
+            $can_request_return = ($current_status == 'Delivered' || $current_status == 'Shipped');
+            
+            // Check if this item already has a return request
+            $return_check_sql = "SELECT id FROM return_requests WHERE order_id = ? AND order_item_id = ? LIMIT 1";
+            $return_check_stmt = $conn->prepare($return_check_sql);
+            $return_check_stmt->bind_param("ii", $order_id, $item['id']);
+            $return_check_stmt->execute();
+            $return_result = $return_check_stmt->get_result();
+            $has_return_request = ($return_result->num_rows > 0);
+        ?>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-3 border-[1px] border-[#E1E1E1] rounded-[4px]">
+            <div class="flex items-center gap-3">
+                <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
+                    <img src="<?php echo $image_path; ?>" class="w-full h-full object-cover" alt="<?php echo $item['product_name']; ?>" />
+                </div>
+                <div>
+                    <h4 class="text-[16px] font-['Open Sans'] font-medium"><?php echo $item['product_name']; ?></h4>
+                    <p class="text-[14px] text-[#262626] font-['Open Sans']">Size: <?php echo $item['size']; ?> • Color: <?php echo $color; ?></p>
+                    <p class="text-[14px] text-[#262626] font-['Open Sans']">Qty: <?php echo $item['quantity']; ?></p>
+                    
+                    <?php if ($can_request_return): ?>
+                    <div class="mt-2">
+                        <?php if ($has_return_request): ?>
+                        <span class="text-[13px] text-[#1A237E] font-['Open Sans'] italic">Return request pending</span>
+                        <?php else: ?>
+                        <a href="./return-request.php?order_id=<?php echo $order_id; ?>&item_id=<?php echo $item['id']; ?>" class="inline-block py-1 px-3 bg-[#1A237E] text-white text-[13px] font-['Open Sans'] rounded-[4px]">Request Return</a>
+                        <?php endif; ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div class="mt-3 md:mt-0 ml-0 md:ml-auto">
+                <p class="text-[16px] font-['Open Sans'] font-medium">₦<?php echo number_format($item['price']); ?></p>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    
+    <div class="mt-6 flex justify-between">
+        <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Total Amount:</p>
+        <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-bold">₦<?php echo number_format($order['order_total']); ?></p>
+    </div>
+</div>
+              
                 <!-- Actions -->
                 <div class="actions mt-6 flex flex-col md:flex-row gap-3 justify-end">
                     <a href="./orders.php" class="py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
