@@ -4,7 +4,7 @@ require_once '../../includes/auth/auth.php';
 require_once "../../config/config.php";
 
 // Authentication check with admin role
-requireAdminAuth();
+
 
 // Database connection
 $conn = mysqli_connect('localhost', 'root', '', 'victosah');
@@ -45,7 +45,7 @@ if ($result->num_rows === 0) {
 }
 
 $return = $result->fetch_assoc();
-$image_path = isset($return['image_path']) ? "../assets/products/" . $return['image_path'] : "../assets/admin/img/product-placeholder.jpg";
+$image_path = isset($return['image_path']) ? "../../assets/products/" . $return['image_path'] : "../assets/admin/img/product-placeholder.jpg";
 
 // Process status updates
 $message = '';
@@ -116,12 +116,11 @@ function formatDate($date) {
 <body class="bg-gray-100">
     <div class="flex h-screen">
         <!-- Sidebar - Include your admin sidebar here -->
-        <?php include(__DIR__ . '/includes/sidebar.php'); ?>
+
         
         <!-- Main Content -->
         <div class="flex-1 overflow-x-hidden overflow-y-auto">
-            <!-- Header - Include your admin header here -->
-            <?php include(__DIR__ . '/includes/header.php'); ?>
+            
             
             <!-- Main Content -->
             <div class="container mx-auto px-4 py-6">
@@ -130,7 +129,7 @@ function formatDate($date) {
                         <h1 class="text-2xl font-semibold text-gray-800">Return Request Details</h1>
                         <p class="text-gray-600">Request #<?php echo $return['id']; ?></p>
                     </div>
-                    <a href="./returns.php" class="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md">
+                    <a href="./admin-returns.php" class="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md">
                         Back to Returns
                     </a>
                 </div>

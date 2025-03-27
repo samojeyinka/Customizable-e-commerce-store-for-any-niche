@@ -106,10 +106,13 @@ function formatDate($date) {
     
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 p-2 md:p-4">
+
+<a href="./overview.php" class="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md my-5 mx-right">
+                        Back to Dashboard
+                    </a>
 
     <div class="flex h-screen">
-        <!-- Sidebar - Include your admin sidebar here -->
 
         
         <!-- Main Content -->
@@ -268,7 +271,7 @@ function formatDate($date) {
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <!-- Main action - View details -->
-                                    <a href="./view-return.php?id=<?php echo $request['id']; ?>" class="text-blue-600 hover:text-blue-900 mr-3">View Details</a>
+                                    <a href="./admin-view-return.php?id=<?php echo $request['id']; ?>" class="text-blue-600 hover:text-blue-900 mr-3">View Details</a>
                                     
                                     <!-- Quick status update buttons -->
                                     <?php if ($request['status'] === 'Processing'): ?>
