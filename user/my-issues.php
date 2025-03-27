@@ -18,6 +18,7 @@ if (!$conn) {
     die(mysqli_error($conn));
 }
 
+
 // Get user's reported issues
 $issues_sql = "SELECT i.*, o.id as order_id, o.order_status 
                FROM order_issues i

@@ -47,10 +47,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
         $error_message = "Please enter a valid 4-digit code";
     } else {
         // Database connection
-        $servername = "localhost";
-        $dbname = 'victosah';
-        $username = 'root';
-        $dbpassword = '';
+        require_once "../config/servername.php";
         
         $conn = new mysqli($servername, $username, $dbpassword, $dbname);
         
@@ -92,10 +89,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
 // Process resend request
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
     // Database connection
-    $servername = "localhost";
-    $dbname = 'victosah';
-    $username = 'root';
-    $dbpassword = '';
+    require_once "../config/servername.php";
     
     $conn = new mysqli($servername, $username, $dbpassword, $dbname);
     

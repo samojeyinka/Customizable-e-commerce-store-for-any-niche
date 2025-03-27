@@ -2,6 +2,7 @@
 // Include authentication utility
 require_once '../includes/auth/auth.php';
 require_once __DIR__ . "/../config/config.php";
+require_once "../config/servername.php";
 
 // Authentication check
 requireAuth();
@@ -15,6 +16,7 @@ $conn = mysqli_connect('localhost', 'root', '', 'victosah');
 if (!$conn) {
     die(mysqli_error($conn));
 }
+
 
 // Get the order ID from the URL
 $order_id = isset($_GET['id']) ? $_GET['id'] : null;

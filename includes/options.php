@@ -3,13 +3,11 @@
 
 // ===== DATABASE CONNECTION =====
 
-$host = 'localhost';
-$dbname = 'victosah';
-$username = 'root';
-$password = '';
+require_once __DIR__ . '/../config/servername.php';
+
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $dbpassword);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());

@@ -90,9 +90,9 @@
 
 
 
-//const route = 'https://victosah.com';
+// const route = 'https://victosah.com';
 
-const route = 'http://localhost/victosah';
+ const route = 'http://localhost/victosah';
     
 document.addEventListener('DOMContentLoaded', function() {
     // Cart toggle functionality

@@ -16,6 +16,8 @@ if (!$conn) {
     die(mysqli_error($conn));
 }
 
+
+
 // Get all return requests for the user
 $sql = "SELECT r.id, r.order_id, r.order_item_id, r.product_id, r.return_reason, 
                r.return_details, r.return_quantity, r.status, r.admin_message, r.created_at,

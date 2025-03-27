@@ -8,12 +8,10 @@ if(isset($_SESSION['user_id'])) {
     exit();
 }
 
-$servername = "localhost";
-$dbname = 'victosah';
-$username = 'root';
-$password = '';
+//db connection
+require_once "../../../config/servername.php";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $dbpassword, $dbname);
 
 if($conn->connect_error){
     die("Connection failed: " . $conn->connect_error);

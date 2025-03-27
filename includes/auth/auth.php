@@ -51,12 +51,18 @@ function getCurrentUser() {
         return false;
     }
     
-    $servername = "localhost";
-    $dbname = 'victosah';
-$username = 'root';
-$password = '';
+ 
 
-    $conn = new mysqli($servername, $username, $password, $dbname);
+    //db connection
+    $servername = "localhost";
+    $dbname = "victosah";
+    $username = "root";
+    $dbpassword = "";
+
+
+
+
+    $conn = new mysqli($servername, $username, $dbpassword, $dbname);
 
     if($conn->connect_error){
         return false;

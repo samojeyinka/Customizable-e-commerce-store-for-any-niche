@@ -46,10 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
     if (empty($email) || empty($password)) {
         $error_message = "Please enter both email and password";
     } else {
-        $servername = "localhost";
-        $dbname = 'victosah';
-        $username = 'root';
-        $dbpassword = '';
+        require_once "../config/servername.php";
         
         $conn = new mysqli($servername, $username, $dbpassword, $dbname);
         

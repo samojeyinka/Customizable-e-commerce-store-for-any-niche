@@ -22,13 +22,11 @@ if(!isset($_SESSION['user_reset_email']) || !isset($_SESSION['user_new_password'
 
 $email = $_SESSION['user_reset_email'];
 
-// Database connection
-$servername = "localhost";
-$dbname = 'victosah';
-$username = 'root';
-$password = '';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+//db connection
+require_once "../../../config/servername.php";
+
+$conn = new mysqli($servername, $username, $dbpassword, $dbname);
 
 if($conn->connect_error){
     die("Connection failed: " . $conn->connect_error);

@@ -29,11 +29,7 @@ if (isset($_SESSION['error_message'])) {
 }
 
 // Database connection
-$servername = "localhost";
-$dbname = 'victosah';
-$username = 'root';
-$dbpassword = '';
-
+require_once "../../../config/servername.php";
 $conn = new mysqli($servername, $username, $dbpassword, $dbname);
 
 if ($conn->connect_error) {

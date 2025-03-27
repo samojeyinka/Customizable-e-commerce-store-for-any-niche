@@ -45,10 +45,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Please enter a valid email address";
     } else {
         // Database connection
-        $servername = "localhost";
-        $dbname = 'victosah';
-        $username = 'root';
-        $dbpassword = '';
+        require_once "../config/servername.php";
         
         $conn = new mysqli($servername, $username, $dbpassword, $dbname);
         

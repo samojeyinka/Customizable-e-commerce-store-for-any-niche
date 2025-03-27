@@ -36,10 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
     $admin_id = $_SESSION['temp_admin_id'];
     
     // Connect to database
-    $servername = "localhost";
-    $dbname = 'victosah';
-    $username = 'root';
-    $dbpassword = '';
+    require_once "../config/servername.php";
     
     $conn = new mysqli($servername, $username, $dbpassword, $dbname);
     
@@ -99,10 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
 // Resend OTP
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
     // Connect to database
-    $servername = "localhost";
-    $dbname = 'victosah';
-    $username = 'root';
-    $dbpassword = '';
+    require_once "../config/servername.php";
     
     $conn = new mysqli($servername, $username, $dbpassword, $dbname);
     

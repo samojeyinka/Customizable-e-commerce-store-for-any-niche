@@ -3,6 +3,9 @@
 require_once '../includes/auth/auth.php';
 require_once __DIR__ . "/../config/config.php";
 
+require_once "../config/servername.php";
+
+
 // Authentication check
 requireAuth();
 
@@ -17,11 +20,14 @@ if(isset($_GET['logout'])) {
 
 
 
+
 // Database connection
 $conn = mysqli_connect('localhost', 'root', '', 'victosah');
 if (!$conn) {
     die(mysqli_error($conn));
 }
+
+
 
 // Get the orders for the current user
 // Let's debug the column names first by showing all columns

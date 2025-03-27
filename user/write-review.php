@@ -16,6 +16,9 @@ if (!$conn) {
     die(mysqli_error($conn));
 }
 
+
+
+
 // Initialize variables
 $order_id = isset($_GET['order_id']) ? intval($_GET['order_id']) : 0;
 $product_id = isset($_GET['product_id']) ? intval($_GET['product_id']) : 0;

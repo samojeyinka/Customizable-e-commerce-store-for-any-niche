@@ -34,7 +34,7 @@ $brands = [
 
 // The domain constant (you may already have this defined elsewhere)
 if (!defined('DOMAIN')) {
-    define('DOMAIN', 'http://yourdomainhere.com'); // Replace with your actual domain
+    define('DOMAIN', 'http://localhost'); // Replace with your actual domain
 }
 ?>
 
@@ -303,4 +303,4 @@ function closeMobileSearch() {
     
 </nav>
 
-
+<script src="<?php echo DOMAIN; ?>/functions/functions.js"></script>

@@ -1,11 +1,13 @@
 <?php
 // Database connection setup
-$servername = "localhost";
-$dbname = 'victosah';
-$username = 'root';
-$password = '';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+
+$servername = "localhost";
+$dbname = "victosah";
+$username = "root";
+$dbpassword = "";
+
+$conn = new mysqli($servername, $username, $dbpassword, $dbname);
 
 // Login logic
 if(isset($_POST['login'])) {

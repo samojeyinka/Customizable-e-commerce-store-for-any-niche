@@ -4,10 +4,9 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Database connection parameters
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "victosah";
+
+require_once "../config/servername.php";
+
 
 // Function to sanitize input data
 function sanitize_input($data) {
@@ -37,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         try {
             // Create database connection
-            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $dbpassword);
             
             // Set the PDO error mode to exception
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

@@ -12,6 +12,8 @@ if(isset($_GET['logout'])) {
     logout();
 }
 
+require_once "./config/servername.php";
+
 
 
 ?> 
@@ -65,6 +67,8 @@ if(isset($_GET['logout'])) {
     <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/faq.js"></script>
     <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/dropdown.js"></script>
     <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/inputs.js"></script>
+
+    
 </body>
 </body>
 

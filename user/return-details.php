@@ -10,11 +10,15 @@ requireAuth();
 $user = getCurrentUser();
 $user_id = $user['id'];
 
+
+
 // Database connection
 $conn = mysqli_connect('localhost', 'root', '', 'victosah');
 if (!$conn) {
     die(mysqli_error($conn));
 }
+
+
 
 // Get the return request ID from the URL
 $return_id = isset($_GET['id']) ? $_GET['id'] : null;

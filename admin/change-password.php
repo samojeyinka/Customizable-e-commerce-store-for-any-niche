@@ -33,11 +33,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif(!preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
         $error_message = "Password must contain at least one special character.";
     } else {
-        // Database connection
-        $servername = "localhost";
-        $dbname = 'victosah';
-        $username = 'root';
-        $dbpassword = '';
+      
+
+        require_once "../config/servername.php";
         
         $conn = new mysqli($servername, $username, $dbpassword, $dbname);
         

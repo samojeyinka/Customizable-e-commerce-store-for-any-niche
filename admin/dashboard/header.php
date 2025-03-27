@@ -6,10 +6,7 @@ $admin_email = $_SESSION['admin_email'];
 $admin_role = $_SESSION['admin_role'] ?? 'admin';
 
 // Connect to the database
-$servername = "localhost";
-$dbname = 'victosah';
-$username = 'root';
-$dbpassword = '';
+require_once "../../config/servername.php";
 
 $conn = new mysqli($servername, $username, $dbpassword, $dbname);
 

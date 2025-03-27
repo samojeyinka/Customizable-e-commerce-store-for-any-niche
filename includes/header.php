@@ -2,6 +2,7 @@
 require_once __DIR__ . '/auth/auth.php';
 
 
+
 // Get current user if logged in
 $user = isAuthenticated() ? getCurrentUser() : null;
 
@@ -16,12 +17,10 @@ if(isset($_GET['logout'])) {
 
     <!-- The nav and sidemenu -->
     <?php
-    // include('./includes/navigation/nav.php');
-    // include('./includes/navigation/sidemenu.php');
+
     include(__DIR__ . '/navigation/sidemenu.php');
     include(__DIR__ . '/navigation/nav.php');
-    // include(__DIR__ . '/auth/password-reset/password-request-new-password.php');
-    // include(__DIR__ . '/auth/password-reset/password-request-success.php');
+
     ?>
 
 

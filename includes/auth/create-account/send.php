@@ -9,12 +9,14 @@ require 'phpmailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$servername = "localhost";
-$dbname = 'victosah';
-$username = 'root';
-$password = '';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+
+
+
+//db connection
+require_once "../../../config/servername.php";
+
+$conn = new mysqli($servername, $username, $dbpassword, $dbname);
 
 if($conn->connect_error){
     die("Connection failed: " . $conn->connect_error);
