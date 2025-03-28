@@ -3,11 +3,11 @@ session_start();
 require_once "../../config/config.php";
 
 // Check if admin is logged in
-if (!isset($_SESSION['admin_id'])) {
-    // Redirect to login page
-    header("Location: ../index.php");
-    exit();
-}
+// if (!isset($_SESSION['admin_id'])) {
+//     // Redirect to login page
+//     header("Location: ../index.php");
+//     exit();
+// }
 
 // Include the dashboard statistics code
 include "dashboard_stats.php";
@@ -324,6 +324,139 @@ include("./sidebar.php");
             </div>
         </div>
         <!-- The charts area ends -->
+
+          <!-- selling location and best selling products setion starts -->
+          <div class="flex flex-col md:flex-row items-start gap-3 md:h-[394px]">
+            <!-- The sales location starts -->
+            <div class="w-full md:w-[50%] h-full overflow-y-auto p-3 border-[1px] border-[#E7E7E7] rounded-[8px]">
+                <div class="flex items-center justify-between">
+
+                    <div class="flex items-center gap-[3px]">
+                        <span class="text-[#262626] text-[15px] md:text-[17px] font-medium font-['Open Sans']">Sales by Location</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 md:gap-2 lg:gap-3">
+                        <div class="custom-dropdown">
+                            <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
+                                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">2025</span>
+                                <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                            </div>
+                            <div class="dropdown-content">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
+                                        <div onclick="selectOption(this)">2025</div>
+                                        <div onclick="selectOption(this)">2024</div>
+                                        <div onclick="selectOption(this)">2023</div>
+                                        <div onclick="selectOption(this)">2022</div>
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="custom-dropdown">
+                            <div class="md:min-w-[65px] lg:min-w-[60px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
+                                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Last 28 days</span>
+                                <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                            </div>
+                            <div class="dropdown-content">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
+                                        <div onclick="selectOption(this)">Today</div>
+                                        <div onclick="selectOption(this)">Last 7 days</div>
+                                        <div onclick="selectOption(this)">Last 28 days</div>
+                                        <div onclick="selectOption(this)">Custom date</div>
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full h-[1px] bg-[#E7E7E7] my-3"></div>
+
+                <div class="w-full flex flex-col gap-2">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex flex-col gap-[3px]">
+                            <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
+                            <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']">105,000 sales</p>
+                        </div>
+
+                        <div class="flex items-center gap-[5px]">
+                            <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦10,000</p>
+                            <button class="w-[fit-content] bg-[#39D959] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium">+10%</button>
+                        </div>
+
+                    </div>
+
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex flex-col gap-[3px]">
+                            <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
+                            <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']">105,000 sales</p>
+                        </div>
+
+                        <div class="flex items-center gap-[5px]">
+                            <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦10,000</p>
+                            <button class="w-[fit-content] bg-[#39D959] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium">+10%</button>
+                        </div>
+
+                    </div>
+
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex flex-col gap-[3px]">
+                            <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
+                            <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']">105,000 sales</p>
+                        </div>
+
+                        <div class="flex items-center gap-[5px]">
+                            <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦10,000</p>
+                            <button class="w-[fit-content] bg-[#D93939] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium">-5%</button>
+                        </div>
+
+                    </div>
+
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex flex-col gap-[3px]">
+                            <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
+                            <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']">105,000 sales</p>
+                        </div>
+
+                        <div class="flex items-center gap-[5px]">
+                            <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦10,000</p>
+                            <button class="w-[fit-content] bg-[#D93939] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium">-5%</button>
+                        </div>
+
+                    </div>
+
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex flex-col gap-[3px]">
+                            <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
+                            <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']">105,000 sales</p>
+                        </div>
+
+                        <div class="flex items-center gap-[5px]">
+                            <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦10,000</p>
+                            <button class="w-[fit-content] bg-[#D93939] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium">-5%</button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- The sales location ends -->
+
+            <!-- The best selling products section starts -->
+            
+            <!-- The best selling products section ends -->
+
+        </div>
+        <!-- selling location and best selling products setion ends -->
     </div>
 
     <script>
