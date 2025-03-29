@@ -87,18 +87,6 @@ if (isset($_GET['buy_now']) && isset($_GET['product_id']) && isset($_GET['varian
 } 
 // Otherwise get from cart
 else {
-    // $cart_query = "SELECT DISTINCT c.cart_id, c.quantity, p.product_id, p.product_name, 
-    //           i.image_path AS main_image, v.size, v.variant_id, v.status,
-    //           COALESCE(v.discount_price, v.original_price) AS price,
-    //           (SELECT MIN(COALESCE(pv.discount_price, pv.original_price)) 
-    //            FROM product_variants pv 
-    //            WHERE pv.product_id = p.product_id) AS min_variant_price
-    //           FROM cart c
-    //           JOIN products p ON c.product_id = p.product_id
-    //           LEFT JOIN product_images i ON p.product_id = i.product_id AND i.is_main = 1
-    //           LEFT JOIN product_variants v ON c.variant_id = v.variant_id
-    //           WHERE c.user_id = ?
-    //           GROUP BY c.cart_id";  // Use GROUP BY cart_id to ensure no duplicates
 
     $cart_query = "SELECT DISTINCT c.cart_id, c.quantity, p.product_id, p.product_name, 
     i.image_path AS main_image, v.size, v.variant_id, v.status,
@@ -211,6 +199,61 @@ $paystack_data = [
     'last_name' => $profile['last_name'] ?? '',
     'order_ref' => 'ORDER-' . time() . rand(1000, 9999)
 ];
+
+
+
+
+// Check if there's a successful order notification to display
+if (isset($_GET['order_success']) && isset($_GET['order_id'])) {
+    // Include notifications functions
+    require_once '../includes/notifications.php';
+    
+    $order_id = intval($_GET['order_id']);
+    
+    // Get order details from database to create proper notification
+    $order_query = "SELECT o.order_total, p.first_name, p.last_name 
+                   FROM orders o 
+                   LEFT JOIN profiles p ON o.user_id = p.user_id 
+                   WHERE o.id = ?";
+    
+    $stmt = mysqli_prepare($con, $order_query);
+    mysqli_stmt_bind_param($stmt, "i", $order_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    if ($order_data = mysqli_fetch_assoc($result)) {
+        $order_total = number_format($order_data['order_total'], 2);
+        $customer_name = trim($order_data['first_name'] . ' ' . $order_data['last_name']);
+        if (empty($customer_name)) {
+            $customer_name = "Customer #" . $user_id;
+        }
+        
+        // Create notification for admin
+        add_notification(
+            $con,
+            'order',
+            "New Order #$order_id",
+            "A new order has been placed by $customer_name for ₦$order_total",
+            $order_id,
+            'order',
+            null, // null for_user_id means it's for all admins
+            1     // 1 means it's for admin
+        );
+        
+        // Create notification for the user too
+        add_notification(
+            $con,
+            'order_confirmation',
+            'Order Successfully Placed',
+            "Your order #$order_id has been received and is being processed. Thank you for shopping with us!",
+            $order_id,
+            'order',
+            $user_id, // specific user
+            0         // 0 means it's not for admin
+        );
+    }
+}
+
 
 ?>
 
@@ -652,18 +695,6 @@ z-index: 10;
 
          
 
-                    <!-- <div class="mt-4">
-                        <label class="font-['Open Sans'] text-[13px] md:text-[15px] font-regular text-[#5B5B5B]">
-                            By proceeding with your purchase you agree to our Terms and Conditions and Privacy Policy
-                        </label>
-                        <button 
-                            type="submit" 
-                            name="checkout" 
-                            value="1"
-                            class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
-                            Continue to Pay
-                        </button>
-                    </div> -->
 
 
                     <!-- Payment Method Section -->
@@ -779,11 +810,7 @@ z-index: 10;
                         <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="desktop-subtotal"><?php echo number_format($subtotal); ?></span></p>
                     </div>
 
-                    <!-- <div class="flex items-center justify-between">
-                        <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Shipping fee (₦<?php echo number_format($base_shipping_fee); ?> x <?php echo $total_item_count; ?> items)</p>
-    <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="desktop-shipping"><?php echo number_format($shipping_fee); ?></span></p>
-
-                    </div> -->
+              
 
            <!-- Shipping fee display for desktop - only show breakdown for express delivery -->
 <div class="flex items-center justify-between">
@@ -1144,7 +1171,7 @@ document.addEventListener('DOMContentLoaded', function() {
             resetButtonTexts();
             
             // User-friendly error notification
-            alert('Order Processing Failed: ' + error.message);
+            // alert('Order Processing Failed: ' + error.message);
         });
     }
     
@@ -1342,7 +1369,7 @@ document.addEventListener('DOMContentLoaded', function() {
             resetButtonTexts();
             
             // User-friendly error notification
-            alert('Order Processing Failed: ' + error.message);
+            // alert('Order Processing Failed: ' + error.message);
         });
     }
     

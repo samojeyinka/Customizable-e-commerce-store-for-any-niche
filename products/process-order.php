@@ -20,6 +20,7 @@ try {
     session_start();
     require_once '../config/connect.php';
     require_once '../includes/auth/auth.php';
+    require_once '../includes/notifications.php';
 
     // Authentication and user validation
     requireAuth();
@@ -261,7 +262,6 @@ try {
     if (!mysqli_query($con, $transaction_insert)) {
         logOrderError("Transaction history insertion failed: " . mysqli_error($con));
         // Continue processing even if transaction history fails
-        // This is not critical to order completion
     } else {
         logOrderError("Transaction history created successfully");
     }
@@ -307,11 +307,43 @@ try {
     // Commit transaction
     mysqli_commit($con);
 
-    // Send success response
+    // Create notifications after successful order
+    $order_total = number_format($total, 2);
+    $customer_name = trim(($profile['first_name'] ?? '') . ' ' . ($profile['last_name'] ?? ''));
+    if (empty($customer_name)) {
+        $customer_name = "Customer #" . $user_id;
+    }
+    
+    // Create notification for admin
+    add_notification(
+        $con,
+        'order',
+        "New Order #$order_id",
+        "A new order has been placed by $customer_name for ₦$order_total",
+        $order_id,
+        'order',
+        null, // null for_user_id means it's for all admins
+        1     // 1 means it's for admin
+    );
+    
+    // Create notification for the user too
+    add_notification(
+        $con,
+        'order_confirmation',
+        'Order Successfully Placed',
+        "Your order #$order_id has been received and is being processed. Thank you for shopping with us!",
+        $order_id,
+        'order',
+        $user_id, // specific user
+        0         // 0 means it's not for admin
+    );
+
+    // Return success response
     echo json_encode([
         'status' => 'success', 
-        'order_id' => $order_id, 
-        'message' => 'Order processed successfully'
+        'order_id' => $order_id,
+        'message' => 'Order processed successfully',
+        'redirect_url' => 'order-success.php?ref=' . $_POST['payment_reference']
     ]);
     exit;
 
@@ -331,9 +363,4 @@ try {
         'message' => $e->getMessage()
     ]);
     exit;
-} finally {
-    // Ensure database connection is closed
-    if (isset($con)) {
-        mysqli_close($con);
-    }
 }

@@ -513,10 +513,148 @@ include("./sidebar.php");
 
             </div>
             <!-- The sales location ends -->
+<!-- The recent order starts  -->
+<div class="w-full p-3 border-[1px] border-[#E7E7E7] rounded-[8px]">
+    <div class="flex items-center justify-between py-3">
+        <span class="text-[#262626] text-[15px] md:text-[17px] font-medium font-['Open Sans']">Latest Orders</span>
+        <a href="./orders.php" class="text-[#1A237E] text-[14px] md:text-[15px] font-medium font-['Open Sans'] cursor-pointer">See All</a>
+    </div>
 
-            <!-- The best selling products section starts -->
-      
-            <!-- The best selling products section ends -->
+    <?php
+    // Create a new connection
+    $orders_conn = mysqli_connect('localhost', 'root', '', 'victosah');
+    if (!$orders_conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+    
+    // Determine the date column
+    $orders_date_column = 'id'; // Default fallback
+    $columns_query = $orders_conn->query("SHOW COLUMNS FROM orders");
+    if ($columns_query) {
+        $available_columns = [];
+        while ($col = $columns_query->fetch_assoc()) {
+            $available_columns[] = $col['Field'];
+        }
+        
+        if (in_array('created_at', $available_columns)) {
+            $orders_date_column = 'created_at';
+        } elseif (in_array('date_added', $available_columns)) {
+            $orders_date_column = 'date_added';
+        } elseif (in_array('created', $available_columns)) {
+            $orders_date_column = 'created';
+        }
+    }
+    
+    // Status classes configuration if not defined
+    $orders_status_classes = [
+        'Confirmed' => 'bg-[#1A7E79]',
+        'Processing' => 'bg-[#E8B006]',
+        'Shipped' => 'bg-[#1A237E]',
+        'Delivered' => 'bg-[#39D959]',
+        'Cancelled' => 'bg-red-500',
+        'Returned' => 'bg-[#9C27B0]'
+    ];
+    ?>
+
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="w-full bg-[#E7E7E7] text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
+                <th class="text-nowrap p-2 flex items-center gap-2">
+                    <input type="checkbox" />
+                    <span class="text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Order ID</span>
+                </th>
+                <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Customer Name</th>
+                <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Amount</th>
+                <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Status</th>
+                <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Date</th>
+                <th class="">
+                    <img src="../assets/dash/column.svg" class="min-w-[24px] min-h-[24px]" />
+                </th>
+            </thead>
+
+            <tbody>
+                <?php
+                // Query to get the 5 most recent orders
+                $latest_orders_sql = "SELECT 
+                    orders.id AS order_id,
+                    orders.order_total AS amount,
+                    orders.order_status,
+                    orders.$orders_date_column AS order_date,
+                    profiles.first_name,
+                    profiles.last_name
+                FROM orders
+                LEFT JOIN profiles ON orders.user_id = profiles.user_id
+                ORDER BY orders.$orders_date_column DESC
+                LIMIT 5";
+                
+                $latest_result = $orders_conn->query($latest_orders_sql);
+                
+                if ($latest_result && $latest_result->num_rows > 0) {
+                    while($order = $latest_result->fetch_assoc()) {
+                        // Format date
+                        $formatted_date = 'N/A';
+                        $formatted_time = 'N/A';
+                        if (!empty($order['order_date'])) {
+                            try {
+                                $dt = new DateTime($order['order_date']);
+                                $formatted_date = $dt->format('d/m/Y');
+                                $formatted_time = $dt->format('h:ia');
+                            } catch (Exception $e) {
+                                // Keep default values
+                            }
+                        }
+                        
+                        // Get status class
+                        $status = $order['order_status'] ?? 'Processing';
+                        $status_class = $orders_status_classes[$status] ?? 'bg-[#E8B006]';
+                        
+                        // Get customer name
+                        $customer_name = trim(($order['first_name'] ?? '') . ' ' . ($order['last_name'] ?? ''));
+                        if (empty($customer_name)) {
+                            $customer_name = 'Unknown Customer';
+                        }
+                ?>
+                <tr>
+                    <td class="text-nowrap flex items-center gap-2 px-2 py-5">
+                        <input type="checkbox" />
+                        <span class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">#<?php echo htmlspecialchars($order['order_id']); ?></span>
+                    </td>
+                    <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo htmlspecialchars($customer_name); ?></td>
+                    <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">₦<?php echo number_format($order['amount'] ?? 0); ?></td>
+                    <td>
+                        <button type="submit" class="py-1 px-4 <?php echo $status_class; ?> text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px]"><?php echo htmlspecialchars($status); ?></button>
+                    </td>
+                    <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-nowrap"><?php echo $formatted_date . ' ' . $formatted_time; ?></td>
+                    <td class="relative">
+                        <img src="../assets/user/action.svg" class="w-[20px] cursor-pointer" onclick="openOrdermenu(this)" />
+                        
+                        <!-- Order Menu (specific to this row) -->
+                        <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
+                            <div class="flex flex-col gap-3">
+                                <a href="./order-details.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                                <a href="./order-details.php?id=<?php echo $order['order_id']; ?>&tab=update-status" class="text-[16px] font-medium text-[#262626]">Update Status</a>
+                                <a href="./order-details.php?id=<?php echo $order['order_id']; ?>&tab=update-status" class="text-[16px] font-medium text-[#D93939]">Cancel Order</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <?php
+                    }
+                } else {
+                ?>
+                <tr>
+                    <td colspan="6" class="py-4 text-center">No recent orders found</td>
+                </tr>
+                <?php
+                }
+                // Close this connection when done
+                $orders_conn->close();
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- The recent order ends  -->
 
         </div>
         <!-- selling location and best selling products setion ends -->
