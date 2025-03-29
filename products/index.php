@@ -28,6 +28,11 @@ include(__DIR__ . '/../config/products.php');
 
    
     <style>
+
+        main{
+            max-width: 1280px;
+            margin:auto;
+        }
 /* Mobile filter options */
 .filteroptions-content {
     display: none;
@@ -49,7 +54,7 @@ include(__DIR__ . '/../config/products.php');
     position: absolute;
     top: 100%;
     left: 0;
-    width: 100%;
+
     background-color: white;
     border: 1px solid #E1E1E1;
     border-radius: 4px;
@@ -57,7 +62,7 @@ include(__DIR__ . '/../config/products.php');
     z-index: 10;
     margin-top: 4px;
     max-height: 200px;
-    overflow-y: auto;
+  
 }
 
 .custom-dropdown.active .dropdown-content {

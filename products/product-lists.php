@@ -17,17 +17,17 @@
     <?php if (mysqli_num_rows($result) > 0): ?>
         <?php while ($product = mysqli_fetch_assoc($result)): ?>
             <!-- Product Card -->
-            <div class="w-[fit-content] productbox rounded-[8px] overflow-hidden flex flex-col">
+            <div class="w-[100%] productbox rounded-[8px] overflow-hidden flex flex-col">
                 <a href="<?php echo DOMAIN; ?>/products/show.php?id=<?php echo $product['product_id']; ?>" class="w-full rounded-[8px] overflow-hidden relative cursor-pointer">
                     <?php if ($product['is_featured']): ?>
                         <button class="w-[fit-content] h-[fit-content] bg-[#D51E5E] absolute top-4 left-4 rounded-[28px] text-white text-[12px] md:text-[13px] font-Onest font-regular py-1 px-2 absolute">Featured</button>
                     <?php endif; ?>
                     
-                    <img src="<?php echo !empty($product['main_image']) ? DOMAIN . '/assets/products/' . $product['main_image'] : DOMAIN .'/assets/products/default.svg'; ?>" class="w-[250px] h-[230px] object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
+                    <img src="<?php echo !empty($product['main_image']) ? DOMAIN . '/assets/products/' . $product['main_image'] : DOMAIN .'/assets/products/default.svg'; ?>" class="w-[100%] h-[230px] object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
                     
            <!-- Only change the text of the button, keep styling consistent -->
         <button 
-            class="add-to-cart-btn bg-[#1A237E] text-white rounded-[8px] text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer p-2 w-[80%] absolute bottom-0 left-[10%]"
+            class="add-to-cart-btn bg-[#1A237E] text-white rounded-[8px] text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer p-2 w-[90%] absolute bottom-0 left-[5%]"
             data-product-id="<?php echo $product['product_id']; ?>"
             data-in-cart="<?php echo array_key_exists($product['product_id'], $cart_items) ? 'true' : 'false'; ?>"
             data-cart-id="<?php echo array_key_exists($product['product_id'], $cart_items) ? $cart_items[$product['product_id']] : ''; ?>"

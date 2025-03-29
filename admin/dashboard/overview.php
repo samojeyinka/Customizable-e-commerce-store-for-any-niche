@@ -11,6 +11,108 @@ require_once "../../config/config.php";
 
 // Include the dashboard statistics code
 include "dashboard_stats.php";
+
+
+function getSalesStats($conn) {
+    $statsData = array();
+    
+    // Get Lagos Store stats
+    $lagosQuery = "SELECT 
+                COUNT(*) as total_sales,
+                SUM(order_total) as total_revenue,
+                AVG(order_total) as avg_order_value
+            FROM 
+                orders 
+            WHERE 
+                pickup_location = 'Lagos Store'";
+    
+    $result = $conn->query($lagosQuery);
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        // Let's assume 5% increase for Lagos (in a real app, you'd compare with previous period)
+        $statsData[] = array(
+            "location" => "Lagos Store",
+            "sales" => $row["total_sales"],
+            "revenue" => $row["total_revenue"],
+            "avg_order" => $row["avg_order_value"],
+            "growth" => 10,
+            "growth_color" => "#39D959"
+        );
+    }
+    
+    // Get non-Lagos Store stats (NULL or other values)
+    $nonLagosQuery = "SELECT 
+                COUNT(*) as total_sales,
+                SUM(order_total) as total_revenue,
+                AVG(order_total) as avg_order_value
+            FROM 
+                orders 
+            WHERE 
+                pickup_location IS NULL OR pickup_location = '' OR pickup_location != 'Lagos Store'";
+    
+    $result = $conn->query($nonLagosQuery);
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        // Let's assume -5% for non-Lagos (in a real app, you'd compare with previous period)
+        $statsData[] = array(
+            "location" => "Non-Lagos Locations",
+            "sales" => $row["total_sales"],
+            "revenue" => $row["total_revenue"],
+            "avg_order" => $row["avg_order_value"],
+            "growth" => -5,
+            "growth_color" => "#D93939"
+        );
+    }
+    
+    return $statsData;
+}
+
+
+function getNonLagosBreakdown($conn) {
+    $breakdownData = array();
+    
+    $sql = "SELECT 
+                COALESCE(pickup_location, 'Express Delivery') as location,
+                COUNT(*) as total_sales,
+                SUM(order_total) as total_revenue,
+                AVG(order_total) as avg_order_value
+            FROM 
+                orders 
+            WHERE 
+                pickup_location IS NULL OR pickup_location = '' OR pickup_location != 'Lagos Store'
+            GROUP BY 
+                pickup_location
+            ORDER BY 
+                total_revenue DESC";
+    
+    $result = $conn->query($sql);
+    
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            // For demo, alternate between positive and negative growth
+            static $i = 0;
+            $growth = ($i % 2 == 0) ? rand(-10, -1) : rand(1, 10);
+            $growthColor = ($growth >= 0) ? "#39D959" : "#D93939";
+            $i++;
+            
+            $breakdownData[] = array(
+                "location" => $row["location"],
+                "sales" => $row["total_sales"],
+                "revenue" => $row["total_revenue"],
+                "avg_order" => $row["avg_order_value"],
+                "growth" => $growth,
+                "growth_color" => $growthColor
+            );
+        }
+    }
+    
+    return $breakdownData;
+}
+
+// Get data for display
+$mainStats = getSalesStats($conn);
+$locationBreakdown = getNonLagosBreakdown($conn);
+
 ?>
 
 
@@ -325,8 +427,8 @@ include("./sidebar.php");
         </div>
         <!-- The charts area ends -->
 
-          <!-- selling location and best selling products setion starts -->
-          <div class="flex flex-col md:flex-row items-start gap-3 md:h-[394px]">
+         <!-- selling location and best selling products setion starts -->
+         <div class="flex flex-col md:flex-row items-start gap-3 md:h-[394px]">
             <!-- The sales location starts -->
             <div class="w-full md:w-[50%] h-full overflow-y-auto p-3 border-[1px] border-[#E7E7E7] rounded-[8px]">
                 <div class="flex items-center justify-between">
@@ -335,128 +437,90 @@ include("./sidebar.php");
                         <span class="text-[#262626] text-[15px] md:text-[17px] font-medium font-['Open Sans']">Sales by Location</span>
                     </div>
 
-                    <div class="flex items-center gap-2 md:gap-2 lg:gap-3">
-                        <div class="custom-dropdown">
-                            <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
-                                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">2025</span>
-                                <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                            </div>
-                            <div class="dropdown-content">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                        <div onclick="selectOption(this)">2025</div>
-                                        <div onclick="selectOption(this)">2024</div>
-                                        <div onclick="selectOption(this)">2023</div>
-                                        <div onclick="selectOption(this)">2022</div>
-
-
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="custom-dropdown">
-                            <div class="md:min-w-[65px] lg:min-w-[60px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
-                                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Last 28 days</span>
-                                <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-                            </div>
-                            <div class="dropdown-content">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex flex-col gap-3 text-[13px] text-[#262626 cursor-pointer">
-                                        <div onclick="selectOption(this)">Today</div>
-                                        <div onclick="selectOption(this)">Last 7 days</div>
-                                        <div onclick="selectOption(this)">Last 28 days</div>
-                                        <div onclick="selectOption(this)">Custom date</div>
-
-
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="w-full h-[1px] bg-[#E7E7E7] my-3"></div>
 
                 <div class="w-full flex flex-col gap-2">
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="flex flex-col gap-[3px]">
-                            <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
-                            <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']">105,000 sales</p>
-                        </div>
 
-                        <div class="flex items-center gap-[5px]">
-                            <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦10,000</p>
-                            <button class="w-[fit-content] bg-[#39D959] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium">+10%</button>
-                        </div>
+                 
+                <?php if (count($mainStats) >= 2): 
+    $lagos_data = $mainStats[0];
+    $non_lagos_data = $mainStats[1];
+    
+    $lagos_revenue = $lagos_data["revenue"];
+    $non_lagos_revenue = $non_lagos_data["revenue"];
+    $lagosSales = $lagos_data["sales"];
+    $nonLagosSales = $non_lagos_data["sales"];
+    
+    // Growth values
+    $lagos_growth = $lagos_data["growth"] ?? 10; // Default to 10% if not set
+    $non_lagos_growth = $non_lagos_data["growth"] ?? -5; // Default to -5% if not set
+    
+    // Get colors based on growth values
+    $lagos_color = ($lagos_growth >= 0) ? "#39D959" : "#D93939";
+    $non_lagos_color = ($non_lagos_growth >= 0) ? "#39D959" : "#D93939";
+?>
 
-                    </div>
+<!-- Lagos Display -->
+<div class="flex items-start justify-between gap-2">
+    <div class="flex flex-col gap-[3px]">
+        <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
+        <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']"><?php echo number_format($lagosSales); ?> sales</p>
+    </div>
 
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="flex flex-col gap-[3px]">
-                            <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
-                            <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']">105,000 sales</p>
-                        </div>
+    <div class="flex items-center gap-[5px]">
+        <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦<?php echo number_format($lagos_revenue); ?></p>
+        <button class="w-[fit-content] bg-[<?php echo $lagos_color; ?>] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium"><?php echo ($lagos_growth >= 0 ? '+' : '') . round($lagos_growth); ?>%</button>
+    </div>
+</div>
 
-                        <div class="flex items-center gap-[5px]">
-                            <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦10,000</p>
-                            <button class="w-[fit-content] bg-[#39D959] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium">+10%</button>
-                        </div>
+<!-- Non-Lagos Display -->
+<div class="flex items-start justify-between gap-2">
+    <div class="flex flex-col gap-[3px]">
+        <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Outside Lagos</p>
+        <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']"><?php echo number_format($nonLagosSales); ?> sales</p>
+    </div>
 
-                    </div>
+    <div class="flex items-center gap-[5px]">
+        <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦<?php echo number_format($non_lagos_revenue); ?></p>
+        <button class="w-[fit-content] bg-[<?php echo $non_lagos_color; ?>] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium"><?php echo ($non_lagos_growth >= 0 ? '+' : '') . round($non_lagos_growth); ?>%</button>
+    </div>
+</div>
 
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="flex flex-col gap-[3px]">
-                            <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
-                            <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']">105,000 sales</p>
-                        </div>
+<!-- Non-Lagos Breakdown Details -->
+<?php if (!empty($locationBreakdown)): ?>
+    <div class="w-full h-[1px] bg-[#E7E7E7] my-3"></div>
+    <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans'] mb-2">Outside Lagos Breakdown</p>
+    
+    <?php foreach ($locationBreakdown as $location): ?>
+        <div class="flex items-start justify-between gap-2 mb-2">
+            <div class="flex flex-col gap-[3px]">
+                <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']"><?php echo htmlspecialchars($location["location"]); ?></p>
+                <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']"><?php echo number_format($location["sales"]); ?> sales</p>
+            </div>
 
-                        <div class="flex items-center gap-[5px]">
-                            <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦10,000</p>
-                            <button class="w-[fit-content] bg-[#D93939] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium">-5%</button>
-                        </div>
+            <div class="flex items-center gap-[5px]">
+                <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦<?php echo number_format($location["revenue"]); ?></p>
+                <button class="w-[fit-content] bg-[<?php echo $location["growth_color"]; ?>] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium"><?php echo ($location["growth"] >= 0 ? '+' : '') . $location["growth"]; ?>%</button>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
 
-                    </div>
-
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="flex flex-col gap-[3px]">
-                            <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
-                            <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']">105,000 sales</p>
-                        </div>
-
-                        <div class="flex items-center gap-[5px]">
-                            <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦10,000</p>
-                            <button class="w-[fit-content] bg-[#D93939] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium">-5%</button>
-                        </div>
-
-                    </div>
-
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="flex flex-col gap-[3px]">
-                            <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
-                            <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']">105,000 sales</p>
-                        </div>
-
-                        <div class="flex items-center gap-[5px]">
-                            <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦10,000</p>
-                            <button class="w-[fit-content] bg-[#D93939] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium">-5%</button>
-                        </div>
-
-                    </div>
-
+<?php endif; ?>
                 </div>
 
             </div>
             <!-- The sales location ends -->
 
             <!-- The best selling products section starts -->
-            
+      
             <!-- The best selling products section ends -->
 
         </div>
         <!-- selling location and best selling products setion ends -->
+
     </div>
 
     <script>

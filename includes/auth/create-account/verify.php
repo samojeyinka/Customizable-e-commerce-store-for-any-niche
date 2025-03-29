@@ -322,8 +322,22 @@ if(!isset($_SESSION['email'])) {
         ?>
     <div class="w-full">
     <div class="w-[95%] md:w-[50%] mx-auto p-4 bg-white border border-[1px] border-[#EFEFEF] my-5 rounded-md">
-            <!-- <img src="../../../assets/global/back.svg" alt="back" id="backtoreg" class="w-[26px] md:w-[32px] absolute left-4 cursor-pointer" />
-             -->
+
+    <?php if(!empty($error_message)): ?>
+        <section id="dangeralert" class="flex flex-col items-center w-full bg-[#FDECEC] shadow-lg mt-2 py-3 px-4 rounded relative overflow-hidden">
+            <div class="h-[100%] w-[5px] bg-[#EE3F3F] absolute left-0 top-0"></div>
+            <div class="flex items-center gap-2 mr-auto">
+                <img src="<?php echo DOMAIN; ?>/assets/global/canceldanger.svg" id="closedangeralert" alt="Cancel danger alert" class="w-[24px] cursor-pointer" />
+                <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
+                    Verification Error
+                </p>
+            </div>
+            <p class="text-[13px] md:text-[14px] text-start w-full font-Satoshi font-regular text-[#7F7F7F] mt-2 ml-[3rem] pr-3">
+                <?php echo $error_message; ?>
+            </p>
+        </section>
+        <?php endif; ?>
+
             <p class="font-['Open Sans'] text-[19px] text-[24px] font-medium text-center">
                 Let us verify it's you
             </p>

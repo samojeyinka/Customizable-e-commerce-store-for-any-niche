@@ -266,7 +266,12 @@ $search_query = isset($_GET['search']) ? $_GET['search'] : '';
                         }
 
                         if (empty($filtered_orders)) {
-                            echo "<tr><td colspan='7' class='py-4 text-center'>No orders found</td></tr>";
+                            echo "<tr><td colspan='7' class='py-4 text-center text-[#262626] font-medium font-[Open Sans]'>
+                            <div>
+                            <img class='mx-auto' src='../assets/global/empty.svg'/>
+                           You have not made any orders yet
+                            </div>
+                            </td></tr>";
                         } else {
                             foreach ($filtered_orders as $order) {
                                 $order_items = getOrderItems($conn, $order['id']);
@@ -369,7 +374,14 @@ echo "
                     }
 
                     if (empty($filtered_orders)) {
-                        echo "<p class='text-center py-4'>No orders found</p>";
+                        echo "
+                        <div class='py-4 text-center text-[#262626] font-medium font-[Open Sans]'>
+                            <div>
+                            <img class='mx-auto' src='../assets/global/empty.svg'/>
+                           You have not made any orders yet
+                            </div>
+                            </div>
+                        ";
                     } else {
                         foreach ($filtered_orders as $order) {
                             $order_items = getOrderItems($conn, $order['id']);

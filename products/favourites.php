@@ -332,18 +332,10 @@ while ($item = mysqli_fetch_assoc($cart_items_result)) {
         </div>
         <?php else: ?> 
                 <div class="text-center py-16">
-                    <div class="mx-auto h-16 w-16 text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                    </div>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No favorites yet</h3>
-                    <p class="mt-1 text-sm text-gray-500">Start adding products to your favorites!</p>
-                    <div class="mt-6">
-                        <a href="./index.php" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#1A237E] hover:bg-[#0D1863] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Browse Products
-                        </a>
-                    </div>
+                    <img class="mx-auto" src="../assets/global/love.svg" alt="No favorite"/>
+                    <h3 class="mt-2 md:text-[20px]  font-medium text-gray-900 font-[Open Sans]">You have not add any item to favorite</h3>
+           
+                   
                 </div>
             <?php endif; ?>
 

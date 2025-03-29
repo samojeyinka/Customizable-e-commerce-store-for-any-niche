@@ -103,7 +103,7 @@ function formatDate($date) {
                 
                 <?php if (empty($return_requests)): ?>
                 <div class="text-center py-10">
-                    <img src="../assets/user/no-returns.svg" alt="No Returns" class="w-[120px] h-[120px] mx-auto mb-4">
+
                     <h3 class="text-[18px] font-['Open Sans'] font-medium text-[#262626] mb-2">No Return Requests Found</h3>
                     <p class="text-[14px] text-[#777777] font-['Open Sans'] mb-4">You haven't made any return requests yet.</p>
                     <a href="./orders.php" class="py-2 px-4 bg-[#1A237E] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">View My Orders</a>

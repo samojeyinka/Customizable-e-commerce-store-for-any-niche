@@ -14,6 +14,7 @@ try {
 }
 
 // ===== FETCH CATEGORIES WITH THEIR ASSOCIATED BRANDS =====
+if (!function_exists('getCategoriesWithBrands')) {
 function getCategoriesWithBrands($pdo) {
     try {
         // Get all categories
@@ -50,6 +51,8 @@ function getCategoriesWithBrands($pdo) {
         error_log("Error fetching categories and brands: " . $e->getMessage());
         return [];
     }
+}
+
 }
 
 // Get all categories with their brands

@@ -182,13 +182,12 @@ $total_items = count($cart_items);
         <?php endif; ?>
         
         <?php if (empty($cart_items)): ?>
-            <div class="bg-white p-6 rounded-lg shadow-sm text-center">
-                <h2 class="text-xl font-medium text-gray-900 mb-4">Your cart is empty</h2>
-                <p class="text-gray-500 mb-6">Looks like you haven't added any products to your cart yet.</p>
-                <a href="<?php echo DOMAIN; ?>/products/index.php" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#1A237E] hover:bg-[#1A237E]/90">
-                    Continue Shopping
-                </a>
-            </div>
+            <div class='py-4 text-center text-[#262626] font-medium font-[Open Sans]'>
+                            <div>
+                            <img class='mx-auto' src='../assets/global/empty.svg'/>
+                           You have not added any items to cart yet.
+                            </div>
+                            </div>
         <?php else: ?>
 <!-- <h2 class="text-lg font-medium text-gray-900">Cart Items (<?php echo $total_items; ?>)</h2> -->
         <div class="w-full bg-[#FFFFFF] py-5">
