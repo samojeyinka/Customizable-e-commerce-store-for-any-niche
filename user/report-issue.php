@@ -129,6 +129,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_issue'])) {
             
             // Optionally, send email notification to admin and/or customer
             // sendIssueNotification($order_id, $issue_id, $user_id, $issue_type);
+
+            // Add this after the successful issue submission (after the issue_id is created)
+if ($stmt->execute()) {
+    $issue_id = $stmt->insert_id;
+    
+    // Handle image uploads if enabled
+    $upload_success = true;
+    // ... [existing image upload code] ...
+    
+    // Include notifications functions
+    require_once '../includes/notifications.php';
+    
+    // Create notification for admin
+    add_notification(
+        $conn,
+        'issue',
+        "New Order Issue Reported",
+        "A new issue has been reported for Order #$order_id. Issue type: $issue_type",
+        $issue_id,
+        'issue',
+        null, // null for_user_id means it's for all admins
+        1     // 1 means it's for admin
+    );
+    
+    // Create notification for the user too
+    add_notification(
+        $conn,
+        'issue_confirmation',
+        'Issue Report Received',
+        "Your issue report for Order #$order_id has been received. We'll get back to you soon.",
+        $issue_id,
+        'issue',
+        $user_id, // specific user
+        0         // 0 means it's not for admin
+    );
+    
+    $success_message = "Your issue has been submitted successfully. We'll get back to you soon.";
+    
+    // ... [rest of existing code]
+}
             
         } else {
             $error_message = "Error submitting your issue. Please try again.";

@@ -69,7 +69,7 @@ if (!$order_id || !$product_id) {
     }
 }
 
-// Process form submission
+// Process form submission - KEEP ONLY ONE VERSION OF THIS BLOCK
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
     $rating = intval($_POST['rating']);
     $review_text = $conn->real_escape_string($_POST['review_text']);
@@ -94,7 +94,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
         }
         
         if ($stmt->execute()) {
+            // Get the review ID (either from existing review or newly inserted)
+            $review_id = $existing_review ? $existing_review['review_id'] : $stmt->insert_id;
+            
+            // Include notifications functions
+            require_once '../includes/notifications.php';
+            
+            $product_name = $product['product_name'];
+            $action_text = $existing_review ? "updated their review" : "left a new review";
+            
+            // Create notification for admin
+            add_notification(
+                $conn,
+                'review',
+                "New Product Review",
+                "A customer has $action_text for $product_name with a rating of $rating/5 stars.",
+                $review_id,
+                'review',
+                null, // null for_user_id means it's for all admins
+                1     // 1 means it's for admin
+            );
+            
+            // Create notification for the user too
+            add_notification(
+                $conn,
+                'review_confirmation',
+                'Review Submitted',
+                "Thank you for reviewing $product_name. Your feedback helps other shoppers make better decisions.",
+                $review_id,
+                'review',
+                $user_id, // specific user
+                0         // 0 means it's not for admin
+            );
+            
             $success_message = "Your review has been successfully submitted!";
+            
             // Refresh existing review data
             if (!$existing_review) {
                 $check_sql = "SELECT * FROM reviews WHERE user_id = ? AND product_id = ? AND order_id = ?";

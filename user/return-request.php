@@ -101,6 +101,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->execute()) {
             $success = "Return request submitted successfully!";
             // Redirect to returns list page after 2 seconds
+
+            // Add this after the successful return request submission (where $success is set)
+if ($stmt->execute()) {
+    $return_request_id = $stmt->insert_id; // Get the ID of the newly created return request
+    $success = "Return request submitted successfully!";
+    
+    // Include notifications functions
+    require_once '../includes/notifications.php';
+    
+    // Get product name for better notification
+    $product_name = $item['product_name'];
+    
+    // Create notification for admin
+    add_notification(
+        $conn,
+        'return',
+        "New Return Request",
+        "A new return request has been submitted for $product_name. Quantity: $return_quantity",
+        $return_request_id,
+        'return',
+        null, // null for_user_id means it's for all admins
+        1     // 1 means it's for admin
+    );
+    
+    // Create notification for the user too
+    add_notification(
+        $conn,
+        'return_confirmation',
+        'Return Request Submitted',
+        "Your return request for $product_name has been received and is being processed. We'll notify you of updates.",
+        $return_request_id,
+        'return',
+        $user_id, // specific user
+        0         // 0 means it's not for admin
+    );
+    
+    // Redirect to returns list page after 2 seconds
+    header("refresh:2;url=./returns.php");
+} else {
+    $error = "Error submitting return request: " . $stmt->error;
+}
             header("refresh:2;url=./returns.php");
         } else {
             $error = "Error submitting return request: " . $stmt->error;

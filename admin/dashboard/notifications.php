@@ -258,7 +258,7 @@ if ($type_result) {
                         </button>
 
                         <?php if ($status_filter === 'unread' || $status_filter === 'all'): ?>
-                        <a href="?notification_action=read_all" class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-800 rounded-lg cursor-pointer">
+                        <a href="?notification_action=read_all" class="hidden flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-800 rounded-lg cursor-pointer">
                             <img src="../assets/dash/check.svg" class="w-4 h-4" />
                             Mark all as read
                         </a>
@@ -323,11 +323,17 @@ if ($type_result) {
                                             <!-- The dropdown menu -->
                                             <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                                                 <div class="flex flex-col gap-3">
-                                                    <?php if ($notification['type'] === 'order' && !empty($notification['reference_id'])): ?>
-                                                        <a href="./order-details.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-                                                    <?php else: ?>
-                                                        <a href="#" class="text-[16px] font-medium text-[#262626]">View Details</a>
-                                                    <?php endif; ?>
+                                                <?php if ($notification['type'] === 'order' && !empty($notification['reference_id'])): ?>
+    <a href="./order-details.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
+<?php elseif ($notification['type'] === 'return' && !empty($notification['reference_id'])): ?>
+    <a href="./admin-view-return.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
+<?php elseif ($notification['type'] === 'issue' && !empty($notification['reference_id'])): ?>
+    <a href="./issues.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
+<?php elseif ($notification['type'] === 'review' && !empty($notification['reference_id'])): ?>
+    <a href="./reviews.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
+<?php else: ?>
+    <a href="#" class="text-[16px] font-medium text-[#262626]">View Details</a>
+<?php endif; ?>
                                                     
                                                     <?php if ($notification['is_read']): ?>
                                                         <a href="?notification_action=unread&notification_id=<?php echo $notification['notification_id']; ?>&<?php echo http_build_query(array_filter([
