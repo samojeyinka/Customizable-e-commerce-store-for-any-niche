@@ -34,6 +34,48 @@ if (!empty($admin['profile_photo'])) {
         $profile_photo = $photo_path;
     }
 }
+
+// Process notification status updates
+if (isset($_GET['notification_action']) && isset($_GET['notification_id'])) {
+    $notification_id = intval($_GET['notification_id']);
+    $action = $_GET['notification_action'];
+    
+    // Include database connection
+    include('../../config/connect.php');
+    
+    if ($action === 'read') {
+        // Mark as read
+        $update_query = "UPDATE notifications SET is_read = 1 WHERE notification_id = ?";
+    } else if ($action === 'unread') {
+        // Mark as unread
+        $update_query = "UPDATE notifications SET is_read = 0 WHERE notification_id = ?";
+    }
+    
+    if (isset($update_query)) {
+        $stmt = mysqli_prepare($con, $update_query);
+        mysqli_stmt_bind_param($stmt, "i", $notification_id);
+        mysqli_stmt_execute($stmt);
+        
+        // Redirect back to remove GET parameters
+        $redirect_url = strtok($_SERVER['REQUEST_URI'], '?'); // Remove query string
+        header("Location: $redirect_url");
+        exit;
+    }
+}
+
+// File: admin/includes/notification-panel.php
+
+// Include notifications functions if not already included
+require_once __DIR__ . '/../../includes/notifications.php';
+
+// Include database connection
+include('../../config/connect.php');
+
+// Get unread count
+$unread_count = get_unread_count($con, true);
+
+// Get latest notifications for dropdown
+$latest_notifications = get_notifications($con, true, null, 5, 0);
 ?>
     
 <!-- ========================  The header  starts ======================== -->
@@ -84,23 +126,80 @@ if (!empty($admin['profile_photo'])) {
     <div id="notification" class="p-3 notification-content shadow-md bg-white rounded-[4px]">
         <!-- Notification content remains the same -->
         <div class="flex flex-col gap-2">
-            <!-- Notification header -->
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1">
-                    <h1 class="text-[18px] md:text-[20px] font-['Open Sans'] font-medium">Notificatons</h1>
-                    <div class="flex items-center justify-center bg-[#1A237E] w-[20px] h-[20px] rounded-[50%]">
-                        <h1 class="text-white text-[11px] md:text-[12px] font-['Open Sans'] font-medium">9</h1>
-                    </div>
-                </div>
-                <a href="./notifications.php" class="text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[#1A237E]">See all</a>
-            </div>
 
-            <!-- Notification content - remaining content stays the same -->
-            <div class="flex flex-col gap-2 h-[78vh] md:h-[75vh] overflow-y-auto">
-                <!-- Notification items - all remaining content -->
-                <!-- I'm keeping this part unchanged -->
-            </div>
+<div class="flex items-center justify-between">
+
+<div class="flex items-center gap-1">
+    <h1 class="text-[18px] md:text-[20px] font-['Open Sans'] font-medium">Notifications</h1>
+    <?php if ($unread_count > 0): ?>
+        <div class="flex items-center justify-center bg-[#1A237E] w-[20px] h-[20px] rounded-[50%]">
+            <h1 class="text-white text-[11px] md:text-[12px] font-['Open Sans'] font-medium">
+                <?php echo $unread_count > 99 ? '99+' : $unread_count; ?>
+            </h1>
         </div>
+    <?php endif; ?>
+</div>
+
+    <a href="./notifications.php" class="text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[#1A237E]">See all</a>
+
+
+</div>
+
+<div class="flex flex-col gap-2 h-[78vh] md:h-[75vh] overflow-y-auto">
+    <div class="flex flex-col gap-2">
+
+    <?php if (empty($latest_notifications)): ?>
+                <div class="p-4 text-center text-[#6B7280]">No notifications</div>
+            <?php else: ?>
+
+                <?php foreach ($latest_notifications as $notification): ?>
+        <div class="w-full flex flex-col gap-2 rounded-[4px] <?php echo $notification['is_read'] ? '' : 'bg-[#EEEEEE]'; ?>  p-2">
+            <div class="flex items-center justify-between">
+                <h1 class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#262626]"><?php echo htmlspecialchars($notification['title']); ?></h1>
+                <div class="relative flex items-center gap-2">
+                    <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]"> <?php 
+                                    $created_at = new DateTime($notification['created_at']);
+                                    echo $created_at->format('d M, Y h:i A'); 
+                                    ?></span>
+                    <img src="../assets/user/action.svg" class="cursor-pointer" onclick="openNotimenu(this)" />
+                    <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
+                                        <div class="flex flex-col gap-3">
+                                            <?php if ($notification['type'] === 'order' && !empty($notification['reference_id'])): ?>
+                                                <a href="./order-details.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                                            <?php else: ?>
+                                                <a href="#" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                                            <?php endif; ?>
+                                            
+                                            <?php 
+                                            // Current page URL for redirect
+                                            $current_url = htmlspecialchars($_SERVER['REQUEST_URI']);
+                                            
+                                            if ($notification['is_read']): 
+                                            ?>
+                                                <a href="?notification_action=unread&notification_id=<?php echo $notification['notification_id']; ?>" class="text-[16px] font-medium text-[#E8B006]">Mark as unread</a>
+                                            <?php else: ?>
+                                                <a href="?notification_action=read&notification_id=<?php echo $notification['notification_id']; ?>" class="text-[16px] font-medium text-[#E8B006]">Mark as read</a>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <!-- The small menu ends -->
+
+                </div>
+            </div>
+            <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]"><?php echo htmlspecialchars($notification['message']); ?></span>
+        </div>
+        <?php endforeach; ?>
+                <div class="p-2 text-center">
+                    <a href="notifications.php" class="text-[14px] text-blue-600 hover:text-blue-800">View all notifications</a>
+                </div>
+            <?php endif; ?>
+
+    </div>
+</div>
+</div>
+    </div>
     </div>
 </header>
 <!-- ========================  The header  ends ======================== -->
+
+

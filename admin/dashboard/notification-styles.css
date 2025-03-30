@@ -1,0 +1,89 @@
+/* Notification styles */
+.not-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    min-width: 150px;
+    z-index: 100;
+}
+
+.not-content.active {
+    display: block;
+}
+
+/* Dropdown styles */
+.custom-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-toggle {
+    cursor: pointer;
+    user-select: none;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #E1E1E1;
+}
+
+/* Notification card transition effects */
+.w-full.flex.flex-col.gap-2.rounded-\[4px\] {
+    transition: background-color 0.2s ease;
+}
+
+/* Tab active state */
+#tabs a.active {
+    color: #007F7F;
+    border-bottom: 2px solid #007F7F;
+}
+
+/* Add hover effect for notification actions */
+.not-content a:hover {
+    opacity: 0.8;
+}
+
+/* Pagination active state */
+.rounded-\[50\%\].bg-\[#1A237E\] {
+    transition: background-color 0.2s ease;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+    .not-content {
+        right: -50px;
+    }
+    
+    .dropdown-content {
+        left: 0;
+    }
+}
+
+/* Filter button styles */
+.cursor-pointer:hover {
+    opacity: 0.8;
+}
+
+/* Highlight unread notifications more prominently */
+.bg-\[#EEEEEE\] {
+    border-left: 3px solid #1A237E;
+}
+
+/* Animation for notification dropdown */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.not-content.active {
+    animation: fadeIn 0.2s ease-out;
+}

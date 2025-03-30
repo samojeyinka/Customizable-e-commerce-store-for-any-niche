@@ -119,7 +119,7 @@ function mark_as_read($con, $notification_id) {
  * @param bool $for_admin Whether to mark admin notifications
  * @param int|null $user_id Specific user ID or NULL for admin
  * @return bool Success status
- */
+ */   
 function mark_all_as_read($con, $for_admin = true, $user_id = null) {
     $query = "UPDATE notifications SET is_read = 1 WHERE for_admin = ?";
     
