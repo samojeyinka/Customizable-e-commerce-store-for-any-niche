@@ -332,7 +332,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
 <body>
 
-<title>Update Product</title>
+<title>Create New Product</title>
 </head>
 
 <body>
@@ -405,7 +405,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
     <div id="main" class="md:p-4 flex flex-col gap-3 bg-[#FAFAFA]">
         <div class="w-full rounded-[16px] bg-white mx-auto p-3">
-            <h1 class="text-[20px] font-Onest font-semibold mb-3">Update Product</h1>
+            <h1 class="text-[20px] font-Onest font-semibold mb-3">Create New Product</h1>
 
             <!-- Navigation Tabs -->
             <div class="w-[fit-content] justify-between overflow-x-auto flex border-b border-[#DDDDDD] mb-6" id="tabs">
@@ -852,18 +852,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 <?php endif; ?>
                     <input type="file" name="mainImage" class="hidden" accept=".png,.jpg,.jpeg,.gif">
                     <div class="space-y-2">
-                        <img src="../../assets/global/folder-2.svg" class="w-[30px] h-[30px] mx-auto"/>
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
                         <div class="text-sm text-gray-600">
-                            <label class="relative cursor-pointer text-[18px] font-medium text-[#262626]">
+                            <label class="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500">
                                 <span>Drop your files or click to upload</span>
                             </label>
                         </div>
-                        <p class="text-[14px] text-[#9A9A9A] font-['Open Sans'] font-regular">Supported file types: PNG, JPG, GIF</p>
-
-                        <button type="button" class="flex items-center gap-2 px-8 py-2 mx-auto bg-blue-900 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-800 transition-colors">
-                    Browse
-                    </button>
-
+                        <p class="text-xs text-gray-500">Supported file types: PNG, JPG, GIF</p>
                     </div>
                 </div>
             </div>
@@ -891,21 +888,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 </div>
 
                 <!-- Persistent Upload Area -->
-                <div class="md:w-[70%] otherImagesUpload border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <div class="otherImagesUpload border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                     <input type="file" name="otherImages[]" class="hidden" accept=".png,.jpg,.jpeg,.gif" multiple>
                     <div class="space-y-2">
-                        <img src="../../assets/global/folder-2.svg" class="w-[30px] h-[30px] mx-auto"/>
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
                         <div class="text-sm text-gray-600">
-                            <label class="relative cursor-pointer text-[18px] font-medium text-[#262626]">
+                            <label class="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500">
                                 <span>Drop your files or click to upload</span>
                             </label>
                         </div>
-                        <p class="text-[14px] text-[#9A9A9A] font-['Open Sans'] font-regular">Supported file types: PNG, JPG, GIF</p>
-
-                        <button type="button" class="flex items-center gap-2 px-8 py-2 mx-auto bg-blue-900 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-800 transition-colors">
-                    Browse
-                    </button>
-
+                        <p class="text-xs text-gray-500">Supported file types: PNG, JPG, GIF</p>
                     </div>
                 </div>
                 
@@ -916,14 +910,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             </div>
         </div>
     </div>
-
-    <div class="flex justify-center mt-8">
-                    <button type="submit" class="flex items-center gap-2 px-8 py-3 bg-blue-900 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-800 transition-colors">
-                    Update Product
-                    </button>
-                </div>
-
 </div>
+
 
 </div>
 

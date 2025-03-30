@@ -1,0 +1,6 @@
+
+<div class="flex justify-center mt-8">
+                    <button type="submit" class="flex items-center gap-2 px-8 py-3 bg-blue-900 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-800 transition-colors">
+                    Update Product
+                    </button>
+                </div>

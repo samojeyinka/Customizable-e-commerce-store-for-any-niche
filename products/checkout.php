@@ -254,6 +254,37 @@ if (isset($_GET['order_success']) && isset($_GET['order_id'])) {
     }
 }
 
+// Check if profile is complete
+$requiredProfileFields = [
+    'first_name', 'last_name', 'phone', 'country', 
+    'address', 'state', 'city', 'zip_code'
+];
+
+$profileComplete = true;
+$missingFields = [];
+
+foreach ($requiredProfileFields as $field) {
+    if (empty($profile[$field])) {
+        $profileComplete = false;
+        $missingFields[] = $field;
+    }
+}
+
+// If billing is different, check those fields too
+if (isset($profile['billing_same_as_delivery']) && !$profile['billing_same_as_delivery']) {
+    $requiredBillingFields = [
+        'billing_first_name', 'billing_last_name', 'billing_country',
+        'billing_address', 'billing_state', 'billing_city', 'billing_zip_code'
+    ];
+    
+    foreach ($requiredBillingFields as $field) {
+        if (empty($profile[$field])) {
+            $profileComplete = false;
+            $missingFields[] = $field;
+        }
+    }
+}
+
 
 ?>
 
@@ -318,6 +349,36 @@ z-index: 10;
                 </div>
             </div>
         </section>
+
+        <?php if (!$profileComplete): ?>
+<div class="w-[90%] mx-auto bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r">
+    <div class="flex items-center">
+        <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">
+                Your profile is not fully set up
+            </h3>
+            <div class="mt-2 text-sm text-red-700">
+                <p>
+                    Please complete your profile information before checking out. 
+                    Missing fields: <?php echo implode(', ', array_map(function($field) {
+                        return str_replace('_', ' ', $field);
+                    }, $missingFields)); ?>
+                </p>
+                <div class="mt-4">
+                    <a href="../user/profile.php" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        Complete Profile Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
         <div class="w-[95%] md:w-[90%] mx-auto flex flex-col-reverse md:flex-row gap-3 py-5">
             <div class="w-full md:w-[55%] flex flex-col gap-5 py-5">
@@ -718,11 +779,20 @@ z-index: 10;
     <label class="font-['Open Sans'] text-[13px] md:text-[15px] font-regular text-[#5B5B5B]">
         By proceeding with your purchase you agree to our Terms and Conditions and Privacy Policy
     </label>
-    <button 
+    <!-- <button 
     type="button" 
     id="pay-button-desktop"
     class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex">
     Pay Now ₦<?php echo number_format($total); ?>
+</button> -->
+
+<button 
+    type="button" 
+    id="pay-button-desktop"
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex <?php echo !$profileComplete ? 'opacity-50 cursor-not-allowed' : ''; ?>"
+    <?php echo !$profileComplete ? 'disabled' : ''; ?>
+>
+    <?php echo $profileComplete ? 'Pay Now ₦' . number_format($total) : 'Complete Profile to Checkout'; ?>
 </button>
 </div>
                 </form>
@@ -747,12 +817,22 @@ z-index: 10;
             <p class="text-[#484F98] text-[18px] md:text-[22px] font-['Open Sans'] font-bold">₦<span id="mobile-total"><?php echo number_format($total); ?></span></p>
         </div>
     </div>
-    <button 
+    <!-- <button 
     type="button" 
     id="pay-button-mobile"
     class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
     Pay Now ₦<?php echo number_format($total); ?>
+</button> -->
+
+<button 
+    type="button" 
+    id="pay-button-mobile"
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] <?php echo !$profileComplete ? 'opacity-50 cursor-not-allowed' : ''; ?>"
+    <?php echo !$profileComplete ? 'disabled' : ''; ?>
+>
+    <?php echo $profileComplete ? 'Pay Now ₦' . number_format($total) : 'Complete Profile to Checkout'; ?>
 </button>
+
 </div>
                 
 

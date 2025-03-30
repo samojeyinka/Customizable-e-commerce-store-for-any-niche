@@ -374,7 +374,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                 <!-- Rich Text Editor Fields -->
                                 <div class="space-y-6">
                                     <!-- Details -->
-                                    <div>
+                                    <div class="hidden">
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             Details
                                         </label>
@@ -411,7 +411,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                     </div>
 
                                     <!-- Sizes details -->
-                                    <div>
+                                    <div class="hidden">
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             Sizes
                                         </label>
@@ -448,7 +448,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                     </div>
 
                                     <!-- Warranty -->
-                                    <div>
+                                    <div class="hidden">
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             Warranty
                                         </label>
@@ -482,7 +482,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                     </div>
 
                                     <!-- Care -->
-                                    <div>
+                                    <div class="hidden">
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             Care
                                         </label>
@@ -659,7 +659,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                             <div id="mainImageContainer" class="relative">
                                 <div class="mainImagePreview hidden mb-4">
                                     <div class="relative inline-block">
-                                        <img src="" alt="Preview" class="w-full h-48 object-cover rounded-lg">
+                                        <img src="" alt="Preview" class="w-[199px] h-[150px]  rounded-lg">
                                         <button type="button" class="removeImage absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-lg hover:bg-gray-100">
                                             <svg class="w-4 h-4 text-gray-500 hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -667,19 +667,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                         </button>
                                     </div>
                                 </div>
-                                <div class="mainImageUpload border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                                <div class="md:w-[70%] mainImageUpload border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                                     <input type="file" name="mainImage" class="hidden" accept=".png,.jpg,.jpeg,.gif">
                                     <div class="space-y-2">
-                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                        <div class="text-sm text-gray-600">
-                                            <label class="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500">
-                                                <span>Drop your files or click to upload</span>
-                                            </label>
-                                        </div>
-                                        <p class="text-xs text-gray-500">Supported file types: PNG, JPG, GIF</p>
-                                    </div>
+                        <img src="../../assets/global/folder-2.svg" class="w-[30px] h-[30px] mx-auto"/>
+                        <div class="text-sm text-gray-600">
+                            <label class="relative cursor-pointer text-[18px] font-medium text-[#262626]">
+                                <span>Drop your files or click to upload</span>
+                            </label>
+                        </div>
+                        <p class="text-[14px] text-[#9A9A9A] font-['Open Sans'] font-regular">Supported file types: PNG, JPG, GIF</p>
+
+                        <button type="button" class="flex items-center gap-2 px-8 py-2 mx-auto bg-blue-900 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-800 transition-colors">
+                    Browse
+                    </button>
+
+                    </div>
                                 </div>
                             </div>
                         </div>
@@ -694,31 +697,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                 </div>
 
                                 <!-- Persistent Upload Area -->
-                                <div class="otherImagesUpload border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                                <div class="md:w-[70%] otherImagesUpload border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                                     <input type="file" name="otherImages[]" class="hidden" accept=".png,.jpg,.jpeg,.gif" multiple>
                                     <div class="space-y-2">
-                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                        <div class="text-sm text-gray-600">
-                                            <label class="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500">
-                                                <span>Drop your files or click to upload</span>
-                                            </label>
-                                        </div>
-                                        <p class="text-xs text-gray-500">Supported file types: PNG, JPG, GIF</p>
-                                    </div>
+                        <img src="../../assets/global/folder-2.svg" class="w-[30px] h-[30px] mx-auto"/>
+                        <div class="text-sm text-gray-600">
+                            <label class="relative cursor-pointer text-[18px] font-medium text-[#262626]">
+                                <span>Drop your files or click to upload</span>
+                            </label>
+                        </div>
+                        <p class="text-[14px] text-[#9A9A9A] font-['Open Sans'] font-regular">Supported file types: PNG, JPG, GIF</p>
+
+                        <button type="button" class="flex items-center gap-2 px-8 py-2 mx-auto bg-blue-900 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-800 transition-colors">
+                    Browse
+                    </button>
+
+                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="flex justify-center mt-8">
+                        <div class="flex justify-center mt-8">
                     <button type="submit" class="flex items-center gap-2 px-8 py-3 bg-blue-900 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-800 transition-colors">
                         Create Product
                     </button>
                 </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+              
             </form>
 
         </div>
@@ -945,7 +952,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 function createPreviewElement(src, type) {
                     return `
         <div class="relative">
-            <img src="${src}" alt="Preview" class="w-full h-48 object-cover rounded-lg">
+            <img src="${src}" alt="Preview" class="w-[199px] h-[150px] object-cover rounded-lg">
             <button type="button" class="removeImage absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-lg hover:bg-gray-100" data-container="${containerId}" data-type="${type}">
                 <svg class="w-4 h-4 text-gray-500 hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
