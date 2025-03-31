@@ -125,8 +125,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
             $mail->SMTPAuth   = true;
             $mail->Username   = 'samuelojeyinka@gmail.com'; // Update with your email
             $mail->Password   = 'teir bvqp ijrx rijl'; // Update with your app password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
+         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL/TLS
+    $mail->Port = 465;
             $mail->Timeout    = 60;
             $mail->SMTPKeepAlive = true;
             
@@ -194,7 +194,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: url("<?php echo DOMAIN; ?>/assets/global/bg.svg");
+            background-image: url("./assets/global/bg.svg");
             background-position: center;
             background-size: cover;
         }

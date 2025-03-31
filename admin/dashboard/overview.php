@@ -3,11 +3,11 @@ session_start();
 require_once "../../config/config.php";
 
 // Check if admin is logged in
-// if (!isset($_SESSION['admin_id'])) {
-//     // Redirect to login page
-//     header("Location: ../index.php");
-//     exit();
-// }
+if (!isset($_SESSION['admin_id'])) {
+    // Redirect to login page
+    header("Location: ../index.php");
+    exit();
+}
 
 // Include the dashboard statistics code
 include "dashboard_stats.php";

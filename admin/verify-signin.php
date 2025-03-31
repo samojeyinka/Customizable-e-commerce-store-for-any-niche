@@ -2,174 +2,282 @@
 session_start();
 require_once "../config/config.php";
 
+// Enable error reporting for development
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Initialize message variables
+$error_message = "";
+$success_message = "";
+
 // Check if the required session variables are set
-if (!isset($_SESSION['temp_admin_id']) || !isset($_SESSION['admin_email']) || !isset($_SESSION['admin_fullname'])) {
+if (!isset($_SESSION['temp_admin_id']) || !isset($_SESSION['admin_email'])) {
     // Redirect to login page if verification is accessed directly
     header("Location: ./index.php");
     exit();
 }
 
-// Include PHPMailer setup if needed for resending OTP
+// If admin_fullname is not set, we can try to use a default or set it to an empty string
+if (!isset($_SESSION['admin_fullname'])) {
+    $_SESSION['admin_fullname'] = "Admin User"; // Default value
+}
+
+// Debug function for logging
+function debug_log($message) {
+    error_log("[ADMIN OTP DEBUG] " . $message);
+}
+
+// Include PHPMailer setup
 $phpmailer_path = '../includes/auth/create-account/phpmailer/src/';
 if (file_exists($phpmailer_path . 'Exception.php')) {
-    require $phpmailer_path . 'Exception.php';
-    require $phpmailer_path . 'PHPMailer.php';
-    require $phpmailer_path . 'SMTP.php';
+    require_once $phpmailer_path . 'Exception.php';
+    require_once $phpmailer_path . 'PHPMailer.php';
+    require_once $phpmailer_path . 'SMTP.php';
 } else {
     $phpmailer_path = 'phpmailer/src/';
     if (file_exists($phpmailer_path . 'Exception.php')) {
-        require $phpmailer_path . 'Exception.php';
-        require $phpmailer_path . 'PHPMailer.php';
-        require $phpmailer_path . 'SMTP.php';
+        require_once $phpmailer_path . 'Exception.php';
+        require_once $phpmailer_path . 'PHPMailer.php';
+        require_once $phpmailer_path . 'SMTP.php';
+    } else {
+        // If we can't find PHPMailer, log it but continue
+        debug_log("PHPMailer files not found in either location");
     }
 }
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$error_message = "";
-$success_message = "";
-
 // Process OTP verification
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
-    $otp = $_POST['otp'];
+    // Get the OTP and ensure it's a string
+    $otp = trim($_POST['otp']);
     $admin_id = $_SESSION['temp_admin_id'];
     
-    // Connect to database
-    require_once "../config/servername.php";
+    // Print out OTP for debugging
+    echo "<div style='background: #f8f9fa; padding: 5px; margin-bottom: 10px; border: 1px solid #ddd;'>
+          <strong>Debug:</strong> Verifying OTP: '<span style='color:red'>$otp</span>' for admin ID: $admin_id
+          </div>";
     
-    $conn = new mysqli($servername, $username, $dbpassword, $dbname);
+    error_log("Verifying OTP: '$otp' for admin ID: $admin_id");
     
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-    
-    // Check if OTP matches - Updated table and column names
-    $sql = "SELECT * FROM administrators WHERE admin_id = ? AND otp_code = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("is", $admin_id, $otp);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result->num_rows > 0) {
-        $admin = $result->fetch_assoc();
+    try {
+        // Connect to database
+        require_once "../config/servername.php";
         
-        // Check if OTP has expired (10 minutes)
-        $otp_expires = strtotime($admin['otp_expires']);
-        $current_time = time();
+        $conn = new mysqli($servername, $username, $dbpassword, $dbname);
         
-        if ($current_time > $otp_expires) {
-            $error_message = "OTP has expired. Please request a new one.";
-        } else {
-            // OTP is valid, set admin session
-            $_SESSION['admin_id'] = $admin_id;
-            $_SESSION['admin_email'] = $admin['email'];
-            $_SESSION['admin_fullname'] = $admin['full_name'];
-            $_SESSION['admin_role'] = $admin['role'];
-            
-            // Clear temporary session variables
-            unset($_SESSION['temp_admin_id']);
-            
-            // Clear OTP from database (optional)
-            $clear_otp = "UPDATE administrators SET otp_code = NULL, otp_expires = NULL WHERE admin_id = ?";
-            $clear_stmt = $conn->prepare($clear_otp);
-            $clear_stmt->bind_param("i", $admin_id);
-            $clear_stmt->execute();
-            
-            // Update last login time
-            $update_login = "UPDATE administrators SET last_login = NOW() WHERE admin_id = ?";
-            $login_stmt = $conn->prepare($update_login);
-            $login_stmt->bind_param("i", $admin_id);
-            $login_stmt->execute();
-            
-            // Redirect to dashboard
-            header("Location: ./dashboard/overview.php");
-            exit();
+        if ($conn->connect_error) {
+            throw new Exception("Connection failed: " . $conn->connect_error);
         }
-    } else {
-        $error_message = "Invalid OTP. Please try again.";
+        
+        // Debug query to see what's in the database
+        $debug_sql = "SELECT admin_id, otp_code, otp_expires FROM administrators WHERE admin_id = ?";
+        $debug_stmt = $conn->prepare($debug_sql);
+        $debug_stmt->bind_param("i", $admin_id);
+        $debug_stmt->execute();
+        $debug_result = $debug_stmt->get_result();
+        
+        if ($debug_result->num_rows > 0) {
+            $debug_row = $debug_result->fetch_assoc();
+            echo "<div style='background: #f8f9fa; padding: 5px; margin-bottom: 10px; border: 1px solid #ddd;'>
+                  <strong>Debug DB Values:</strong> admin_id: " . $debug_row['admin_id'] . 
+                  ", DB otp_code: '<span style='color:red'>" . $debug_row['otp_code'] . "</span>', 
+                  Expires: " . $debug_row['otp_expires'] . "
+                  </div>";
+            
+            error_log("DB Values - admin_id: " . $debug_row['admin_id'] . 
+                      ", DB otp_code: " . $debug_row['otp_code'] . 
+                      ", Expires: " . $debug_row['otp_expires']);
+        }
+        
+        // Check if OTP matches
+        $sql = "SELECT * FROM administrators WHERE admin_id = ? AND otp_code = ?";
+        $stmt = $conn->prepare($sql);
+        
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        
+        // Important: Make sure both values are passed as strings for consistent comparison
+        $stmt->bind_param("is", $admin_id, $otp);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        echo "<div style='background: #f8f9fa; padding: 5px; margin-bottom: 10px; border: 1px solid #ddd;'>
+              <strong>Debug:</strong> OTP check result rows: " . $result->num_rows . "
+              </div>";
+        
+        error_log("OTP check result rows: " . $result->num_rows);
+        
+        if ($result->num_rows > 0) {
+            // OTP verification successful
+            $row = $result->fetch_assoc();
+            
+            // Update admin status
+            $update_sql = "UPDATE administrators SET otp_code = NULL, otp_expires = NULL, account_status = 'active', last_login = NOW() WHERE admin_id = ?";
+            $update_stmt = $conn->prepare($update_sql);
+            $update_stmt->bind_param("i", $admin_id);
+            
+            if ($update_stmt->execute()) {
+                // Set admin session
+                $_SESSION['admin_id'] = $row['admin_id'];
+                $_SESSION['admin_role'] = $row['role'];
+                
+                // Clear temporary session variables
+                unset($_SESSION['temp_admin_id']);
+                
+                // Redirect to dashboard
+                header("Location: ./dashboard/overview.php");
+                exit();
+            } else {
+                $error_message = "Failed to update admin status. Please try again.";
+            }
+        } else {
+            $error_message = "Invalid OTP. Please try again.";
+        }
+        
+        $conn->close();
+    } catch (Exception $e) {
+        $error_message = "Error: " . $e->getMessage();
+        error_log("Exception: " . $e->getMessage());
     }
-    
-    $conn->close();
 }
 
 // Resend OTP
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
-    // Connect to database
-    require_once "../config/servername.php";
+    debug_log("Resend OTP process started");
     
-    $conn = new mysqli($servername, $username, $dbpassword, $dbname);
-    
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-    
-    // Generate new OTP
-    $otp = sprintf("%04d", rand(1000, 9999));
-    $admin_id = $_SESSION['temp_admin_id'];
-    
-    // Update OTP in database - Updated table and column names
-    $update_sql = "UPDATE administrators SET otp_code = ?, otp_expires = DATE_ADD(NOW(), INTERVAL 10 MINUTE) WHERE admin_id = ?";
-    $update_stmt = $conn->prepare($update_sql);
-    $update_stmt->bind_param("si", $otp, $admin_id);
-    
-    if ($update_stmt->execute()) {
-        // Send email with new OTP
-        $mail = new PHPMailer(true);
+    try {
+        // Connect to database
+        require_once "../config/servername.php";
         
-        try {
-            // Server settings
-            $mail->SMTPDebug = 0;
-            $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'samuelojeyinka@gmail.com'; // Update with your email
-            $mail->Password   = 'teir bvqp ijrx rijl'; // Update with your app password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
-            $mail->Timeout    = 60;
-            $mail->SMTPKeepAlive = true;
-            
-            $mail->SMTPOptions = array(
-                'ssl' => array(
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true
-                )
-            );
-            
-            // Recipients
-            $mail->setFrom('samuelojeyinka@gmail.com', 'Victosah Admin');
-            $mail->addAddress($_SESSION['admin_email'], $_SESSION['admin_fullname']);
-            
-            // Content
-            $mail->isHTML(true);
-            $mail->Subject = 'Admin Login Verification Code (Resent)';
-            $mail->Body = "
-            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;'>
-                <h2 style='color: #1A237E; text-align: center;'>Victosah Solution</h2>
-                <p style='font-size: 16px; line-height: 1.5;'>Hello {$_SESSION['admin_fullname']},</p>
-                <p style='font-size: 16px; line-height: 1.5;'>You requested a new OTP code. To verify your identity, please use the following code:</p>
-                <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
-                    {$otp}
-                </div>
-                <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this, please contact the system administrator immediately.</p>
-                <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
-            </div>
-            ";
-            $mail->AltBody = "Your new admin login verification code is: {$otp}";
-            
-            $mail->send();
-            $success_message = "New OTP has been sent to your email.";
-        } catch (Exception $e) {
-            $error_message = "Error sending verification email: " . $mail->ErrorInfo;
+        $conn = new mysqli($servername, $username, $dbpassword, $dbname);
+        
+        if ($conn->connect_error) {
+            throw new Exception("Connection failed: " . $conn->connect_error);
         }
-    } else {
-        $error_message = "Error generating new OTP: " . $conn->error;
+        
+        // Generate new OTP - 4 digits
+        $otp = sprintf("%04d", rand(1000, 9999));
+        $admin_id = $_SESSION['temp_admin_id'];
+        
+        debug_log("Generated new OTP: $otp for admin ID: $admin_id");
+        
+        // Update OTP in database
+        $update_sql = "UPDATE administrators SET otp_code = ?, otp_expires = DATE_ADD(NOW(), INTERVAL 10 MINUTE) WHERE admin_id = ?";
+        $update_stmt = $conn->prepare($update_sql);
+        
+        if (!$update_stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        
+        $update_stmt->bind_param("si", $otp, $admin_id);
+        
+        if ($update_stmt->execute()) {
+            debug_log("Database updated successfully");
+            
+            // Make sure session email is set
+            if (!isset($_SESSION['admin_email']) || empty($_SESSION['admin_email'])) {
+                debug_log("Admin email not in session, fetching from database");
+                
+                // Fetch email from database if not in session
+                $get_email_sql = "SELECT email, full_name FROM administrators WHERE admin_id = ?";
+                $email_stmt = $conn->prepare($get_email_sql);
+                
+                if (!$email_stmt) {
+                    throw new Exception("Prepare failed: " . $conn->error);
+                }
+                
+                $email_stmt->bind_param("i", $admin_id);
+                $email_stmt->execute();
+                $email_result = $email_stmt->get_result();
+                
+                if ($email_result->num_rows > 0) {
+                    $admin_data = $email_result->fetch_assoc();
+                    $_SESSION['admin_email'] = $admin_data['email'];
+                    $_SESSION['admin_fullname'] = $admin_data['full_name'];
+                    debug_log("Retrieved email: " . $_SESSION['admin_email']);
+                } else {
+                    throw new Exception("Admin record not found");
+                }
+            }
+            
+            // Send email with new OTP
+            try {
+                debug_log("Creating PHPMailer instance");
+                $mail = new PHPMailer(true);
+                
+                // Server settings
+                $mail->SMTPDebug = 0;  // Set to 2 for verbose debug output
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'samuelojeyinka@gmail.com'; // Update with your email
+                $mail->Password   = 'teir bvqp ijrx rijl'; // Update with your app password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL/TLS
+                $mail->Port       = 465;
+                $mail->Timeout    = 60;
+                $mail->SMTPKeepAlive = true;
+                
+                debug_log("Setting SMTP options");
+                $mail->SMTPOptions = array(
+                    'ssl' => array(
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true
+                    )
+                );
+                
+                // Recipients
+                debug_log("Setting email recipient: " . $_SESSION['admin_email']);
+                $mail->setFrom('samuelojeyinka@gmail.com', 'Victosah Admin');
+                $mail->addAddress($_SESSION['admin_email'], $_SESSION['admin_fullname']);
+                
+                // Content
+                debug_log("Setting email content");
+                $mail->isHTML(true);
+                $mail->Subject = 'Admin Login Verification Code';
+                
+                // Use direct variable in string with concatenation
+                $mail->Body = "
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;'>
+                    <h2 style='color: #1A237E; text-align: center;'>Victosah Solution</h2>
+                    <p style='font-size: 16px; line-height: 1.5;'>Hello " . $_SESSION['admin_fullname'] . ",</p>
+                    <p style='font-size: 16px; line-height: 1.5;'>You requested a new OTP code. To verify your identity, please use the following code:</p>
+                    <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
+                        " . $otp . "
+                    </div>
+                    <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this, please contact the system administrator immediately.</p>
+                    <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
+                </div>
+                ";
+                $mail->AltBody = "Your admin login verification code is: " . $otp;
+                
+                debug_log("Attempting to send email");
+                if($mail->send()) {
+                    debug_log("Email sent successfully");
+                    $success_message = "New OTP has been sent to your email.";
+                } else {
+                    debug_log("Email send failed with no exception");
+                    $error_message = "Failed to send verification email. Please try again.";
+                }
+            } catch (Exception $e) {
+                debug_log("Email exception: " . $e->getMessage());
+                $error_message = "Error sending verification email: " . $e->getMessage();
+            }
+        } else {
+            throw new Exception("Error updating database: " . $conn->error);
+        }
+        
+        $conn->close();
+    } catch (Exception $e) {
+        $error_message = "Error: " . $e->getMessage();
+        debug_log("Exception in resend process: " . $e->getMessage());
     }
-    
-    $conn->close();
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -292,14 +400,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
         </div>
         <?php endif; ?>
 
-        <form method="POST" action="" class="mt-4">
+        <form method="POST" action="" id="verifyForm" class="mt-4">
             <input type="hidden" name="verify_otp" value="1">
             
             <div class="otp-input-group">
-                <input type="password" maxlength="1" class="otp-input" inputmode="numeric" id="otp1" autofocus>
-                <input type="password" maxlength="1" class="otp-input" inputmode="numeric" id="otp2">
-                <input type="password" maxlength="1" class="otp-input" inputmode="numeric" id="otp3">
-                <input type="password" maxlength="1" class="otp-input" inputmode="numeric" id="otp4">
+                <input type="text" maxlength="1" class="otp-input" inputmode="numeric" id="otp1" autofocus>
+                <input type="text" maxlength="1" class="otp-input" inputmode="numeric" id="otp2">
+                <input type="text" maxlength="1" class="otp-input" inputmode="numeric" id="otp3">
+                <input type="text" maxlength="1" class="otp-input" inputmode="numeric" id="otp4">
                 <input type="hidden" name="otp" id="otpFull">
             </div>
             
@@ -331,6 +439,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
         // OTP input handling
         const inputs = document.querySelectorAll('.otp-input');
         const otpFull = document.getElementById('otpFull');
+        const form = document.getElementById('verifyForm');
         
         // Function to update the hidden input with complete OTP
         function updateOtpValue() {
@@ -339,6 +448,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
                 otp += input.value;
             });
             otpFull.value = otp;
+            console.log("Current OTP value:", otpFull.value);
         }
         
         // Auto-focus next input and only allow numbers
@@ -353,12 +463,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
                 }
                 
                 updateOtpValue();
+                
+                // Removed auto-submit functionality
             });
             
             // Handle backspace to go to previous input
             input.addEventListener('keydown', function(e) {
-                if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
-                    inputs[index - 1].focus();
+                if (e.key === 'Backspace') {
+                    if (this.value.length === 0 && index > 0) {
+                        inputs[index - 1].focus();
+                    } else {
+                        this.value = '';
+                        updateOtpValue();
+                    }
+                    e.preventDefault();
                 }
             });
             
@@ -378,8 +496,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
                         inputs[pasteData.length].focus();
                     }
                     updateOtpValue();
+                    
+                    // Removed auto-submit functionality
                 }
             });
+        });
+        
+        // Ensure OTP is correctly set before form submission
+        form.addEventListener('submit', function(e) {
+            updateOtpValue();
+            
+            // Final validation - make sure we have a 4-digit OTP
+            if (otpFull.value.length !== 4 || !/^\d{4}$/.test(otpFull.value)) {
+                e.preventDefault();
+                alert('Please enter a valid 4-digit OTP');
+                return false;
+            }
+            
+            console.log("Submitting OTP:", otpFull.value);
         });
         
         // OTP expiry timer (10 minutes)
@@ -424,6 +558,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
         // Handle resend link click
         resendLinkElement.addEventListener('click', function(e) {
             e.preventDefault();
+            resendLinkElement.classList.add('hidden');
+            resendTimerElement.classList.remove('hidden');
+            resendCounter = 60;
+            resendCounterElement.textContent = resendCounter;
+            
+            // Start the counter again
+            const newResendInterval = setInterval(function() {
+                resendCounterElement.textContent = resendCounter;
+                
+                if (resendCounter <= 0) {
+                    clearInterval(newResendInterval);
+                    resendTimerElement.classList.add('hidden');
+                    resendLinkElement.classList.remove('hidden');
+                } else {
+                    resendCounter--;
+                }
+            }, 1000);
+            
+            // Submit the form
             resendForm.submit();
         });
         

@@ -27,7 +27,7 @@ use PHPMailer\PHPMailer\Exception;
 
 // If admin is already logged in, redirect to dashboard
 if(isset($_SESSION['admin_id'])) {
-    header("Location: " . DOMAIN . "./dashboard.php");
+    header("Location: " . DOMAIN . "/admin/dashboard/overview.php");
     exit();
 }
 
@@ -101,8 +101,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
                             $mail->SMTPAuth   = true;
                             $mail->Username   = 'samuelojeyinka@gmail.com'; // Update with your email
                             $mail->Password   = 'teir bvqp ijrx rijl'; // Update with your app password
-                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                            $mail->Port       = 587;
+                            // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                            // $mail->Port       = 587;
+                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL/TLS
+    $mail->Port = 465;
                             $mail->Timeout    = 60;
                             $mail->SMTPKeepAlive = true;
                             

@@ -9,12 +9,13 @@ require 'phpmailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-
-
-
-
 //db connection
-require_once "../../../config/servername.php";
+// require_once "../../../config/servername.php";
+
+$servername = "localhost";
+$dbname = "victosah";
+$username = "root";
+$dbpassword = "";
 
 $conn = new mysqli($servername, $username, $dbpassword, $dbname);
 
@@ -25,7 +26,9 @@ if($conn->connect_error){
 if (isset($_POST['send'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
-    $otp = $_POST['otp'];
+    
+    // Always generate a fresh OTP for better security
+    $otp = rand(1000, 9999);
     
     $ip_address = $_SERVER['REMOTE_ADDR'];
     
@@ -51,13 +54,13 @@ if (isset($_POST['send'])) {
             ";
             exit();
         } else {
-            // User exists but hasn't verified yet - generate new OTP and update
-            $new_otp = $otp; // Use the new OTP from the form
+            // User exists but hasn't verified yet - use fresh OTP and update
+            // No need to use $_POST['otp'] here - we've generated a new one
             
             // Update the existing record with new OTP and timestamp
             $update_sql = "UPDATE users SET otp = ?, otp_send_time = NOW() WHERE email = ?";
             $update_stmt = $conn->prepare($update_sql);
-            $update_stmt->bind_param("ss", $new_otp, $email);
+            $update_stmt->bind_param("ss", $otp, $email);
             
             if ($update_stmt->execute()) {
                 // Store email in session for verification page
@@ -74,8 +77,8 @@ if (isset($_POST['send'])) {
                     $mail->SMTPAuth   = true;
                     $mail->Username   = 'samuelojeyinka@gmail.com';
                     $mail->Password   = 'teir bvqp ijrx rijl';
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                    $mail->Port       = 587;
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL/TLS
+                    $mail->Port = 465;
                     $mail->Timeout    = 60;
                     $mail->SMTPKeepAlive = true;
                     
@@ -101,13 +104,13 @@ if (isset($_POST['send'])) {
                         <p style='font-size: 16px; line-height: 1.5;'>Hello,</p>
                         <p style='font-size: 16px; line-height: 1.5;'>You have requested to create an account with Victosah Solution. To verify your account, please use the following OTP code:</p>
                         <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
-                            {$new_otp}
+                            $otp
                         </div>
                         <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this code, please ignore this email.</p>
                         <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
                     </div>
                     ";
-                    $mail->AltBody = "Your OTP Verification code is: {$new_otp}";
+                    $mail->AltBody = "Your OTP Verification code is: $otp";
 
                     $mail->send();
                     echo "
@@ -167,8 +170,8 @@ if (isset($_POST['send'])) {
             $mail->SMTPAuth   = true;
             $mail->Username   = 'samuelojeyinka@gmail.com';
             $mail->Password   = 'teir bvqp ijrx rijl';
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL/TLS
+            $mail->Port = 465;
             $mail->Timeout    = 60;
             $mail->SMTPKeepAlive = true;
             
@@ -194,13 +197,13 @@ if (isset($_POST['send'])) {
                 <p style='font-size: 16px; line-height: 1.5;'>Hello,</p>
                 <p style='font-size: 16px; line-height: 1.5;'>Thank you for signing up with Victosah Solution. To verify your account, please use the following OTP code:</p>
                 <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
-                    {$otp}
+                    $otp
                 </div>
                 <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this code, please ignore this email.</p>
                 <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
             </div>
             ";
-            $mail->AltBody = "Your OTP Verification code is: {$otp}";
+            $mail->AltBody = "Your OTP Verification code is: $otp";
 
             $mail->send();
             echo "

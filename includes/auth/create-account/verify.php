@@ -131,8 +131,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
                 $mail->SMTPAuth   = true;
                 $mail->Username   = 'samuelojeyinka@gmail.com';
                 $mail->Password   = 'teir bvqp ijrx rijl';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
+                // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                // $mail->Port       = 587;
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL/TLS
+    $mail->Port = 465;
                 $mail->Timeout    = 60;
                 $mail->SMTPKeepAlive = true;
                 
@@ -223,8 +225,10 @@ if(isset($_POST['resend'])) {
                 $mail->SMTPAuth   = true;
                 $mail->Username   = 'samuelojeyinka@gmail.com';
                 $mail->Password   = 'teir bvqp ijrx rijl';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
+                // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                // $mail->Port       = 587;
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL/TLS
+    $mail->Port = 465;
                 $mail->Timeout    = 60;
                 $mail->SMTPKeepAlive = true;
                 

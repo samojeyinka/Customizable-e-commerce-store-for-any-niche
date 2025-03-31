@@ -75,8 +75,10 @@ require_once "../../../config/servername.php";
                 $mail->SMTPAuth   = true;
                 $mail->Username   = 'samuelojeyinka@gmail.com';
                 $mail->Password   = 'teir bvqp ijrx rijl';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
+                // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                // $mail->Port       = 587;
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL/TLS
+    $mail->Port = 465;
                 $mail->Timeout    = 60;
                 $mail->SMTPKeepAlive = true;
                 
