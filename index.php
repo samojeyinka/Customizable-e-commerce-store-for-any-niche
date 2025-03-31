@@ -13,7 +13,7 @@ if(isset($_GET['logout'])) {
 }
 
 require_once "./config/servername.php";
-
+require_once "./includes/auth/google.php";
 
 
 ?> 

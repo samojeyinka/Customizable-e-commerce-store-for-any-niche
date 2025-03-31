@@ -80,6 +80,9 @@ $cart_items_result = mysqli_stmt_get_result($cart_items_stmt);
 while ($item = mysqli_fetch_assoc($cart_items_result)) {
     $cart_items[$item['product_id']] = $item['cart_id'];
 }
+
+
+require_once "../includes/auth/google.php";
 ?>
 
 

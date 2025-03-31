@@ -129,6 +129,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_FILES['profile_image'])) {
 if(isset($_GET['logout'])) {
     logout();
 }
+
+require_once "../includes/auth/google.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">

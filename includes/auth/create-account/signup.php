@@ -64,12 +64,12 @@
         Or
     </p>
 
-    <div class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
+    <a href="<?= $url ?>" class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
         <img src="<?php echo DOMAIN; ?>/assets/global/google.svg" class="w-[20px]" />
         <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#262626] py-3">
             Create an account with Google
         </p>
-    </div>
+</a>
 </div>
 
 

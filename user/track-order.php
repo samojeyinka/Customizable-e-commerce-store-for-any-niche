@@ -124,6 +124,8 @@ $current_status_index = array_search($current_status, $status_sequence);
 
 // If the order is cancelled, we need special handling
 $is_cancelled = ($current_status == 'Cancelled');
+
+require_once "../includes/auth/google.php";
 ?>
 
 <!DOCTYPE html>

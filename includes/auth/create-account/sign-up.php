@@ -8,6 +8,9 @@ if(isset($_SESSION['user_id'])) {
     exit();
 }
 
+
+require_once "../google.php"
+
 ?>
 
 <!DOCTYPE html>
@@ -89,12 +92,12 @@ if(isset($_SESSION['user_id'])) {
             </div>
         </div>
 
-        <div class="cursor-pointer flex items-center justify-center gap-3 border-[1px] border-[#E1E1E1] rounded-[8px] py-3 hover:bg-gray-50 transition-colors duration-300">
+        <a href="<?= $url ?>" class="cursor-pointer flex items-center justify-center gap-3 border-[1px] border-[#E1E1E1] rounded-[8px] py-3 hover:bg-gray-50 transition-colors duration-300">
             <img src="<?php echo DOMAIN; ?>/assets/global/google.svg" class="w-[20px]" />
             <p class="font-['Open Sans'] text-[16px] font-regular text-[#262626]">
                 Create an account with Google
             </p>
-        </div>
+</a>
 
         <div class="text-center mt-6">
             <p class="text-[#7A7A7A] text-[14px]">

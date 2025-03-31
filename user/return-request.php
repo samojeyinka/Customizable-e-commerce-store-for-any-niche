@@ -148,6 +148,8 @@ if ($stmt->execute()) {
         }
     }
 }
+
+require_once "../includes/auth/google.php";
 ?>
 
 <!DOCTYPE html>

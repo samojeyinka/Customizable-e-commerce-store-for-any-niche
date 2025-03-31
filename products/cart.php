@@ -131,6 +131,8 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 // Get total number of items in cart
 $total_items = count($cart_items);
+
+require_once "../includes/auth/google.php";
 ?>
 
 <!DOCTYPE html>

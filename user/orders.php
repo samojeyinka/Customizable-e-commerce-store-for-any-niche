@@ -107,6 +107,8 @@ $status_filter = isset($_GET['status']) ? $_GET['status'] : 'all';
 
 // Handle search
 $search_query = isset($_GET['search']) ? $_GET['search'] : '';
+
+require_once "../includes/auth/google.php";
 ?>
 
 

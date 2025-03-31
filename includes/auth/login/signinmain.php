@@ -1,7 +1,5 @@
 <?php
 // Database connection setup
-
-
 $servername = "localhost";
 $dbname = "victosah";
 $username = "root";
@@ -51,7 +49,6 @@ if(isset($_POST['login'])) {
                     $update_stmt->execute();
                     
                     // Redirect to dashboard using JavaScript
-                    // echo "<script>window.location.href = '/victosah/user/orders.php';</script>";
                     echo "<script>window.location.href = '" . DOMAIN . "/user/orders.php';</script>";
                     exit();
                 } else {
@@ -77,11 +74,13 @@ if(isset($_POST['login'])) {
         $_SESSION['login_error'] = $error_message;
         
         // Redirect to signin page
-        // echo "<script>window.location.href = 'http://localhost/victosah/includes/auth/login/signin.php';</script>";
         echo "<script>window.location.href = '" . DOMAIN . "/includes/auth/login/signin.php';</script>";
         exit();
     }
 }
+
+// Include Google configuration
+
 ?>
 
 <!-- Your form HTML -->
@@ -149,12 +148,12 @@ if(isset($_POST['login'])) {
         Or
     </p>
 
-    <div class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
+    <a href="<?= $url ?>" class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
         <img src="<?php echo DOMAIN; ?>/assets/global/google.svg" class="w-[20px]" />
         <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#262626] py-3">
-            Create an account with Google
+            Sign In  with Google
         </p>
-    </div>
+    </a>
 </div>
 
 <!-- Simple JavaScript for password toggle -->

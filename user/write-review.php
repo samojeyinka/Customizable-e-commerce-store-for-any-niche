@@ -149,6 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
 
 // Get image path
 $image_path = isset($product['image_path']) ? "../assets/products/" . $product['image_path'] : "../assets/products/img1.svg";
+
+require_once "../includes/auth/google.php";
 ?>
 
 <!DOCTYPE html>

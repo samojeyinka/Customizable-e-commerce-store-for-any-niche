@@ -286,6 +286,9 @@ if (isset($profile['billing_same_as_delivery']) && !$profile['billing_same_as_de
 }
 
 
+require_once "../includes/auth/google.php";
+
+
 ?>
 
 
@@ -351,7 +354,7 @@ z-index: 10;
         </section>
 
         <?php if (!$profileComplete): ?>
-<div class="w-[90%] mx-auto bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r">
+<div class="w-[90%] mt-[10rem] md:mt-0  mx-auto bg-red-50 border-l-4 border-red-500 p-4 md:mb-6 rounded-r">
     <div class="flex items-center">
         <div class="flex-shrink-0">
             <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -381,8 +384,8 @@ z-index: 10;
 <?php endif; ?>
 
         <div class="w-[95%] md:w-[90%] mx-auto flex flex-col-reverse md:flex-row gap-3 py-5">
-            <div class="w-full md:w-[55%] flex flex-col gap-5 py-5">
-                <form method="POST" action="">
+            <div class="w-full md:w-[55%] flex flex-col">
+                <form method="POST" action="" class="flex flex-col gap-3">
                     <div class="w-[95%] md:w-[90%] lg:w-[80%] border-[1px] border-[#E1E1E1] rounded-[8px] p-4 flex flex-col gap-2">
                         <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
                             How do you want to receive your product?
@@ -417,7 +420,7 @@ z-index: 10;
                                         Lagos Store
                                     </p>
                                     <p class="text-[13px] md:text-[14px] text-[#262626] w-full font-['Open Sans'] font-regular">
-                                        Location of the company<br />Pickup is available from 8am-6pm
+                                    Tejuosho Main Complex Yaba.<br />Pickup is available from 8am-6pm
                                     </p>
                                 </div>
                             </label>
@@ -838,7 +841,7 @@ z-index: 10;
 
              
 
-      <div class="w-full flex flex-col gap-3 rounded-[4px] bg-[#E8E9F2] md:bg-[#EEEEEE] mt-[9rem] md:mt-0 p-2">
+      <div class="w-full flex flex-col gap-3 rounded-[4px] bg-[#E8E9F2] md:bg-[#EEEEEE] md:mt-[9rem] md:mt-0 p-2">
     <div class="flex items-center justify-between">
         <p class="text-[#262626] text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Your Order</p>
         <img src="../assets/products/down2.svg" class="rotate-[180deg] cursor-pointer md:hidden" />

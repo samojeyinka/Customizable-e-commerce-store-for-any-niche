@@ -58,6 +58,8 @@ $status_descriptions = [
 function formatDate($date) {
     return date('M d, Y h:i A', strtotime($date));
 }
+
+require_once "../includes/auth/google.php";
 ?>
 
 <!DOCTYPE html>

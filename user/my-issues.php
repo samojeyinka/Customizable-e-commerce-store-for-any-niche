@@ -65,6 +65,8 @@ function getOrderStatusBadgeClass($status) {
             return 'bg-gray-500 text-white';
     }
 }
+
+require_once "../includes/auth/google.php";
 ?>
 
 <!DOCTYPE html>

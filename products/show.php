@@ -158,7 +158,7 @@ function generateStarRating($rating) {
     return $html;
 }
 
-
+require_once "../includes/auth/google.php";
 ?>
 
 <!DOCTYPE html>

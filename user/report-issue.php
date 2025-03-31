@@ -193,6 +193,8 @@ function getStatusBadgeClass($status) {
             return 'bg-gray-500';
     }
 }
+
+require_once "../includes/auth/google.php";
 ?>
 
 <!DOCTYPE html>

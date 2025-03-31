@@ -7,6 +7,7 @@ require_once __DIR__ . '/../includes/auth/auth.php';
 
 $user = isAuthenticated() ? getCurrentUser() : null;
 include(__DIR__ . '/../config/products.php');
+require_once "../includes/auth/google.php";
 
 ?>
 <!DOCTYPE html>

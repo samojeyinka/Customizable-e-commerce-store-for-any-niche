@@ -77,6 +77,8 @@ if(isset($_POST['login'])) {
         }
     }
 }
+
+require_once "../google.php";
 ?>
 
 <!DOCTYPE html>
@@ -98,6 +100,7 @@ if(isset($_POST['login'])) {
 <?php
     include(__DIR__ . '/../../header.php');
     include(__DIR__ . '/../../options.php');
+   
 ?>
 
 <div class="w-full bg-[#FEFEFE]">
@@ -171,12 +174,12 @@ if(isset($_POST['login'])) {
             Or
         </p>
         
-        <div class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
+        <a href="<?= $url ?>" class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
             <img src="<?php echo DOMAIN; ?>/assets/global/google.svg" class="w-[20px]" />
             <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#262626] py-3">
                 Sign in with Google
             </p>
-        </div>
+        </a>
         
         <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#7A7A7A] mt-4">
             Don't have an account? <a href="../create-account/sign-up.php" class="text-[#1A237E]">Create an account</a>
