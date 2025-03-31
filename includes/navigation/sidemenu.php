@@ -18,12 +18,12 @@ $isIncludesPath = strpos($currentUrl, '/includes/') !== false ||
                 <span>My Orders</span>
             </a>
             <a href="<?php echo DOMAIN; ?>/user/my-issues.php" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#262626] font-['Open Sans']">
-                <img src="<?php echo DOMAIN; ?>/assets/global/invoice.svg" class="" />
+                <img src="<?php echo DOMAIN; ?>/assets/global/issues.svg" class="" />
                 <span>My Issues</span>
             </a>
 
             <a href="<?php echo DOMAIN; ?>/user/returns.php" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#262626] font-['Open Sans']">
-                <img src="<?php echo DOMAIN; ?>/assets/global/invoice.svg" class="" />
+                <img src="<?php echo DOMAIN; ?>/assets/global/return.svg" class="" />
                 <span>Returned Items</span>
             </a>
 
