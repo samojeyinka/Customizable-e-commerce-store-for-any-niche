@@ -192,7 +192,7 @@ $total = $subtotal + $shipping_fee;
 
 // Add this PHP code at the top of your checkout.php file to generate the necessary data
 $paystack_data = [
-    'key' => 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41', // Replace with your public key
+    'key' => 'pk_test_ffbf13a1e6d967184705ae17a339b027b6ec459c', // Replace with your public key
     'user_email' => $user['email'] ?? '',
     'amount' => $total,
     'first_name' => $profile['first_name'] ?? '',
@@ -1107,7 +1107,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Processing payment for amount:', amount);
                 
                 let handler = PaystackPop.setup({
-                    key: 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41',
+                    key: 'pk_test_ffbf13a1e6d967184705ae17a339b027b6ec459c',
                     email: email,
                     amount: amount * 100, // Convert to kobo
                     currency: "NGN",
@@ -1289,7 +1289,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Processing payment for amount:', amount);
         
         let handler = PaystackPop.setup({
-            key: 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41',
+            key: 'pk_test_ffbf13a1e6d967184705ae17a339b027b6ec459c',
             email: email,
             amount: amount * 100, // Convert to kobo
             currency: "NGN",
