@@ -465,6 +465,14 @@ include "./sidebar.php"
     </div>
 </div>
 
+<script type="text/javascript" src="../functions/drop-select.js"></script>
+    <script type="text/javascript" src="../functions/order.js"></script>
+    <script type="text/javascript" src="../functions/dash.js"></script>
+    <script type="text/javascript" src="../functions/tab.js"></script>
+    <script type="text/javascript" src="../functions/overlay.js"></script>
+    <script type="text/javascript" src="../functions/ordermenu.js"></script>
+    <script type="text/javascript" src="../functions/nav.js"></script>
+    
 <script>
     // Issue Modal Functions
     function openIssueModal(issueId, issueType, issueDescription, status, adminNotes, resolution) {

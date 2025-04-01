@@ -576,10 +576,21 @@ include "./sidebar.php"
     </div>
 
     <script type="text/javascript" src="../functions/drop-select.js"></script>
+    <script type="text/javascript" src="../functions/order.js"></script>
     <script type="text/javascript" src="../functions/dash.js"></script>
     <script type="text/javascript" src="../functions/tab.js"></script>
     <script type="text/javascript" src="../functions/overlay.js"></script>
     <script type="text/javascript" src="../functions/nav.js"></script>
+
+    
+
+    <!-- <script type="text/javascript" src="../functions/drop-select.js"></script>
+    <script type="text/javascript" src="../functions/order.js"></script>
+    <script type="text/javascript" src="../functions/dash.js"></script>
+    <script type="text/javascript" src="../functions/tab.js"></script>
+    <script type="text/javascript" src="../functions/overlay.js"></script>
+    <script type="text/javascript" src="../functions/ordermenu.js"></script>
+    <script type="text/javascript" src="../functions/nav.js"></script> -->
 
     <script>
         // User menu functionality

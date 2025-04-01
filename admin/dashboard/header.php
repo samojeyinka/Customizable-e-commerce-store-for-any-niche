@@ -209,3 +209,125 @@ $latest_notifications = get_notifications($con, true, null, 5, 0);
 <!-- ========================  The header  ends ======================== -->
 
 
+<script>
+    // Add this script to your page
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the search input
+    const searchInput = document.querySelector('input[type="text"]');
+    const searchContainer = searchInput.closest('div');
+    
+    // Create suggestions container
+    const suggestionsContainer = document.createElement('div');
+    suggestionsContainer.className = 'bg-white border border-gray-200 rounded shadow-lg absolute left-0 right-0 z-50 hidden';
+    suggestionsContainer.style.top = '60px'; // Position below header
+    suggestionsContainer.style.maxWidth = '550px';
+    suggestionsContainer.style.width = '100%';
+    searchContainer.style.position = 'relative';
+    searchContainer.appendChild(suggestionsContainer);
+    
+    // Listen for input in the search field
+    searchInput.addEventListener('input', function(e) {
+        const query = e.target.value.trim();
+        
+        if (query.length === 0) {
+            hideSuggestions();
+            return;
+        }
+        
+        // Display search suggestions based directly on what the user typed
+        displaySuggestions(query);
+    });
+    
+    // Close suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchContainer.contains(e.target)) {
+            hideSuggestions();
+        }
+    });
+    
+    // Function to display suggestions
+    function displaySuggestions(query) {
+        suggestionsContainer.innerHTML = '';
+        
+        // Define categories - now including Users
+        const categories = [
+            { 
+                key: 'order', 
+                title: `Order with ID: ${query}`,
+                subtitle: 'Click to view order details',
+                labelText: 'Order',
+                labelClass: 'bg-green-100 text-green-800',
+                url: './order-details.php?id='
+            },
+            { 
+                key: 'reviews', 
+                title: `Reviews with "${query}"`,
+                subtitle: '',
+                labelText: '',
+                labelClass: '',
+                url: './reviews.php?q='
+            },
+            { 
+                key: 'review', 
+                title: `Review with Product ID: ${query}`,
+                subtitle: 'Click to view product reviews',
+                labelText: 'Review',
+                labelClass: 'bg-yellow-100 text-yellow-800',
+                url: './reviews.php?product_id='
+            },
+            { 
+                key: 'user', 
+                title: `User with ID: ${query}`,
+                subtitle: 'Click to view user details',
+                labelText: 'User',
+                labelClass: 'bg-blue-100 text-blue-800',
+                url: './user-details.php?id='
+            }
+        ];
+        
+        // For each category, create a suggestion item with styling from the screenshot
+        categories.forEach((category, index) => {
+            const itemContainer = document.createElement('div');
+            
+            // Apply different styles based on category type
+            if (category.key === 'reviews') {
+                itemContainer.className = 'p-4 border-t border-b border-gray-200 bg-gray-50';
+                itemContainer.innerHTML = `<div class="font-medium text-gray-700">${category.title}</div>`;
+            } else {
+                itemContainer.className = 'p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer';
+                
+                let labelHtml = '';
+                if (category.labelText) {
+                    labelHtml = `<span class="text-sm rounded-full px-3 py-1 ${category.labelClass}">${category.labelText}</span>`;
+                }
+                
+                itemContainer.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-medium">${category.title}</div>
+                            <div class="text-sm text-gray-500">${category.subtitle}</div>
+                        </div>
+                        ${labelHtml}
+                    </div>
+                `;
+                
+                // Add click handler to navigate to the appropriate page
+                itemContainer.addEventListener('click', function() {
+                    window.location.href = `${category.url}${query}`;
+                });
+            }
+            
+            suggestionsContainer.appendChild(itemContainer);
+        });
+        
+        // Show the suggestions container
+        suggestionsContainer.classList.remove('hidden');
+    }
+    
+    // Function to hide suggestions
+    function hideSuggestions() {
+        suggestionsContainer.classList.add('hidden');
+    }
+});a
+</script>
+

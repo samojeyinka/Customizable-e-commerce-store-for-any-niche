@@ -23,7 +23,7 @@ $isIncludesPath = strpos($currentUrl, '/includes/') !== false ||
             </a>
 
             <a href="<?php echo DOMAIN; ?>/user/returns.php" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#262626] font-['Open Sans']">
-                <img src="<?php echo DOMAIN; ?>/assets/global/return.svg" class="" />
+                <img <?php echo DOMAIN; ?>/assets/global/return.svg" class="" />
                 <span>Returned Items</span>
             </a>
 
