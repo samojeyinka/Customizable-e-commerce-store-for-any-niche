@@ -3,6 +3,13 @@
 require_once __DIR__ . '/../../includes/auth/auth.php';
 require_once __DIR__ . "/../../config/config.php";
 
+// Check if admin is logged in
+if (!isset($_SESSION['admin_id'])) {
+    // Redirect to login page
+    header("Location: ../index.php");
+    exit();
+}
+
 // Check if admin
 
 // Database connection

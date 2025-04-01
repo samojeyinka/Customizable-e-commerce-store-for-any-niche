@@ -3,6 +3,13 @@ session_start();
 include('../../config/connect.php');
 require_once "../../config/config.php";
 
+// Check if admin is logged in
+if (!isset($_SESSION['admin_id'])) {
+    // Redirect to login page
+    header("Location: ../index.php");
+    exit();
+}
+
 // Get admin information
 $admin_id = $_SESSION['admin_id'];
 $admin_name = $_SESSION['admin_fullname'];

@@ -83,7 +83,7 @@ $latest_notifications = get_notifications($con, true, null, 5, 0);
     <nav class="w-full md:w-[98%] lg-w-[95%] flex items-center justify-between">
 
         <div class="flex items-center gap-5 md:gap-8 lg:gap-10">
-            <a href="./index.php" class="flex items-center gap-1 md:gap-2">
+            <a href="./overview.php" class="flex items-center gap-1 md:gap-2">
                 <img src="../assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
                 <h1 class="hidden md:block text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
             </a>

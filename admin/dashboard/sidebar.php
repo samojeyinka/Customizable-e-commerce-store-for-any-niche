@@ -1,4 +1,4 @@
-<div id="mySidenav" class="sidenav p-2 hidden md:flex flex-col justify-between gap-2">
+<div id="mySidenav" class="sidenav p-2  md:flex flex-col justify-between gap-2 fixed md:relative">
 
 <div class="flex flex-col gap-2">
     <a href="<?php echo DOMAIN; ?>/admin/dashboard/overview.php" class="nav-link active flex items-center gap-3" onclick="setActive(this)"><img src="<?php echo DOMAIN; ?>/admin/assets/dash/category.svg" class="activeicon w-[20px] h-[20px]" /> <img src="<?php echo DOMAIN; ?>/admin/assets/dash/category2.svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Overview</span></a>

@@ -5,7 +5,7 @@ require_once "../../../config/config.php";
 // Check if admin is logged in
 if (!isset($_SESSION['admin_id'])) {
     // Redirect to login page
-    header("Location: ../index.php");
+    header("Location: ../../index.php");
     exit();
 }
 
