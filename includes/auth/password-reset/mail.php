@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Include PHPMailer at the top of the file
 require '../create-account/phpmailer/src/Exception.php';
 require '../create-account/phpmailer/src/PHPMailer.php';
@@ -34,11 +34,7 @@ require_once "../../../config/servername.php";
 
 
 
-    $conn = new mysqli($servername, $username, $dbpassword, $dbname);
-
-    if($conn->connect_error){
-        die("Connection failed: " . $conn->connect_error);
-    }
+    $conn = db();
     
     // Check if the email exists in the database
     $check_sql = "SELECT * FROM users WHERE email = ?";
@@ -100,14 +96,14 @@ require_once "../../../config/servername.php";
                 $mail->Subject = 'Password Reset Verification Code';
                 $mail->Body    = "
                 <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;'>
-                    <h2 style='color: #1A237E; text-align: center;'>Victosah Solution</h2>
+                    <h2 style='color: #C2185B; text-align: center;'>Glorefy</h2>
                     <p style='font-size: 16px; line-height: 1.5;'>Hello,</p>
                     <p style='font-size: 16px; line-height: 1.5;'>You requested to reset your password. To verify your identity, please use the following OTP code:</p>
                     <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
                         {$otp}
                     </div>
                     <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this code, please ignore this email.</p>
-                    <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
+                    <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Glorefy Team</p>
                 </div>
                 ";
                 $mail->AltBody = "Your Password Reset Verification code is: {$otp}";
@@ -126,7 +122,7 @@ require_once "../../../config/servername.php";
         }
     }
     
-    $conn->close();
+    
 }
 ?>
 
@@ -134,16 +130,14 @@ require_once "../../../config/servername.php";
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH - Password Reset</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY - Password Reset</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../../style.css" />
-    <link rel="stylesheet" href="../../../styles/faq.css" />
-    <link rel="stylesheet" href="../../../styles/modal.css">
-    <link rel="stylesheet" href="../../../styles/tabs.css">
-    <link rel="stylesheet" href="../../../styles/inputs.css">
+<?php include '../../../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     
@@ -190,11 +184,11 @@ require_once "../../../config/servername.php";
             
             <input type="hidden" name="send" value="1">
             
-            <button type="submit" class="w-full py-[8px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Send Reset Code</button>
+            <button type="submit" class="w-full py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Send Reset Code</button>
         </form>
 
         <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#7A7A7A] py-3">
-            Remember your password? <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-[#1A237E] font-medium">Sign in</a>
+            Remember your password? <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-[#C2185B] font-medium">Sign in</a>
         </p>
     </div>
 </div>

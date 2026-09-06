@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "../../../config/config.php";
 
@@ -18,11 +18,7 @@ $admin_role = $_SESSION['admin_role'] ?? 'admin';
 // Connect to the database
 require_once "../../../config/servername.php";
 
-$conn = new mysqli($servername, $username, $dbpassword, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$conn = db();
 
 // Fetch admin details
 $sql = "SELECT * FROM administrators WHERE admin_id = ?";
@@ -92,7 +88,7 @@ if (file_exists($notifications_file)) {
 }
 
 // Close the main database connection
-$conn->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -104,14 +100,10 @@ $conn->close();
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../style.css" />
-    <link rel="stylesheet" href="../../styles/styles.css" />
-    <link rel="stylesheet" href="../../styles/overlay.css">
-    <link rel="stylesheet" href="../../styles/dropdown.css" />
-    <link rel="stylesheet" href=".././../styles/graph.css" />
-    <link rel="stylesheet" href="../../styles/dash.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <title>Admin Settings - Victosah</title>
+    <?php include '../../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body class="relative">
@@ -121,18 +113,17 @@ $conn->close();
 
         <div class="flex items-center gap-5 md:gap-8 lg:gap-10">
             <a href="./index.php" class="flex items-center gap-1 md:gap-2">
-                <img src="<?php echo DOMAIN; ?>/assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-                <h1 class="hidden md:block text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                <img src="<?php echo DOMAIN; ?>/assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
             </a>
 
-            <img onclick="toggleNav()" src="../../assets/home/menu.svg" alt="Search" class="w-[28px] cursor-pointer" />
+            <i class="fa-solid fa-bars text-[24px] cursor-pointer" onclick="toggleNav()" alt="Search"></i>
             <h1 class="hidden md:block text-[16px] md:text-[20px] font-Onest font-semibold">Orders</h1>
         </div>
 
 
         <div class="flex items-center gap-0">
             <div class="flex items-center gap-2 border-[1px] border-[#F3F3F3] rounded-[25px] p-2">
-                <img src="../../assets/global/search-normal.svg" alt="Search" class="w-[18px]" />
+                <i class="fa-solid fa-magnifying-glass text-[18px]" alt="Search"></i>
                 <input type="text" placeholder="Search name, Order ID..." class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
             </div>
 
@@ -140,9 +131,9 @@ $conn->close();
         <div class="flex items-center gap-6 md:bg-[#F3F3F3] rounded-[4px] py-1 px-4">
 
             <span class="cursor-pointer relative" onclick="openNotification()">
-                <img src="../../assets/global/bell.svg" class="w-[18px] md:w-[20px]" alt="bag" />
+                <i class="fa-regular fa-bell text-[20px]" alt="bag"></i>
                 <?php if ($unread_count > 0): ?>
-                <div class="w-[8px] h-[8px] bg-[#1A237E] rounded-full absolute top-[-.1rem] left-3"></div>
+                <div class="w-[8px] h-[8px] bg-[#C2185B] rounded-full absolute top-[-.1rem] left-3"></div>
                 <?php endif; ?>
             </span>
 
@@ -171,7 +162,7 @@ $conn->close();
 <div class="flex items-center gap-1">
     <h1 class="text-[18px] md:text-[20px] font-['Open Sans'] font-medium">Notifications</h1>
     <?php if ($unread_count > 0): ?>
-        <div class="flex items-center justify-center bg-[#1A237E] w-[20px] h-[20px] rounded-[50%]">
+        <div class="flex items-center justify-center bg-[#C2185B] w-[20px] h-[20px] rounded-[50%]">
             <h1 class="text-white text-[11px] md:text-[12px] font-['Open Sans'] font-medium">
                 <?php echo $unread_count > 99 ? '99+' : $unread_count; ?>
             </h1>
@@ -179,7 +170,7 @@ $conn->close();
     <?php endif; ?>
 </div>
 
-    <a href="./notifications.php" class="text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[#1A237E]">See all</a>
+    <a href="./notifications.php" class="text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[#C2185B]">See all</a>
 
 
 </div>
@@ -200,7 +191,7 @@ $conn->close();
                                     $created_at = new DateTime($notification['created_at']);
                                     echo $created_at->format('d M, Y h:i A'); 
                                     ?></span>
-                    <img src="../../assets/user/action.svg" class="cursor-pointer" onclick="openNotimenu(this)" />
+                    <i class="fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer" onclick="openNotimenu(this)"></i>
                     <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                                         <div class="flex flex-col gap-3">
                                         <?php if ($notification['type'] === 'order' && !empty($notification['reference_id'])): ?>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Include PHPMailer at the top of the file
 require '../create-account/phpmailer/src/Exception.php';
 require '../create-account/phpmailer/src/PHPMailer.php';
@@ -26,11 +26,7 @@ $email = $_SESSION['user_reset_email'];
 //db connection
 require_once "../../../config/servername.php";
 
-$conn = new mysqli($servername, $username, $dbpassword, $dbname);
-
-if($conn->connect_error){
-    die("Connection failed: " . $conn->connect_error);
-}
+$conn = db();
 
 // Initialize message variables
 $error_message = "";
@@ -140,14 +136,14 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
             $mail->Subject = 'Your New OTP for Password Reset';
             $mail->Body    = "
             <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;'>
-                <h2 style='color: #1A237E; text-align: center;'>Victosah Solution</h2>
+                <h2 style='color: #C2185B; text-align: center;'>Glorefy</h2>
                 <p style='font-size: 16px; line-height: 1.5;'>Hello,</p>
                 <p style='font-size: 16px; line-height: 1.5;'>You requested a new verification code for your password reset. Please use the following OTP code:</p>
                 <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
                     {$new_otp}
                 </div>
                 <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this code, please ignore this email.</p>
-                <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
+                <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Glorefy Team</p>
                 </div>
             ";
             $mail->AltBody = "Your new OTP for password reset is: {$new_otp}";
@@ -169,16 +165,14 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH - VERIFY RESET</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY - VERIFY RESET</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../../style.css" />
-    <link rel="stylesheet" href="../../../styles/faq.css" />
-    <link rel="stylesheet" href="../../../styles/modal.css">
-    <link rel="stylesheet" href="../../../styles/tabs.css">
-    <link rel="stylesheet" href="../../../styles/inputs.css">
+<?php include '../../../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     
@@ -253,7 +247,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
             
             <button
                 type="submit"
-                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
+                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
                 Verify & Reset Password
             </button>
         </form>
@@ -263,8 +257,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
         </form>
         
         <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-center">
-            <span id="countdown-text">Resend code in <span class="text-[#1A237E]" id="countdown">60</span>sec</span>
-            <a href="#" id="resendLink" class="text-[#1A237E] hidden" onclick="document.getElementById('resendForm').submit(); return false;">Resend code</a>
+            <span id="countdown-text">Resend code in <span class="text-[#C2185B]" id="countdown">60</span>sec</span>
+            <a href="#" id="resendLink" class="text-[#C2185B] hidden" onclick="document.getElementById('resendForm').submit(); return false;">Resend code</a>
         </p>
     </div>
 </div>

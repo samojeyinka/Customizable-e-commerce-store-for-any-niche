@@ -1,6 +1,5 @@
 <?php
 require_once "../../../config/config.php";
-session_start();
 
 // If user is already logged in, redirect to dashboard
 if(isset($_SESSION['user_id'])) {
@@ -17,15 +16,13 @@ require_once "../google.php"
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create an Account - Victosah Solution</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>Create an Account - Glorefy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../../style.css" />
-    <link rel="stylesheet" href="../../../styles/faq.css" />
-    <link rel="stylesheet" href="../../../styles/modal.css">
-    <link rel="stylesheet" href="../../../styles/tabs.css">
-    <link rel="stylesheet" href="../../../styles/inputs.css">
+<?php include '../../../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body class="">
 <?php
@@ -34,7 +31,7 @@ require_once "../google.php"
 ?>
      <div class="md:w-[50%] mx-auto p-4 bg-white border border-[1px] border-[#EFEFEF] my-5 rounded-md">
         <div class="text-center mb-6">
-            <h2 class="text-[#262626] text-[24px] font-['Open Sans'] font-medium">Welcome to Victosah Solution</h2>
+            <h2 class="text-[#262626] text-[24px] font-['Open Sans'] font-medium">Welcome to Glorefy</h2>
             <p class="text-[#7A7A7A] text-[16px] mt-2">Create your account to get started</p>
         </div>
 
@@ -78,7 +75,7 @@ require_once "../google.php"
 
             <p id="passwordError" class='text-[14px] font-["Open Sans"] text-[#EE3F3F] font-regular underline cursor-pointer' style="display: none;"></p>
             
-            <button type="submit" class="w-full py-[10px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center hover:bg-[#1A237E]/90 transition-colors duration-300">
+            <button type="submit" class="w-full py-[10px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center hover:bg-[#C2185B]/90 transition-colors duration-300">
                 Create an account
             </button>
         </form>
@@ -102,7 +99,7 @@ require_once "../google.php"
         <div class="text-center mt-6">
             <p class="text-[#7A7A7A] text-[14px]">
                 Already have an account? 
-                <a href="../login/signin.php" class="text-[#1A237E] font-medium hover:underline">Log in</a>
+                <a href="../login/signin.php" class="text-[#C2185B] font-medium hover:underline">Log in</a>
             </p>
         </div>
     </div>

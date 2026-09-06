@@ -10,8 +10,9 @@ requireAuth();
 $user = getCurrentUser();
 $user_id = $user['id'];
 
+
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die(mysqli_error($conn));
 }
@@ -33,7 +34,8 @@ if (!$order_id || !$product_id) {
     $error_message = "You can only leave a review for a product you bought.";
 } else {
     // Get order details to verify it belongs to the user and is delivered
-    $order_sql = "SELECT o.id, o.order_status, o.delivered_at, 
+    $order_sql = "SELECT o.id, o.order_status, 
+                     (SELECT MAX(changed_at) FROM order_status_history WHERE order_id = o.id AND new_status = 'Delivered') as delivered_at,
                      p.product_id, p.product_name, p.colors,
                      (SELECT image_path FROM product_images WHERE product_id = p.product_id AND is_main = 1 LIMIT 1) as image_path
                  FROM orders o
@@ -158,73 +160,15 @@ require_once "../includes/auth/google.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Write a Review</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Write a Review</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/styles.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
-
-    <style>
-        .star-rating {
-            display: flex;
-            flex-direction: row-reverse;
-            justify-content: flex-end;
-        }
-        
-        .star-rating input {
-            display: none;
-        }
-        
-        .star-rating label {
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>');
-            background-size: 36px;
-            background-position: center;
-            background-repeat: no-repeat;
-            filter: grayscale(100%);
-            opacity: 0.5;
-            transition: all 0.2s ease;
-        }
-        
-        .star-rating label:hover,
-        .star-rating label:hover ~ label,
-        .star-rating input:checked ~ label {
-            filter: grayscale(0);
-            opacity: 1;
-            color: #FFD700;
-            fill: #FFD700;
-            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23FFD700" stroke="%23FFD700" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>');
-        }
-        
-        .rating-display {
-            display: flex;
-            align-items: center;
-        }
-        
-        .rating-display .star {
-            width: 20px;
-            height: 20px;
-            margin-right: 2px;
-            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23FFD700" stroke="%23FFD700" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>');
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        
-        .rating-display .star.empty {
-            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>');
-            filter: grayscale(100%);
-            opacity: 0.5;
-        }
-    </style>
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -235,18 +179,18 @@ require_once "../includes/auth/google.php";
         ?>
 
         <section class="w-full bg-[#FFFFFFF] py-1">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./orders.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">Write a Review</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Write a Review</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto bg-[#FFFFFF] py-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] bg-[#FFFFFF] py-5">
             <div class="w-full md:w-[80%] lg:w-[60%] mx-auto">
                 <h1 class="text-[24px] md:text-[28px] font-['Open Sans'] font-bold mb-6">Write a Review</h1>
                 
@@ -255,7 +199,7 @@ require_once "../includes/auth/google.php";
                     <?php echo $error_message; ?>
                 </div>
                 <div class="flex justify-center mt-6">
-                    <a href="./orders.php" class="py-2 px-4 bg-[#1A237E] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
+                    <a href="./orders.php" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
                 </div>
                 <?php elseif (!empty($success_message)): ?>
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
@@ -274,7 +218,7 @@ require_once "../includes/auth/google.php";
                             <h2 class="text-[18px] font-medium mb-2"><?php echo htmlspecialchars($product['product_name']); ?></h2>
                             <p class="text-[14px] text-[#262626]">Color: <?php echo htmlspecialchars($product['colors']); ?></p>
                             <p class="text-[14px] text-[#262626]">Order #<?php echo $order_id; ?></p>
-                            <p class="text-[14px] text-[#262626]">Delivered on: <?php echo date('M d, Y', strtotime($product['delivered_at'])); ?></p>
+                            <p class="text-[14px] text-[#262626]">Delivered on: <?php echo $product['delivered_at'] ? date('M d, Y', strtotime($product['delivered_at'])) : '—'; ?></p>
                         </div>
                     </div>
                 </div>
@@ -314,14 +258,14 @@ require_once "../includes/auth/google.php";
                                 id="review_text" 
                                 name="review_text" 
                                 rows="6" 
-                                class="w-full p-3 border border-[#E1E1E1] rounded-[4px] focus:outline-none focus:ring-2 focus:ring-[#1A237E]"
+                                class="w-full p-3 border border-[#E1E1E1] rounded-[4px] focus:outline-none focus:ring-2 focus:ring-[#C2185B]"
                                 placeholder="Share your experience with this product..."
                             ><?php echo $existing_review ? htmlspecialchars($existing_review['review_text']) : ''; ?></textarea>
                         </div>
                         
                         <div class="flex justify-end space-x-3">
                             <a href="./orders.php" class="py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[16px] font-['Open Sans'] rounded-[4px]">Cancel</a>
-                            <button type="submit" name="submit_review" class="py-2 px-4 bg-[#1A237E] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">
+                            <button type="submit" name="submit_review" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">
                                 <?php echo $existing_review ? 'Update Review' : 'Submit Review'; ?>
                             </button>
                         </div>

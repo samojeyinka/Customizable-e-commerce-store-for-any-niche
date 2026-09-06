@@ -8,8 +8,9 @@ ini_set('display_errors', 1);
 require_once '../../includes/auth/auth.php';
 require_once "../../config/config.php";
 
+
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
@@ -50,7 +51,7 @@ if (!empty($_GET['search'])) {
 // Status filter (for disabled/enabled)
 if (isset($_GET['status']) && $_GET['status'] !== '') {
     $status = $conn->real_escape_string($_GET['status']);
-    $conditions[] = "users.is_disabled = " . ($status == 'disabled' ? '1' : '0');
+    $conditions[] = "users.status = '" . ($status == 'disabled' ? 'suspended' : 'active') . "'";
 }
 
 // Build WHERE clause
@@ -60,8 +61,8 @@ $where_clause = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $condition
 $sql = "SELECT 
             users.id,
             users.email,
-            users.last_login,
-            users.is_disabled,
+users.last_login,
+            users.status,
             profiles.first_name,
             profiles.last_name,
             profiles.phone,
@@ -133,8 +134,8 @@ foreach ($users as &$user) {
 // Get user statistics for the modal
 $stats_query = "SELECT 
     COUNT(*) as total_users,
-    SUM(CASE WHEN users.is_disabled = 0 THEN 1 ELSE 0 END) as active_users,
-    SUM(CASE WHEN users.is_disabled = 1 THEN 1 ELSE 0 END) as disabled_users,
+SUM(CASE WHEN users.status = 'active' THEN 1 ELSE 0 END) as active_users,
+    SUM(CASE WHEN users.status = 'suspended' THEN 1 ELSE 0 END) as disabled_users,
     (SELECT COUNT(*) FROM users WHERE last_login >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)) as recent_users,
     (SELECT COUNT(*) FROM users WHERE last_login >= DATE_SUB(CURDATE(), INTERVAL 56 DAY) AND last_login < DATE_SUB(CURDATE(), INTERVAL 28 DAY)) as previous_period_users
 FROM users";
@@ -158,8 +159,8 @@ if (isset($_GET['export']) && $_GET['export'] == 'csv') {
     $export_sql = "SELECT 
         users.id,
         users.email,
-        users.last_login,
-        users.is_disabled,
+users.last_login,
+        users.status,
         profiles.first_name,
         profiles.last_name,
         profiles.phone,
@@ -179,11 +180,11 @@ if (isset($_GET['export']) && $_GET['export'] == 'csv') {
     $output = fopen('php://output', 'w');
     
     // Add CSV headers
-    fputcsv($output, ['ID', 'Name', 'Email', 'Phone', 'Address', 'Last Login', 'Status', 'Total Orders', 'Last Order Date']);
+    fputcsv($output, ['ID', 'Name', 'Email', 'Phone', 'Address', 'Last Login', 'Status', 'Total Orders', 'Last Order Date'], ',', '"', '\\');
     
     // Add data rows
     while ($user = $export_result->fetch_assoc()) {
-        $status = ($user['is_disabled'] == 0) ? 'Active' : 'Disabled';
+        $status = ($user['status'] == 'suspended') ? 'Disabled' : 'Active';
         $name = $user['first_name'] . ' ' . $user['last_name'];
         
         fputcsv($output, [
@@ -195,8 +196,8 @@ if (isset($_GET['export']) && $_GET['export'] == 'csv') {
             $user['last_login'],
             $status,
             $user['total_orders'],
-            $user['last_order_date']
-        ]);
+$user['last_order_date']
+        ], ',', '"', '\\');
     }
     
     fclose($output);
@@ -213,27 +214,11 @@ if (isset($_GET['export']) && $_GET['export'] == 'csv') {
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-    <link rel="stylesheet" href="../styles/overlay.css">
-    <link rel="stylesheet" href="../styles/dropdown.css" />
-    <link rel="stylesheet" href="../styles/graph.css" />
-    <link rel="stylesheet" href="../styles/dash.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-    <title>Users</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Users</title>
 
-    <style>
-        .adminusersMenu{
-            position: absolute;
-            left: -10rem;
-            min-width: 10rem;
-            min-height: 10rem;
-            height: 100%;
-            z-index: 2;
-            display: none;
-        }
-    </style>
-
+<?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 
@@ -250,7 +235,7 @@ include "./sidebar.php"
 
             <div id="openUsersModal" class="w-full md:w-[274px] border-[1px] border-[#F3F3F3] cursor-pointer rounded-[8px] p-2 flex justify-between items-center">
                 <h1 class="text-[16px] font-Onest font-regular">Users Overview</h1>
-                <img src="../assets/dash/Vector 6905.svg" />
+<i class="fa-solid fa-ellipsis-vertical text-[20px]"></i>
             </div>
         </div>
 
@@ -259,7 +244,7 @@ include "./sidebar.php"
                 <div class="flex items-center gap-0">
                     <form action="" method="GET" class="w-full flex">
                         <div class="w-full flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[24px] p-2">
-                            <img src="../assets/dash/search-normal (1).svg" alt="Search" class="w-[18px]" />
+                            <i class="fa-solid fa-magnifying-glass text-[18px]" alt="Search"></i>
                             <input type="text" name="search" placeholder="Search by name, email, phone..." value="<?php echo htmlspecialchars($search_query); ?>" class="w-full md:w-[250px] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
                             <!-- Preserve date filter when searching -->
                             <?php if($date_filter != 'all'): ?>
@@ -272,7 +257,7 @@ include "./sidebar.php"
                 <div class="w-full flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <span class="text-[#2c2c2c] text-[14px] md:text-[16px] font-Onest font-medium">Filter by:</span>
-                        <img src="../assets/dash/filter-horizontal.svg" class="md:hidden" />
+                        <i class="fa-solid fa-filter md:hidden"></i>
 
                         <div class="hidden md:flex items-center gap-2 md:gap-3 lg:gap-4">
                            <!-- Filter dropdowns -->
@@ -313,14 +298,14 @@ include "./sidebar.php"
                     </div>
 
                     <div class="flex items-center gap-1 shrink-0">
-                        <img src="../assets/dash/Path.svg" />
+                        <i class="fa-solid fa-xmark text-[14px] text-[#262626]"></i>
                         <a href="?">
                             <span class="text-[#262626] text-[14px] font-Onest font-regular">Clear filter</span>
                         </a>
                     </div>
 
                     <button onclick="exportToCSV()" class="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer shrink-0">
-                        <img src="../assets/dash/send-square.svg" />
+                        <i class="fa-solid fa-download text-[16px]"></i>
                         Export
                     </button>
                 </div>
@@ -340,7 +325,7 @@ include "./sidebar.php"
                         <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Total Orders</th>
                         <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Last Order</th>
                         <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">
-                            <img src="../assets/dash/column.svg" class="min-w-[24px] min-h-[24px]" />
+                            <i class="fa-solid fa-table-columns text-[20px]"></i>
                         </th>
                     </thead>
 
@@ -393,13 +378,13 @@ include "./sidebar.php"
                                         ?>
                                     </td>
                                     <td class="relative">
-                                        <img src="../assets/user/action.svg" class="w-[20px] cursor-pointer" onclick="openAdminUserMenu(this)" />
+                                        <i class="fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer" onclick="openAdminUserMenu(this)"></i>
 
                                         <!-- The menu for each user starts -->
                                         <div class="adminusersMenu h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                                             <div class="flex flex-col gap-3">
                                                 <a href="./user-details.php?id=<?php echo $user['id']; ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-                                                <?php if ($user['is_disabled'] == 0): ?>
+<?php if ($user['status'] != 'suspended'): ?>
                                                     <a href="javascript:void(0)" onclick="confirmAction(<?php echo $user['id']; ?>, 'disable')" class="text-[16px] font-medium text-[#E8B006]">Disable User</a>
                                                 <?php else: ?>
                                                     <a href="javascript:void(0)" onclick="confirmAction(<?php echo $user['id']; ?>, 'enable')" class="text-[16px] font-medium text-[#39D959]">Enable User</a>
@@ -422,12 +407,12 @@ include "./sidebar.php"
                     <div class="flex items-center gap-2 cursor-pointer">
                         <?php if ($current_page > 1): ?>
                             <a href="?page=<?php echo $current_page - 1; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo isset($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?>" class="flex items-center">
-                                <img src="../assets/products/prev.svg" class="w-[6px] h-[11px]" />
+                                <i class="fa-solid fa-chevron-left text-[12px]"></i>
                                 <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Prev</span>
                             </a>
                         <?php else: ?>
-                            <div class="flex items-center opacity-50">
-                                <img src="../assets/products/prev.svg" class="w-[6px] h-[11px]" />
+<div class="flex items-center opacity-50">
+                                <i class="fa-solid fa-chevron-left text-[12px]"></i>
                                 <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Prev</span>
                             </div>
                         <?php endif; ?>
@@ -441,7 +426,7 @@ include "./sidebar.php"
                         for ($i = $start_page; $i <= $end_page; $i++):
                         ?>
                             <?php if ($i == $current_page): ?>
-                                <span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#1A237E]"><?php echo $i; ?></span>
+                                <span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#C2185B]"><?php echo $i; ?></span>
                             <?php else: ?>
                                 <a href="?page=<?php echo $i; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo isset($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer"><?php echo $i; ?></a>
                             <?php endif; ?>
@@ -457,12 +442,12 @@ include "./sidebar.php"
                         <?php if ($current_page < $total_pages): ?>
                             <a href="?page=<?php echo $current_page + 1; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo isset($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?>" class="shrink-0 text-nowrap flex items-center">
                                 <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Next</span>
-                                <img src="../assets/products/next.svg" class="w-[6px] h-[11px]" />
+                                <i class="fa-solid fa-chevron-right text-[12px]"></i>
                             </a>
                         <?php else: ?>
-                            <div class="flex items-center opacity-50">
+<div class="flex items-center opacity-50">
                                 <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Next</span>
-                                <img src="../assets/products/next.svg" class="w-[6px] h-[11px]" />
+                                <i class="fa-solid fa-chevron-right text-[12px]"></i>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -476,7 +461,7 @@ include "./sidebar.php"
         <!-- Modal content -->
         <div class="modal-content overflow-hidden p-4">
             <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Users Overview</h1>
-            <img src="../assets/global/close-circle.svg" alt="close" id="closeUsersModal" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+            <i class="fa-solid fa-xmark text-[24px] cursor-pointer absolute top-4 right-4" id="closeUsersModal" alt="close"></i>
 
             <div class="grid grid-cols-1 md:grid-cols-2 p-2 gap-4 mt-2">
                 <!-- Total Users Card -->
@@ -487,10 +472,10 @@ include "./sidebar.php"
                     <div class="flex flex-col gap-[1px]">
                         <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Users</span>
                         <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($user_stats['total_users']); ?></h2>
+                            <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((float)$user_stats['total_users']); ?></h2>
                         </div>
                         <div class="flex items-center gap-1">
-                            <img src="../assets/dash/<?php echo $user_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                            <i class="fa-solid <?php echo $user_change >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                             <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                                 <span class="text-<?php echo $user_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                     <?php echo abs($user_percentage); ?>%
@@ -508,10 +493,10 @@ include "./sidebar.php"
                     <div class="flex flex-col gap-[1px]">
                         <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Active Users</span>
                         <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($user_stats['active_users']); ?></h2>
+                            <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((float)$user_stats['active_users']); ?></h2>
                         </div>
                         <div class="flex items-center gap-1">
-                            <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
+                            <i class="fa-solid fa-arrow-trend-up text-[20px]"></i>
                             <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                                 <span class="text-[#39D959]">
                                     <?php echo round(($user_stats['active_users'] / max(1, $user_stats['total_users'])) * 100); ?>%
@@ -529,10 +514,10 @@ include "./sidebar.php"
                     <div class="flex flex-col gap-[1px]">
                         <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Recent Users (28 Days)</span>
                         <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($user_stats['recent_users']); ?></h2>
+                            <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((float)$user_stats['recent_users']); ?></h2>
                         </div>
                         <div class="flex items-center gap-1">
-                            <img src="../assets/dash/<?php echo $user_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                            <i class="fa-solid <?php echo $user_change >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                             <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                                 <span class="text-<?php echo $user_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                     <?php echo abs($user_percentage); ?>%
@@ -550,10 +535,10 @@ include "./sidebar.php"
                     <div class="flex flex-col gap-[1px]">
                         <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Disabled Users</span>
                         <div class="flex items-center gap-2">
-                            <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($user_stats['disabled_users']); ?></h2>
+                            <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((float)$user_stats['disabled_users']); ?></h2>
                         </div>
                         <div class="flex items-center gap-1">
-                            <img src="../assets/dash/<?php echo $user_stats['disabled_users'] > 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                            <i class="fa-solid <?php echo $user_stats['disabled_users'] > 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                             <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                                 <span class="text-<?php echo $user_stats['disabled_users'] > 0 ? '[#D93939]' : '[#39D959]'; ?>">
                                     <?php echo round(($user_stats['disabled_users'] / max(1, $user_stats['total_users'])) * 100); ?>%
@@ -595,33 +580,55 @@ include "./sidebar.php"
     <script type="text/javascript" src="../functions/nav.js"></script> -->
 
     <script>
-        // User menu functionality
+// User menu functionality
         function openAdminUserMenu(element) {
             // Find the closest parent td and then find the menu inside it
             const menuContainer = element.closest('td').querySelector('.adminusersMenu');
-            
-            // Toggle the display of the menu
-            if (menuContainer.style.display === "block") {
-                menuContainer.style.display = "none";
-            } else {
-                // First, close all other open menus
-                document.querySelectorAll('.adminusersMenu').forEach(menu => {
-                    menu.style.display = "none";
-                });
-                
-                // Then open the clicked menu
-                menuContainer.style.display = "block";
+            const isOpen = menuContainer.style.display === "block";
+
+            document.querySelectorAll('.adminusersMenu').forEach(menu => {
+                menu.style.display = "none";
+            });
+
+            if (isOpen) return;
+
+            const rect = element.getBoundingClientRect();
+            const menuWidth = menuContainer.offsetWidth || 190;
+            const menuHeight = menuContainer.offsetHeight || 100;
+
+            let left = rect.right - menuWidth;
+            if (left < 8) left = 8;
+
+            let top = rect.bottom + 6;
+            if (top + menuHeight > window.innerHeight) {
+                top = rect.top - menuHeight - 6;
             }
+
+            menuContainer.style.position = "fixed";
+            menuContainer.style.left = left + "px";
+            menuContainer.style.top = top + "px";
+            menuContainer.style.width = menuWidth + "px";
+            menuContainer.style.height = "auto";
+            menuContainer.style.minHeight = "auto";
+            menuContainer.style.margin = "0";
+            menuContainer.style.display = "block";
+        }
+
+        function closeAdminUserMenus() {
+            document.querySelectorAll('.adminusersMenu').forEach(menu => {
+                menu.style.display = "none";
+            });
         }
 
         // Hide menus when clicking outside
         document.addEventListener('click', function(event) {
-            if (!event.target.closest('.adminusersMenu') && !event.target.matches('img[onclick="openAdminUserMenu(this)"]')) {
-                document.querySelectorAll('.adminusersMenu').forEach(menu => {
-                    menu.style.display = "none";
-                });
+            if (!event.target.closest('.adminusersMenu') && !event.target.closest('[onclick="openAdminUserMenu(this)"]')) {
+                closeAdminUserMenus();
             }
         });
+
+        window.addEventListener('scroll', closeAdminUserMenus, true);
+        window.addEventListener('resize', closeAdminUserMenus);
 
         // Make sure menus are hidden initially
         document.addEventListener('DOMContentLoaded', function() {

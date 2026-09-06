@@ -70,31 +70,28 @@ while ($item = mysqli_fetch_assoc($items_result)) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Order Confirmed</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Order Confirmed</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles/checkout.css">
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../styles/modal.css">
-    <link rel="stylesheet" href="../styles/tabs.css">
-    <link rel="stylesheet" href="../styles/styles.css">
-    <link rel="stylesheet" href="../styles/faq.css" />
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     <main class="bg-[#FEFEFE] relative min-h-screen flex flex-col">
         <section class="w-full bg-[#FFFFFFF] py-1">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="../products/cart.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Cart</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="checkout.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Check Out</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">Order Confirmed</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Order Confirmed</span>
                 </div>
             </div>
         </section>
@@ -103,11 +100,11 @@ while ($item = mysqli_fetch_assoc($items_result)) {
             <!-- Success Message -->
             <div class="w-full rounded-lg border border-green-200 bg-green-50 p-6 text-center">
                 <div class="flex justify-center">
-                    <img src="../assets/global/success.svg" class="w-20 h-20 mb-4" alt="Success" />
+                    <i class="fa-solid fa-circle-check text-[80px] text-[#C2185B] mb-4" alt="Success"></i>
                 </div>
                 <h1 class="text-2xl md:text-3xl font-medium text-gray-800 mb-2">Order Confirmed</h1>
                 <p class="text-gray-600 mb-4">Your order has been placed successfully. A confirmation email has been sent to you.</p>
-                <p class="font-medium text-gray-800">Order ID: <span class="text-[#18237E]"><?php echo htmlspecialchars($order_id); ?></span></p>
+                <p class="font-medium text-gray-800">Order ID: <span class="text-[#C2185B]"><?php echo htmlspecialchars($order_id); ?></span></p>
             </div>
             
             <!-- Order Summary -->
@@ -152,7 +149,7 @@ while ($item = mysqli_fetch_assoc($items_result)) {
                                         <span>Size: <?php echo htmlspecialchars($item['size']); ?></span> |
                                         <span>Qty: <?php echo $item['quantity']; ?></span>
                                     </div>
-                                    <div class="font-medium">₦<?php echo number_format($item['item_total']); ?></div>
+                                    <div class="font-medium">₦<?php echo number_format((float)$item['item_total']); ?></div>
                                 </div>
                             </div>
                             <?php endforeach; ?>
@@ -168,11 +165,11 @@ while ($item = mysqli_fetch_assoc($items_result)) {
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Shipping Fee</span>
-                                <span class="font-medium">₦<?php echo number_format($order['shipping_fee']); ?></span>
+                                <span class="font-medium">₦<?php echo number_format((float)$order['shipping_fee']); ?></span>
                             </div>
                             <div class="flex justify-between pt-2 border-t border-gray-200">
                                 <span class="text-gray-800 font-medium">Total</span>
-                                <span class="font-medium text-lg text-[#18237E]">₦<?php echo number_format($order['order_total']); ?></span>
+                                <span class="font-medium text-lg text-[#C2185B]">₦<?php echo number_format((float)$order['order_total']); ?></span>
                             </div>
                         </div>
                     </div>
@@ -184,7 +181,7 @@ while ($item = mysqli_fetch_assoc($items_result)) {
                 <a href="../products/index.php" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg text-center font-medium hover:bg-gray-300 transition">
                     Continue Shopping
                 </a>
-                <a href="../account/orders.php" class="px-6 py-3 bg-[#1A237E] text-white rounded-lg text-center font-medium hover:bg-[#0c1450] transition">
+                <a href="../account/orders.php" class="px-6 py-3 bg-[#C2185B] text-white rounded-lg text-center font-medium hover:bg-[#0c1450] transition">
                     View Your Orders
                 </a>
             </div>

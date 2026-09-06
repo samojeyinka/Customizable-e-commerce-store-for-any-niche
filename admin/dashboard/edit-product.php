@@ -75,9 +75,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     $warranty = $_POST['warranty'];
     $care = $_POST['care'];
 
+// Regenerate a unique slug from the product name
+    $product_slug = generate_product_slug($product_name, $product_id);
+
     // Update product in database
     $update_product = "UPDATE products SET 
                         product_name = ?, 
+                        product_slug = ?, 
                         category_id = ?, 
                         brand_id = ?, 
                         sku = ?, 
@@ -89,7 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                        WHERE product_id = ?";
 
     $stmt = mysqli_prepare($con, $update_product);
-    mysqli_stmt_bind_param($stmt, "siisssssii", $product_name, $category_id, $brand_id, $sku, $colors, $details, $warranty, $care, $is_featured, $product_id);
+    mysqli_stmt_bind_param($stmt, "ssissssssii", $product_name, $product_slug, $category_id, $brand_id, $sku, $colors, $details, $warranty, $care, $is_featured, $product_id);
 
     if (mysqli_stmt_execute($stmt)) {
         // Process variants
@@ -320,19 +324,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-    <link rel="stylesheet" href="../styles/modal.css">
-    <link rel="stylesheet" href="../styles/dropdown.css" />
-    <link rel="stylesheet" href="../styles/graph.css" />
-    <link rel="stylesheet" href="../styles/dash.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-    <title>Update Product</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Update Product</title>
+    <?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
 
 <title>Update Product</title>
+    <?php include '../tailwind-components.php'; ?>
 </head>
 
 <body>
@@ -343,18 +344,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
             <div class="flex items-center gap-5 md:gap-8 lg:gap-10">
                 <a href="./index.php" class="flex items-center gap-1 md:gap-2">
-                    <img src="../assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-                    <h1 class="hidden md:block text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                    <img src="../assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
                 </a>
 
-                <img onclick="toggleNav()" src="../assets/home/menu.svg" alt="Search" class="w-[28px] cursor-pointer" />
+                <i class="fa-solid fa-bars text-[24px] cursor-pointer" onclick="toggleNav()" alt="Search"></i>
                 <h1 class="hidden md:block  text-[16px] md:text-[20px] font-Onest font-semibold">Products</h1>
             </div>
 
 
             <div class="flex items-center gap-0">
                 <div class="flex items-center gap-2 border-[1px] border-[#F3F3F3] rounded-[25px] p-2">
-                    <img src="../assets/global/search-normal.svg" alt="Search" class="w-[18px]" />
+                    <i class="fa-solid fa-magnifying-glass text-[18px]" alt="Search"></i>
                     <input type="text" placeholder="Search name, Order ID..." class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
                 </div>
 
@@ -362,13 +362,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             <div class="flex items-center gap-6 md:bg-[#F3F3F3] rounded-[4px] py-1 px-4">
 
                 <span class="cursor-pointer relative" onclick="openNotification()">
-                    <img src="../assets/global/bell.svg" class="w-[18px] md:w-[20px]" alt="bag" />
-                    <div class="w-[8px] h-[8px] bg-[#1A237E] rounded-full absolute top-[-.1rem] left-3"></div>
+                    <i class="fa-regular fa-bell text-[20px]" alt="bag"></i>
+                    <div class="w-[8px] h-[8px] bg-[#C2185B] rounded-full absolute top-[-.1rem] left-3"></div>
                 </span>
 
                 <div class="flex items-center gap-2 cursor-pointer">
                     <div class="w-[40px] h-[40px] md:w-[44px] md:h-[44px] rounded-[50%]">
-                        <img src="../assets/home/user.svg" alt="Profile Picture" class="w-full h-full" />
+                        <i class="fa-solid fa-user text-[26px]" alt="Profile Picture"></i>
                     </div>
 
                     <div class="hidden md:block  flex flex-col gap-0">
@@ -390,16 +390,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
     <div id="mySidenav" class="sidenav p-2 hidden md:flex flex-col justify-between gap-2">
         <div class="flex flex-col gap-2">
-            <a href="#" class="nav-link flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/category.svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/category2.svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Overview</span></a>
-            <a href="./products.php" class="nav-link active flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/book (1).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/book.svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Products</span></a>
-            <a href="./orders.php" class="nav-link flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/bag-happy (2).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/bag-happy (1).svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Orders</span></a>
-            <a href="./users.php" class="nav-link flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/profile (2).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/profile (1).svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Users</span></a>
+            <a href="#" class="nav-link flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-layer-group activeicon text-[#FBFBFB]"></i> <i class="fa-solid fa-layer-group nonactiveicon text-[#ADAFCF]"></i><span>Overview</span></a>
+            <a href="./products.php" class="nav-link active flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-box activeicon text-[#FBFBFB] text-[20px]"></i> <i class="fa-solid fa-box nonactiveicon text-[#ADAFCF] text-[20px]"></i><span>Products</span></a>
+            <a href="./orders.php" class="nav-link flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-bag-shopping activeicon text-[#FBFBFB] text-[20px]"></i> <i class="fa-solid fa-bag-shopping nonactiveicon text-[#ADAFCF] text-[20px]"></i><span>Orders</span></a>
+            <a href="./users.php" class="nav-link flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-user activeicon text-[#FBFBFB] text-[20px]"></i> <i class="fa-solid fa-user nonactiveicon text-[#ADAFCF] text-[20px]"></i><span>Users</span></a>
             <a href="./transactions.php" class="nav-link flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/receipt-minus (1).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/receipt-minus.svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Transactions</span></a>
         </div>
 
         <div class="flex flex-col gap-2 mb-7">
-            <a href="./settings.php" class="nav-link flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/setting-2 (1).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/setting-2.svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Settings</span></a>
-            <span class="cursor-pointer logout-text flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/logout.svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/logout.svg" class="nonactiveicon w-[20px] h-[20px]" /><span class="text-[#D93939]">Logout</span></span>
+            <a href="./settings.php" class="nav-link flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-gear activeicon text-[#FBFBFB] text-[20px]"></i> <i class="fa-solid fa-gear nonactiveicon text-[#ADAFCF] text-[20px]"></i><span>Settings</span></a>
+            <span class="cursor-pointer logout-text flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-right-from-bracket activeicon text-[20px] text-[#D93939]"></i> <i class="fa-solid fa-right-from-bracket nonactiveicon text-[20px] text-[#D93939]"></i><span class="text-[#D93939]">Logout</span></span>
         </div>
     </div>
 
@@ -554,8 +554,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                                 @
                                             </button>
                                             <span class="border-l border-gray-300 mx-2"></span>
-                                            <button type="button" data-command="justifyLeft" class="p-1 hover:bg-gray-200 rounded"><img src="../assets/dash/Group 1321314023.svg" class="w-[20px]" /></button>
-                                            <button type="button" data-command="justifyCenter" class="p-1 hover:bg-gray-200 rounded"><img src="../assets/dash/Group 1321314022.svg" class="w-[20px]" /></button>
+                                            <button type="button" data-command="justifyLeft" class="p-1 hover:bg-gray-200 rounded"><i class="fa-solid fa-align-left text-[16px] leading-none"></i></button>
+                                            <button type="button" data-command="justifyCenter" class="p-1 hover:bg-gray-200 rounded"><i class="fa-solid fa-align-center text-[16px] leading-none"></i></button>
                                         </div>
                                     </div>
                                     <div
@@ -852,7 +852,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 <?php endif; ?>
                     <input type="file" name="mainImage" class="hidden" accept=".png,.jpg,.jpeg,.gif">
                     <div class="space-y-2">
-                        <img src="../../assets/global/folder-2.svg" class="w-[30px] h-[30px] mx-auto"/>
+                        <i class="fa-regular fa-folder-open text-[30px] mx-auto"></i>
                         <div class="text-sm text-gray-600">
                             <label class="relative cursor-pointer text-[18px] font-medium text-[#262626]">
                                 <span>Drop your files or click to upload</span>
@@ -894,7 +894,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 <div class="md:w-[70%] otherImagesUpload border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                     <input type="file" name="otherImages[]" class="hidden" accept=".png,.jpg,.jpeg,.gif" multiple>
                     <div class="space-y-2">
-                        <img src="../../assets/global/folder-2.svg" class="w-[30px] h-[30px] mx-auto"/>
+                        <i class="fa-regular fa-folder-open text-[30px] mx-auto"></i>
                         <div class="text-sm text-gray-600">
                             <label class="relative cursor-pointer text-[18px] font-medium text-[#262626]">
                                 <span>Drop your files or click to upload</span>

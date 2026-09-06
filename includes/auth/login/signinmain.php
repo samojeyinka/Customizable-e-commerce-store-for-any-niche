@@ -1,11 +1,7 @@
 <?php
-// Database connection setup
-$servername = "localhost";
-$dbname = "victosah";
-$username = "root";
-$dbpassword = "";
+require_once __DIR__ . '/../../../config/config.php';
 
-$conn = new mysqli($servername, $username, $dbpassword, $dbname);
+$conn = db();
 
 // Login logic
 if(isset($_POST['login'])) {
@@ -139,9 +135,9 @@ if(isset($_POST['login'])) {
     </div>
 </div>
 
- <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-[14px] font-['Open Sans'] text-[#1A237E] font-regular cursor-pointer">Forgot Password</a>
+ <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-[14px] font-['Open Sans'] text-[#C2185B] font-regular cursor-pointer">Forgot Password</a>
 
-        <button type="submit" name="login" class="w-full py-[8px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Sign In</button>
+        <button type="submit" name="login" class="w-full py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Sign In</button>
     </form>
 
     <p class="text-center font-['Open Sans'] text-[17px] md:text-[18px] font-regular text-[#7A7A7A] py-3">

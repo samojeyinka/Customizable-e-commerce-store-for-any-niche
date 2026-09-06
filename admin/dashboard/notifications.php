@@ -155,14 +155,10 @@ if ($type_result) {
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-    <link rel="stylesheet" href="../styles/modal.css">
-    <link rel="stylesheet" href="../styles/dropdown.css" />
-    <link rel="stylesheet" href="../styles/graph.css" />
-    <link rel="stylesheet" href="../styles/dash.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <title>Notifications - Admin Dashboard</title>
+    <?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -175,7 +171,7 @@ if ($type_result) {
                     <div class="flex items-center gap-0">
                         <form action="" method="GET" class="w-full">
                             <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[24px] p-2">
-                                <img src="../assets/dash/search-normal (1).svg" alt="Search" class="w-[18px]" />
+                                <i class="fa-solid fa-magnifying-glass text-[18px]" alt="Search"></i>
                                 <input type="text" name="search" value="<?php echo htmlspecialchars($search_query); ?>" placeholder="Search" class="w-full md:w-[250px] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
                                 <?php if ($current_tab !== 'all'): ?>
                                 <input type="hidden" name="tab" value="<?php echo htmlspecialchars($current_tab); ?>" />
@@ -203,7 +199,7 @@ if ($type_result) {
                                             echo ucfirst($status_filter);
                                             ?>
                                         </span>
-                                        <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                                        <i class="fa-solid fa-chevron-down arrow-down"></i>
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="flex items-center gap-3">
@@ -227,7 +223,7 @@ if ($type_result) {
                                             else echo 'Custom date';
                                             ?>
                                         </span>
-                                        <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                                        <i class="fa-solid fa-chevron-down arrow-down"></i>
                                     </div>
                                     <div class="dropdown-content">
                                         <div class="flex items-center gap-3">
@@ -246,20 +242,20 @@ if ($type_result) {
                         <?php if (!empty($search_query) || $status_filter !== 'all' || $date_filter !== 'all'): ?>
                         <div class="flex items-center gap-1">
                             <a href="?tab=<?php echo $current_tab; ?>" class="flex items-center gap-1 cursor-pointer">
-                                <img src="../assets/dash/Path.svg" />
+                                <i class="fa-solid fa-xmark text-[14px] text-[#262626]"></i>
                                 <span class="text-[#262626] text-[14px] font-Onest font-regular">Clear filter</span>
                             </a>
                         </div>
                         <?php endif; ?>
 
                         <button class="hidden flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
-                            <img src="../assets/dash/send-square.svg" />
+                            <i class="fa-solid fa-download text-[16px]"></i>
                             Export as
                         </button>
 
                         <?php if ($status_filter === 'unread' || $status_filter === 'all'): ?>
                         <a href="?notification_action=read_all" class="hidden flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-800 rounded-lg cursor-pointer">
-                            <img src="../assets/dash/check.svg" class="w-4 h-4" />
+                            <i class="fa-solid fa-check text-[16px]"></i>
                             Mark all as read
                         </a>
                         <?php endif; ?>
@@ -319,7 +315,7 @@ if ($type_result) {
                                                 echo $created_at->format('M d, Y h:i A'); 
                                                 ?>
                                             </span>
-                                            <img src="../assets/user/action.svg" class="cursor-pointer" onclick="openNotimenu(this)" />
+                                            <i class="fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer" onclick="openNotimenu(this)"></i>
                                             <!-- The dropdown menu -->
                                             <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                                                 <div class="flex flex-col gap-3">
@@ -379,12 +375,12 @@ if ($type_result) {
                     <div class="w-full md:w-[fit-content] ml-auto flex items-center justify-between gap-5">
                         <?php if ($page > 1): ?>
                         <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page - 1])); ?>" class="flex items-center gap-2 cursor-pointer">
-                            <img src="../assets/products/prev.svg" class="w-[6px] h-[11px]" />
+                            <i class="fa-solid fa-chevron-left text-[12px]"></i>
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Prev</span>
                         </a>
                         <?php else: ?>
                         <div class="flex items-center gap-2 cursor-not-allowed opacity-50">
-                            <img src="../assets/products/prev.svg" class="w-[6px] h-[11px]" />
+                            <i class="fa-solid fa-chevron-left text-[12px]"></i>
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Prev</span>
                         </div>
                         <?php endif; ?>
@@ -406,7 +402,7 @@ if ($type_result) {
                             // Show page numbers
                             for ($i = $start_page; $i <= $end_page; $i++) {
                                 if ($i == $page) {
-                                    echo '<span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#1A237E]">' . $i . '</span>';
+                                    echo '<span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#C2185B]">' . $i . '</span>';
                                 } else {
                                     echo '<a href="?' . http_build_query(array_merge($_GET, ['page' => $i])) . '" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">' . $i . '</a>';
                                 }
@@ -425,12 +421,12 @@ if ($type_result) {
                         <?php if ($page < $total_pages): ?>
                         <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page + 1])); ?>" class="flex items-center gap-2 cursor-pointer">
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Next</span>
-                            <img src="../assets/products/next.svg" class="w-[6px] h-[11px]" />
+                            <i class="fa-solid fa-chevron-right text-[12px]"></i>
                         </a>
                         <?php else: ?>
                         <div class="flex items-center gap-2 cursor-not-allowed opacity-50">
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Next</span>
-                            <img src="../assets/products/next.svg" class="w-[6px] h-[11px]" />
+                            <i class="fa-solid fa-chevron-right text-[12px]"></i>
                         </div>
                         <?php endif; ?>
                     </div>

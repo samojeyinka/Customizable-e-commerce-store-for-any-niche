@@ -8,7 +8,7 @@ require_once '../../includes/auth/auth.php';
 require_once "../../config/config.php";
 
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }

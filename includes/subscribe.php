@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Turn on error reporting to see all errors
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         try {
             // Create database connection
-            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $dbpassword);
+            $conn = pdo_db();
             
             // Set the PDO error mode to exception
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

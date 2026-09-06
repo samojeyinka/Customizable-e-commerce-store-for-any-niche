@@ -4,19 +4,16 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+require_once "../../config/config.php";
+
 // Include authentication utility
-
-
-
+require_once '../../includes/auth/auth.php';
 
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-
-require_once '../../includes/auth/auth.php';
-require_once "../../config/config.php";
 
 // Get valid columns from orders table
 $available_columns = [];
@@ -73,8 +70,8 @@ if (isset($_GET['date'])) {
 if (!empty($_GET['search'])) {
     $search_query = $_GET['search'];
     $search = $conn->real_escape_string($search_query);
-    // Search by order ID and possibly by customer name if joined with profiles
-    $conditions[] = "(orders.id LIKE '%$search%' OR CONCAT(profiles.first_name, ' ', profiles.last_name) LIKE '%$search%')";
+// Search by order ID and possibly by customer name if joined with profiles
+    $conditions[] = "(orders.id LIKE '%$search%' OR CONCAT(profiles.first_name, ' ', profiles.last_name) LIKE '%$search%' OR users.email LIKE '%$search%')";
 }
 
 // Status filter
@@ -86,22 +83,24 @@ if (!empty($_GET['status'])) {
 // Build WHERE clause
 $where_clause = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $conditions);
 
-// Base SQL query - Include JOIN with profiles
+// Base SQL query - Include JOIN with users and profiles
 $sql = "SELECT 
             orders.id AS order_id,
             orders.order_total AS amount,
             orders.delivery_method,
             orders.order_status,
             orders.$date_column AS order_date,
+            users.email AS customer_email,
             profiles.first_name,
             profiles.last_name
         FROM orders
+        LEFT JOIN users ON orders.user_id = users.id
         LEFT JOIN profiles ON orders.user_id = profiles.user_id
         $where_clause
         ORDER BY orders.$date_column DESC";
 
 // Get total count for pagination with correct JOIN
-$count_sql = "SELECT COUNT(*) AS total FROM orders LEFT JOIN profiles ON orders.user_id = profiles.user_id $where_clause";
+$count_sql = "SELECT COUNT(*) AS total FROM orders LEFT JOIN users ON orders.user_id = users.id LEFT JOIN profiles ON orders.user_id = profiles.user_id $where_clause";
 $count_result = $conn->query($count_sql);
 $total_count = $count_result->fetch_assoc()['total'];
 
@@ -139,13 +138,19 @@ foreach ($orders as &$order) {
         $order['formatted_date'] = 'N/A';
         $order['formatted_time'] = 'N/A';
     }
+
+    // Build a readable customer name with fallbacks
+    $name = trim(($order['first_name'] ?? '') . ' ' . ($order['last_name'] ?? ''));
+    $order['customer_name'] = $name !== ''
+        ? $name
+        : (!empty($order['customer_email']) ? $order['customer_email'] : 'Guest');
 }
 
 // Status classes configuration
 $status_classes = [
     'Confirmed' => 'bg-[#1A7E79]',
     'Processing' => 'bg-[#E8B006]',
-    'Shipped' => 'bg-[#1A237E]',
+    'Shipped' => 'bg-[#C2185B]',
     'Delivered' => 'bg-[#39D959]',
     'Cancelled' => 'bg-red-500',
     'Returned' => 'bg-[#9C27B0]'
@@ -179,20 +184,32 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     header('Content-Type: application/vnd.ms-excel');
     header('Content-Disposition: attachment; filename="orders_export_'.date('Y-m-d').'.xls"');
     
-    // Get all orders without pagination for export
+// Get all orders without pagination for export
     $export_sql = "SELECT 
         orders.id AS order_id,
-        CONCAT(profiles.first_name, ' ', profiles.last_name) AS customer_name,
+        CONCAT(COALESCE(profiles.first_name, ''), ' ', COALESCE(profiles.last_name, '')) AS customer_name,
+        users.email AS customer_email,
         orders.order_total AS amount,
         orders.order_status,
         orders.delivery_method,
         orders.$date_column AS order_date
     FROM orders
+    LEFT JOIN users ON orders.user_id = users.id
     LEFT JOIN profiles ON orders.user_id = profiles.user_id
     $where_clause
     ORDER BY orders.$date_column DESC";
     
     $export_result = $conn->query($export_sql);
+    
+    $exported_orders = [];
+    while ($export_order = $export_result->fetch_assoc()) {
+        $export_name = trim($export_order['customer_name']);
+        if ($export_name === '') {
+            $export_name = !empty($export_order['customer_email']) ? $export_order['customer_email'] : 'Guest';
+        }
+        $export_order['customer_name'] = $export_name;
+        $exported_orders[] = $export_order;
+    }
     
     // Start Excel output
     echo "<table border='1'>";
@@ -205,11 +222,11 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
             <th>Order Date</th>
           </tr>";
     
-    while ($order = $export_result->fetch_assoc()) {
+foreach ($exported_orders as $order) {
         echo "<tr>
                 <td>#".htmlspecialchars($order['order_id'])."</td>
                 <td>".htmlspecialchars($order['customer_name'])."</td>
-                <td>₦".number_format($order['amount'])."</td>
+                <td>₦".number_format((float)$order['amount'])."</td>
                 <td>".htmlspecialchars($order['order_status'])."</td>
                 <td>".htmlspecialchars($order['delivery_method'])."</td>
                 <td>".date('d/m/Y h:ia', strtotime($order['order_date']))."</td>
@@ -232,26 +249,11 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-    <link rel="stylesheet" href="../styles/overlay.css">
-    <link rel="stylesheet" href="../styles/dropdown.css" />
-    <link rel="stylesheet" href="../styles/graph.css" />
-    <link rel="stylesheet" href="../styles/dash.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-    <title>Orders</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Orders</title>
 
-    <style>
-        .adminordersMenu{
-            position: absolute;
-            left: -10rem;
-         min-width: 10rem;
-         min-height: 10rem;
-           height: 100%;
-           z-index: 2;
-        }
-    </style>
-
+<?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 
@@ -266,142 +268,129 @@ include "./sidebar.php"
   
 
 
-    <div id="main" class="md:p-4 flex flex-col gap-3 bg-[#FAFAFA]">
-        <div class="w-full rounded-[16px] bg-white mx-auto p-2">
-            <h1 class="md:hidden  text-[18px] font-Onest font-semibold mb-3 md:mb-0">Orders</h1>
+<?php
+    // Shared page parameter string used by pagination links
+    $page_params = http_build_query(array_filter([
+        'search' => $search_query ?: null,
+        'date' => $date_filter != 'all' ? $date_filter : null,
+        'start_date' => ($date_filter == 'custom' && isset($_GET['start_date'])) ? $_GET['start_date'] : null,
+        'end_date' => ($date_filter == 'custom' && isset($_GET['end_date'])) ? $_GET['end_date'] : null,
+    ]));
+    $page_link = function($page) use ($page_params) {
+        return '?page=' . (int)$page . ($page_params !== '' ? '&' . $page_params : '');
+    };
+    ?>
 
-            <div id="openOrdersModal" class="w-full md:w-[274px] border-[1px] border-[#F3F3F3] cursor-pointer rounded-[8px] p-2 flex justify-between items-center">
-                <h1 class="text-[16px] font-Onest font-regular">Orders Overview</h1>
-                <img src="../assets/dash/Vector 6905.svg" />
+    <div id="main" class="md:p-4 flex flex-col gap-4 bg-[#FAFAFA]">
+
+        <!-- Page heading -->
+        <div class="px-1 md:px-2 mt-2 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+                <h1 class="text-[22px] md:text-[26px] font-Onest font-bold text-[#111827]">Orders</h1>
+                <p class="text-[14px] font-['Open Sans'] text-gray-500 mt-1">Manage and track all customer orders</p>
             </div>
+            <button id="openOrdersModal" class="w-fit md:w-auto flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-[14px] font-medium text-[#262626] hover:bg-gray-50 cursor-pointer transition-colors shrink-0">
+                <i class="fa-solid fa-chart-pie text-[14px] text-[#C2185B]"></i>
+                Orders Overview
+            </button>
         </div>
 
+        <!-- Toolbar + table card -->
+        <div class="w-full rounded-xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-gray-100 mx-auto overflow-hidden">
+            <div id="myBtn" class="w-full p-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-4 justify-between border-b border-gray-100">
+                <form action="" method="GET" class="w-full md:max-w-[340px]">
+                    <div class="w-full flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus-within:border-[#C2185B] focus-within:ring-2 focus-within:ring-[#C2185B]/10 transition-all">
+                        <i class="fa-solid fa-magnifying-glass text-[15px] text-gray-400" alt="Search"></i>
+                        <input type="text" name="search" placeholder="Search order ID or customer..." value="<?php echo htmlspecialchars($search_query); ?>" class="w-full text-[14px] font-['Open Sans'] bg-transparent border-none outline-none placeholder:text-gray-400" />
+                        <?php if($date_filter != 'all'): ?>
+                            <input type="hidden" name="date" value="<?php echo htmlspecialchars($date_filter); ?>">
+                        <?php endif; ?>
+                    </div>
+                </form>
 
-
-     
-        <div class="w-full rounded-[16px] bg-white mx-auto p-3">
-            <div id="myBtn" class="w-full flex flex-col md:flex-row md:items-center gap-3 md:gap-5 justify-between">
-                <div class="flex items-center gap-0">
-                    <form action="" method="GET" class="w-full flex">
-                        <div class="w-full flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[24px] p-2">
-                            <img src="../assets/dash/search-normal (1).svg" alt="Search" class="w-[18px]" />
-                            <input type="text" name="search" placeholder="Search" value="<?php echo htmlspecialchars($search_query); ?>" class="w-full md:w-[250px] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
-                            <!-- Preserve date filter when searching -->
-                            <?php if($date_filter != 'all'): ?>
-                                <input type="hidden" name="date" value="<?php echo htmlspecialchars($date_filter); ?>">
-                                <?php if($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])): ?>
-                                    <input type="hidden" name="start_date" value="<?php echo htmlspecialchars($_GET['start_date']); ?>">
-                                    <input type="hidden" name="end_date" value="<?php echo htmlspecialchars($_GET['end_date']); ?>">
-                                <?php endif; ?>
-                            <?php endif; ?>
-                        </div>
+                <div class="flex items-center gap-3 flex-wrap">
+                    <form action="" method="GET" class="flex items-center gap-2">
+                        <?php if(!empty($search_query)): ?>
+                        <input type="hidden" name="search" value="<?php echo htmlspecialchars($search_query); ?>">
+                        <?php endif; ?>
+                        <select name="date" id="dateFilter" onchange="this.form.submit()" class="rounded-lg border border-gray-200 bg-white py-2 px-3 text-[14px] font-['Open Sans'] text-[#262626] focus:ring-2 focus:ring-[#C2185B]/10 focus:border-[#C2185B] focus:outline-none">
+                            <option value="all" <?php echo $date_filter == 'all' ? 'selected' : ''; ?>>All time</option>
+                            <option value="today" <?php echo $date_filter == 'today' ? 'selected' : ''; ?>>Today</option>
+                            <option value="last7days" <?php echo $date_filter == 'last7days' ? 'selected' : ''; ?>>Last 7 days</option>
+                            <option value="last28days" <?php echo $date_filter == 'last28days' ? 'selected' : ''; ?>>Last 28 days</option>
+                        </select>
                     </form>
-                </div>
 
-                <div class="w-full flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <span class="text-[#2c2c2c] text-[14px] md:text-[16px] font-Onest font-medium">Filer by:</span>
-                        <img src="../assets/dash/filter-horizontal.svg" class="md:hidden" />
+                    <?php if ($date_filter != 'all' || !empty($search_query)): ?>
+                    <a href="?date=all" class="flex items-center gap-1 text-[14px] font-medium text-gray-500 hover:text-[#D93939] transition-colors">
+                        <i class="fa-solid fa-xmark text-[13px]"></i>
+                        Clear filter
+                    </a>
+                    <?php endif; ?>
 
-                        <div class="hidden md:flex items-center gap-2 md:gap-3 lg:gap-4">
-                           <!-- Replace custom dropdown with standard select -->
-                           <div class="flex items-center gap-2">
-                               <form id="dateFilterForm" action="" method="GET" class="flex items-center">
-                                   <!-- Preserve search parameter if it exists -->
-                                   <?php if(!empty($search_query)): ?>
-                                   <input type="hidden" name="search" value="<?php echo htmlspecialchars($search_query); ?>">
-                                   <?php endif; ?>
-                                   
-                                   <select name="date" id="dateFilter" onchange="this.form.submit()" class="md:min-w-[120px] rounded-[4px] border-[1px] border-[#C5C5C5] py-1 px-2 text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular focus:outline-none">
-                                       <option value="all" <?php echo $date_filter == 'all' ? 'selected' : ''; ?>>All time</option>
-                                       <option value="today" <?php echo $date_filter == 'today' ? 'selected' : ''; ?>>Today</option>
-                                       <option value="last7days" <?php echo $date_filter == 'last7days' ? 'selected' : ''; ?>>Last 7 days</option>
-                                       <option value="last28days" <?php echo $date_filter == 'last28days' ? 'selected' : ''; ?>>Last 28 days</option>
-                        
-                                   </select>
-                               </form>
-                               
-                             
-                           </div>
-                        </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-1 shrink-0">
-                    <img src="../assets/dash/Path.svg" />
-                        <a href="?date=all">
-                            <span class="text-[#262626] text-[14px] font-Onest font-regular">Clear filter</span>
-                        </a>
-                    </div>
-
-                    <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer shrink-0">
-    <img src="../assets/dash/send-square.svg" />
-    Export
-</button>
+                    <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-[#111827] hover:bg-[#1F2937] text-white text-[14px] font-medium rounded-lg cursor-pointer transition-colors shrink-0">
+                        <i class="fa-solid fa-download text-[14px]"></i>
+                        Export
+                    </button>
                 </div>
             </div>
 
             
-            <div class="overflow-x-auto mt-3 h-[33rem]">
-                <table cols="" class="w-full shrink-0">
-                    <thead class="w-full bg-[#E7E7E7] text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
-                        <th class="text-nowrap p-2 flex items-center gap-2">
-                            <input type="checkbox" />
-                            <span class="text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Order ID</span>
-                        </th>
-                        <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Customer Name</th>
-                        <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Amount</th>
-                        <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Status</th>
-                        <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Mode of Order</th>
-                        <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Date</th>
-                        <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">
-                            <img src="../assets/dash/column.svg" class="min-w-[24px] min-h-[24px]" />
-                        </th>
+<div class="overflow-x-auto">
+                <table class="w-full min-w-[760px]">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="text-left px-4 py-3 text-[12px] font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Order ID</th>
+                            <th class="text-left px-4 py-3 text-[12px] font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Customer</th>
+                            <th class="text-left px-4 py-3 text-[12px] font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Amount</th>
+                            <th class="text-left px-4 py-3 text-[12px] font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Status</th>
+                            <th class="text-left px-4 py-3 text-[12px] font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Mode of Order</th>
+                            <th class="text-left px-4 py-3 text-[12px] font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Date</th>
+                            <th class="text-right px-4 py-3"></th>
+                        </tr>
                     </thead>
 
                     <tbody>
                         <?php if (empty($orders)): ?>
                             <tr>
-                                <td colspan="7" class="text-center py-4">No orders found</td>
+                                <td colspan="7" class="text-center py-10 text-gray-400 font-['Open Sans'] text-[14px]">No orders found</td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($orders as $order): ?>
-                                <tr>
-                                    <td class="flex items-center gap-[10px] p-3">
-                                        <input type="checkbox" class="border-[#E1E1E1]" />
-                                        <span class="text-[#262626] text-[13px] md:text-[14px] font-regular font-['Open Sans']">#<?php echo htmlspecialchars($order['order_id']); ?></span>
+                                <tr class="border-b border-gray-50 hover:bg-[#FBF5F8] transition-colors">
+                                    <td class="px-4 py-4 whitespace-nowrap">
+                                        <span class="text-[14px] font-semibold font-['Open Sans'] text-[#262626]">#<?php echo htmlspecialchars($order['order_id']); ?></span>
                                     </td>
-                                    <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">
-                                    <?php 
-                                    $firstName = $order['first_name'] ?? '';
-                                    $lastName = $order['last_name'] ?? '';
-                                    echo htmlspecialchars(trim("$firstName $lastName")); 
-                                    ?>
+                                    <td class="px-4 py-4 whitespace-nowrap">
+                                        <span class="text-[14px] font-['Open Sans'] text-[#262626]"><?php echo htmlspecialchars($order['customer_name']); ?></span>
+                                        <?php if (!empty($order['customer_email']) && $order['customer_email'] !== $order['customer_name']): ?>
+                                            <span class="text-[12px] text-gray-400 font-['Open Sans'] block"><?php echo htmlspecialchars($order['customer_email']); ?></span>
+                                        <?php endif; ?>
                                     </td>
-                                    <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">₦<?php echo number_format($order['amount'] ?? 0); ?></td>
-                                    <td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-[14px] font-semibold font-['Open Sans'] text-[#262626]">₦<?php echo number_format($order['amount'] ?? 0); ?></td>
+                                    <td class="px-4 py-4 whitespace-nowrap">
                                         <?php
                                         $status = $order['order_status'] ?? 'Processing';
                                         $status_class = $status_classes[$status] ?? 'bg-[#E8B006]';
                                         ?>
-                                        <button type="submit" class="py-1 px-4 <?php echo $status_class; ?> text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px]"><?php echo htmlspecialchars($status); ?></button>
+                                        <span class="inline-flex px-3 py-1 <?php echo $status_class; ?> text-white text-[12px] font-medium font-['Open Sans'] rounded-full"><?php echo htmlspecialchars($status); ?></span>
                                     </td>
-                                    <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo htmlspecialchars($order['delivery_method'] ?? 'Express Delivery'); ?></td>
-                                    <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo htmlspecialchars($order['formatted_date'] . ' ' . $order['formatted_time']); ?></td>
-                                    <td class="relative">
-                                        <img src="../assets/user/action.svg" class="w-[20px] cursor-pointer" onclick="openAdminOrderMenu(this)" />
+                                    <td class="px-4 py-4 whitespace-nowrap text-[14px] font-['Open Sans'] text-[#262626]"><?php echo htmlspecialchars(ucfirst($order['delivery_method'] ?? 'Express')); ?></td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-[14px] font-['Open Sans'] text-gray-500"><?php echo htmlspecialchars($order['formatted_date'] . ' ' . $order['formatted_time']); ?></td>
+                                    <td class="px-4 py-4 text-right relative">
+                                        <i class="fa-solid fa-ellipsis-vertical text-[17px] text-gray-400 cursor-pointer hover:text-[#262626]" onclick="openAdminOrderMenu(this)"></i>
 
                                         <!-- The menu for each order  starts ---->
-                                        <div class="adminordersMenu h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-    <div class="flex flex-col gap-3">
-        <a href="./order-details.php?id=<?php echo $order['order_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-        <a href="./order-details.php?id=<?php echo $order['order_id']; ?>&tab=update-status" class="text-[16px] font-medium text-[#262626]">Update Order Status</a>
+                                        <div class="adminordersMenu bg-white border border-gray-100 shadow-lg rounded-lg p-2">
+                                            <div class="flex flex-col gap-1">
+                                                <a href="./order-details.php?id=<?php echo $order['order_id']; ?>" class="px-3 py-2 text-[14px] font-medium text-[#262626] rounded-md hover:bg-gray-50">View Details</a>
+                                                <a href="./order-details.php?id=<?php echo $order['order_id']; ?>&tab=update-status" class="px-3 py-2 text-[14px] font-medium text-[#262626] rounded-md hover:bg-gray-50">Update Order Status</a>
 
-        <a href="./order-details.php?id=<?php echo $order['order_id']; ?>&tab=update-status" class="text-[16px] font-medium text-[#D93939]">Cancel Order</a>
-    </div>
-</div>
+                                                <a href="./order-details.php?id=<?php echo $order['order_id']; ?>&tab=update-status" class="px-3 py-2 text-[14px] font-medium text-[#D93939] rounded-md hover:bg-red-50">Cancel Order</a>
+                                            </div>
+                                        </div>
 
-  <!-- The menu for each order  ends ---->
+                                        <!-- The menu for each order  ends ---->
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -410,67 +399,57 @@ include "./sidebar.php"
                 </table>
             </div>
 
-            <div class="w-[90%] md:w-full py-2 mx-auto flex flex-col gap-2 md:flex-row md:items-center justify-between">
-            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">Showing <?php echo count($orders); ?> results from <?php echo $total_count; ?></span>
-            <div class="w-full md:w-[fit-content] ml-auto flex items-center justify-between gap-5">
-                <div class="flex items-center gap-2 cursor-pointer">
-                    <?php if ($current_page > 1): ?>
-                        <a href="?page=<?php echo $current_page - 1; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo ($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])) ? '&start_date=' . urlencode($_GET['start_date']) . '&end_date=' . urlencode($_GET['end_date']) : ''; ?>">
-                            <img src="../assets/products/prev.svg" class="w-[6px] h-[11px]" />
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Prev</span>
-                        </a>
-                    <?php else: ?>
-                        <img src="../assets/products/prev.svg" class="w-[6px] h-[11px] opacity-50" />
-                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular opacity-50">Prev</span>
-                    <?php endif; ?>
-                </div>
+<?php if ($total_pages > 1): ?>
+            <div class="w-full px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 border-t border-gray-100">
+                <span class="text-[13px] text-gray-500 font-['Open Sans']">Showing <?php echo count($orders); ?> of <?php echo $total_count; ?> orders</span>
+                <div class="flex items-center gap-1">
 
-                <div class="w-full flex items-center justify-between md:gap-6">
-                    <?php
-                    $start_page = max(1, min($current_page - 2, $total_pages - 4));
-                    $end_page = min($total_pages, max($current_page + 2, 5));
-                    
-                    for ($i = $start_page; $i <= $end_page; $i++):
-                    ?>
-                        <?php if ($i == $current_page): ?>
-                            <span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#1A237E]"><?php echo $i; ?></span>
+                    <div class="flex items-center gap-1">
+                        <?php if ($current_page > 1): ?>
+                            <a href="<?php echo $page_link($current_page - 1); ?>" class="px-3 py-1.5 text-[13px] font-['Open Sans'] text-gray-600 rounded-lg hover:bg-gray-100 flex items-center gap-1"><i class="fa-solid fa-chevron-left text-[11px]"></i> Prev</a>
                         <?php else: ?>
-                            <a href="?page=<?php echo $i; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo ($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])) ? '&start_date=' . urlencode($_GET['start_date']) . '&end_date=' . urlencode($_GET['end_date']) : ''; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer"><?php echo $i; ?></a>
+                            <span class="px-3 py-1.5 text-[13px] font-['Open Sans'] text-gray-300 flex items-center gap-1"><i class="fa-solid fa-chevron-left text-[11px]"></i> Prev</span>
                         <?php endif; ?>
-                    <?php endfor; ?>
-                    
-                    <?php if ($end_page < $total_pages): ?>
-                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">...</span>
-                        <a href="?page=<?php echo $total_pages; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo ($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])) ? '&start_date=' . urlencode($_GET['start_date']) . '&end_date=' . urlencode($_GET['end_date']) : ''; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer"><?php echo $total_pages; ?></a>
-                    <?php endif; ?>
-                </div>
+                    </div>
 
-                <div class="flex items-center gap-2 cursor-pointer shrink-0">
-                    <?php if ($current_page < $total_pages): ?>
-                        <a href="?page=<?php echo $current_page + 1; ?><?php echo !empty($search_query) ? '&search=' . urlencode($search_query) : ''; ?><?php echo $date_filter != 'all' ? '&date=' . urlencode($date_filter) : ''; ?><?php echo ($date_filter == 'custom' && isset($_GET['start_date']) && isset($_GET['end_date'])) ? '&start_date=' . urlencode($_GET['start_date']) . '&end_date=' . urlencode($_GET['end_date']) : ''; ?>" class="shrink-0 text-nowrap">
-                            <img src="../assets/products/next.svg" class="w-[6px] h-[11px]" />
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Next</span>
-                        </a>
-                    <?php else: ?>
-                        
-                        <img src="../assets/products/next.svg" class="w-[6px] h-[11px] opacity-50 " />
-                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular opacity-50">Next</span>
-                    <?php endif; ?>
+                    <div class="flex items-center gap-1">
+                        <?php
+                        $start_page = max(1, min($current_page - 2, $total_pages - 4));
+                        $end_page = min($total_pages, max($current_page + 2, 5));
+                        for ($i = $start_page; $i <= $end_page; $i++):
+                        ?>
+                            <?php if ($i == $current_page): ?>
+                                <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#C2185B] text-white text-[13px] font-medium"><?php echo $i; ?></span>
+                            <?php else: ?>
+                                <a href="<?php echo $page_link($i); ?>" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-['Open Sans'] text-gray-600 hover:bg-gray-100"><?php echo $i; ?></a>
+                            <?php endif; ?>
+                        <?php endfor; ?>
+
+                        <?php if ($end_page < $total_pages): ?>
+                            <span class="px-1 text-gray-400 font-['Open Sans']">...</span>
+                            <a href="<?php echo $page_link($total_pages); ?>" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-['Open Sans'] text-gray-600 hover:bg-gray-100"><?php echo $total_pages; ?></a>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="flex items-center gap-1">
+                        <?php if ($current_page < $total_pages): ?>
+                            <a href="<?php echo $page_link($current_page + 1); ?>" class="px-3 py-1.5 text-[13px] font-['Open Sans'] text-gray-600 rounded-lg hover:bg-gray-100 flex items-center gap-1">Next <i class="fa-solid fa-chevron-right text-[11px]"></i></a>
+                        <?php else: ?>
+                            <span class="px-3 py-1.5 text-[13px] font-['Open Sans'] text-gray-300 flex items-center gap-1">Next <i class="fa-solid fa-chevron-right text-[11px]"></i></span>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
+            <?php endif; ?>
         </div>
-     
     </div>
-    </div>
-
-
 
     <!-- The modals starts -->
     <div id="ordersModal" class="modal reg">
     <!-- Modal content -->
     <div class="modal-content overflow-hidden p-4">
         <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Order Overview</h1>
-        <img src="../assets/global/close-circle.svg" alt="close" id="closeOrdersModal" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+        <i class="fa-solid fa-xmark text-[24px] cursor-pointer absolute top-4 right-4" id="closeOrdersModal" alt="close"></i>
 
         <div class="grid grid-cols-1 md:grid-cols-2 p-2 gap-4 mt-2">
             <!-- Total Orders Card -->
@@ -481,10 +460,10 @@ include "./sidebar.php"
                 <div class="flex flex-col gap-[1px]">
                     <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Orders</span>
                     <div class="flex items-center gap-2">
-                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($order_stats['total_orders']); ?></h2>
+                        <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((float)$order_stats['total_orders']); ?></h2>
                     </div>
                     <div class="flex items-center gap-1">
-                        <img src="../assets/dash/<?php echo $total_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <i class="fa-solid <?php echo $total_change >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                         <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                             <span class="text-<?php echo $total_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                 <?php echo abs($total_percentage); ?>%
@@ -502,10 +481,10 @@ include "./sidebar.php"
                 <div class="flex flex-col gap-[1px]">
                     <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Completed Orders</span>
                     <div class="flex items-center gap-2">
-                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($order_stats['completed_orders']); ?></h2>
+                        <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((float)$order_stats['completed_orders']); ?></h2>
                     </div>
                     <div class="flex items-center gap-1">
-                        <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
+                        <i class="fa-solid fa-arrow-trend-up text-[20px]"></i>
                         <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                             <span class="text-[#39D959]">+12%</span> from last 28 days
                         </p>
@@ -521,10 +500,10 @@ include "./sidebar.php"
                 <div class="flex flex-col gap-[1px]">
                     <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Pending Orders</span>
                     <div class="flex items-center gap-2">
-                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($order_stats['pending_orders']); ?></h2>
+                        <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((float)$order_stats['pending_orders']); ?></h2>
                     </div>
                     <div class="flex items-center gap-1">
-                        <img src="../assets/dash/decrease.svg" class="w-[20px] h-[20px]" />
+                        <i class="fa-solid fa-arrow-trend-down text-[20px]"></i>
                         <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                             <span class="text-[#D93939]">+12%</span> from last 28 days
                         </p>
@@ -540,10 +519,10 @@ include "./sidebar.php"
                 <div class="flex flex-col gap-[1px]">
                     <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Returned Orders</span>
                     <div class="flex items-center gap-2">
-                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($order_stats['returned_orders']); ?></h2>
+                        <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((float)$order_stats['returned_orders']); ?></h2>
                     </div>
                     <div class="flex items-center gap-1">
-                        <img src="../assets/dash/increase.svg" class="w-[20px] h-[20px]" />
+                        <i class="fa-solid fa-arrow-trend-up text-[20px]"></i>
                         <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                             <span class="text-[#39D959]">+12%</span> from last 28 days
                         </p>
@@ -569,33 +548,54 @@ include "./sidebar.php"
     <script type="text/javascript" src="../functions/nav.js"></script>
 
 <script>
-    function openAdminOrderMenu(element) {
-    // Find the closest parent td and then find the menu inside it
+function openAdminOrderMenu(element) {
   const menuContainer = element.closest('td').querySelector('.adminordersMenu');
-    
-    // Toggle the display of the menu
-    if (menuContainer.style.display === "block") {
-        menuContainer.style.display = "none";
-    } else {
-        // First, close all other open menus
-        document.querySelectorAll('.adminordersMenu').forEach(menu => {
-            menu.style.display = "none";
-        });
-        
-        // Then open the clicked menu
-        menuContainer.style.display = "block";
-    }
+  const isOpen = menuContainer.style.display === "block";
+
+  document.querySelectorAll('.adminordersMenu').forEach(menu => {
+      menu.style.display = "none";
+  });
+
+  if (isOpen) return;
+
+  const rect = element.getBoundingClientRect();
+  const menuWidth = menuContainer.offsetWidth || 190;
+  const menuHeight = menuContainer.offsetHeight || 100;
+
+  let left = rect.right - menuWidth;
+  if (left < 8) left = 8;
+
+  let top = rect.bottom + 6;
+  if (top + menuHeight > window.innerHeight) {
+      top = rect.top - menuHeight - 6;
+  }
+
+  menuContainer.style.position = "fixed";
+  menuContainer.style.left = left + "px";
+  menuContainer.style.top = top + "px";
+  menuContainer.style.width = menuWidth + "px";
+  menuContainer.style.height = "auto";
+  menuContainer.style.minHeight = "auto";
+  menuContainer.style.margin = "0";
+  menuContainer.style.display = "block";
+}
+
+function closeAdminOrderMenus() {
+    document.querySelectorAll('.adminordersMenu').forEach(menu => {
+        menu.style.display = "none";
+    });
 }
 
 // Add this to hide menus when clicking outside
 document.addEventListener('click', function(event) {
     // Check if the click was outside any menu or menu trigger
-    if (!event.target.closest('.adminordersMenu') && !event.target.matches('img[onclick="openAdminOrderMenu(this)"]')) {
-        document.querySelectorAll('.adminordersMenu').forEach(menu => {
-            menu.style.display = "none";
-        });
+    if (!event.target.closest('.adminordersMenu') && !event.target.closest('[onclick="openAdminOrderMenu(this)"]')) {
+        closeAdminOrderMenus();
     }
 });
+
+window.addEventListener('scroll', closeAdminOrderMenus, true);
+window.addEventListener('resize', closeAdminOrderMenus);
 
 // Make sure menus are hidden initially
 document.addEventListener('DOMContentLoaded', function() {

@@ -21,8 +21,9 @@ $user_id = $user['id'];
 $query = "
     SELECT 
         f.favorite_id,
-        p.product_id,
+p.product_id,
         p.product_name,
+        p.product_slug,
         p.is_featured,
         p.colors,
         c.category_title,
@@ -49,9 +50,9 @@ $query = "
     WHERE 
         f.user_id = ?
     GROUP BY 
-        f.favorite_id, p.product_id, p.product_name, p.is_featured, p.colors, c.category_title, b.brand_title, i.image_path
+        f.favorite_id, p.product_id, p.product_name, p.product_slug, p.is_featured, p.colors, c.category_title, b.brand_title, i.image_path
     ORDER BY 
-        f.date_added DESC
+        f.created_at DESC
 ";
 
 $stmt = mysqli_prepare($con, $query);
@@ -91,18 +92,16 @@ require_once "../includes/auth/google.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Favourites</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Favourites</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/styles.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -124,18 +123,18 @@ require_once "../includes/auth/google.php";
 
 
         <section class="w-full bg-[#FFFFFFF] py-1">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">My Favourites</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">My Favourites</span>
                 </div>
             </div>
         </section>
 
         <?php if (mysqli_num_rows($result) > 0): ?>
         <div class="w-full bg-[#FFFFFF] py-5">
-            <div class="w-[90%] mx-auto hidden md:block">
+            <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block">
 
 
                 <table cols="" class="w-full">
@@ -154,7 +153,7 @@ require_once "../includes/auth/google.php";
                             <td class="py-3 flex gap-2">
 
                                 <div class="w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden">
-                                <a href="./show.php?id=<?php echo $product['product_id']; ?>">
+                                <a href="<?php echo product_url($product); ?>">
                                     <img src="<?php echo !empty($product['main_image']) ? DOMAIN . '/assets/products/' . $product['main_image'] : DOMAIN . '/assets/products/default.svg'; ?>" 
                                         class="w-full h-[280px] object-cover" 
                                         alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
@@ -185,14 +184,14 @@ require_once "../includes/auth/google.php";
                             <div>
                                             <?php if (!empty($product['min_discount_price'])): ?>
                                                 <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">
-                                                    ₦<?php echo number_format($product['min_discount_price']); ?>
+                                                    ₦<?php echo number_format((float)$product['min_discount_price']); ?>
                                                 </span>
                                                 <span class="text-gray-500 text-xs line-through ml-1">
-                                                    ₦<?php echo number_format($product['min_price']); ?>
+                                                    ₦<?php echo number_format((float)$product['min_price']); ?>
                                                 </span>
                                             <?php else: ?>
                                                 <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">
-                                                    ₦<?php echo number_format($product['min_price']); ?>
+                                                    ₦<?php echo number_format((float)$product['min_price']); ?>
                                                 </span>
                                             <?php endif; ?>
                                         </div>
@@ -213,7 +212,7 @@ require_once "../includes/auth/google.php";
 
                                 <?php if (array_key_exists($product['product_id'], $cart_items)): ?>
                                         <button 
-                                            class="cart-toggle-button py-1 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]"
+                                            class="cart-toggle-button py-1 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]"
                                             data-product-id="<?php echo $product['product_id']; ?>"
                                             data-cart-id="<?php echo $cart_items[$product['product_id']]; ?>"
                                             data-in-cart="true">
@@ -221,7 +220,7 @@ require_once "../includes/auth/google.php";
                                         </button>
                                     <?php else: ?>
                                         <button 
-                                                                                       class="cart-toggle-button py-1 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]"
+                                                                                       class="cart-toggle-button py-1 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]"
                                             data-product-id="<?php echo $product['product_id']; ?>"
                                             data-in-cart="false">
                                             Add to Cart
@@ -253,7 +252,7 @@ require_once "../includes/auth/google.php";
 
 
 
-            <div class="w-[90%] mx-auto  md:hidden">
+            <div class="w-[90%] mx-auto max-w-[1440px]  md:hidden">
                 <div class="w-full flex flex-col gap-4">
 
                     <div class="border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2">
@@ -275,7 +274,7 @@ require_once "../includes/auth/google.php";
                                         <img src="../assets/products/img1.svg" class="w-full h-full object-cover" />
                                     </div>
                                     <div class="flex flex-col gap-[2px]">
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Bounce Pillow</p>
+                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Dewy Glow Serum</p>
                                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> Blue</p>
                                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> King size (6 a 4 in)</p>
                                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Quantity:</b>1</p>
@@ -283,7 +282,7 @@ require_once "../includes/auth/google.php";
 
                                 </div>
 
-                                <button type="submit" class="w-[fit-content] rounded-[4px] py-1 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointerprounded-[8px]">Add to Cart</button>
+                                <button type="submit" class="w-[fit-content] rounded-[4px] py-1 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointerprounded-[8px]">Add to Cart</button>
                             </div>
 
                             <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
@@ -312,7 +311,7 @@ require_once "../includes/auth/google.php";
                                         <img src="../assets/products/img1.svg" class="w-full h-full object-cover" />
                                     </div>
                                     <div class="flex flex-col gap-[2px]">
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Bounce Pillow</p>
+                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Dewy Glow Serum</p>
                                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> Blue</p>
                                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> King size (6 a 4 in)</p>
                                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Quantity:</b>1</p>
@@ -320,7 +319,7 @@ require_once "../includes/auth/google.php";
 
                                 </div>
 
-                                <button type="submit" class="w-[fit-content] rounded-[4px] py-1 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointerprounded-[8px]">Add to Cart</button>
+                                <button type="submit" class="w-[fit-content] rounded-[4px] py-1 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointerprounded-[8px]">Add to Cart</button>
                             </div>
 
                             <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
@@ -335,7 +334,7 @@ require_once "../includes/auth/google.php";
         </div>
         <?php else: ?> 
                 <div class="text-center py-16">
-                    <img class="mx-auto" src="../assets/global/love.svg" alt="No favorite"/>
+                    <i class="fa-regular fa-heart text-[80px] text-[#D8C4CE] mx-auto leading-none" alt="No favorite"></i>
                     <h3 class="mt-2 md:text-[20px]  font-medium text-gray-900 font-[Open Sans]">You have not add any item to favorite</h3>
            
                    
@@ -404,117 +403,6 @@ include(__DIR__ . '/../includes/footer.php');
             });
         });
         
-        // Add to cart functionality
-        const cartToggleButtons = document.querySelectorAll('.cart-toggle-button');
-        const cartToast = document.getElementById('cart-toast');
-        const cartCountElement = document.getElementById('cart-count');
-        const cartBadge = document.getElementById('cart-badge');
-        
-        cartToggleButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const productId = this.getAttribute('data-product-id');
-                const isInCart = this.getAttribute('data-in-cart') === 'true';
-                
-                if (isInCart) {
-                    // Remove from cart
-                    const cartId = this.getAttribute('data-cart-id');
-                    
-                    fetch('./remove-from-cart.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'cart_id=' + encodeURIComponent(cartId)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Update button appearance
-                            this.classList.remove('bg-[#E1F5E6]', 'border-[#4CAF50]');
-                            this.classList.add('bg-[#1A237E]', 'text-white');
-                            this.textContent = 'Add to Cart';
-                            this.setAttribute('data-in-cart', 'false');
-                            this.setAttribute('data-cart-id', '');
-                            
-                            // Update cart count
-                            if (cartCountElement) {
-                                cartCountElement.textContent = data.cart_count;
-                                
-                                if (data.cart_count <= 0) {
-                                    cartBadge.classList.add('hidden');
-                                }
-                            }
-                            
-                            // Show toast notification
-                            cartToast.innerHTML = 'Item removed from your cart!';
-                            cartToast.classList.remove('hidden', 'bg-green-600');
-                            cartToast.classList.add('bg-orange-500');
-                            
-                            setTimeout(() => {
-                                cartToast.classList.add('hidden');
-                                cartToast.classList.remove('bg-orange-500');
-                                cartToast.innerHTML = 'Item added to your cart!';
-                            }, 3000);
-                        } else {
-                            alert(data.message || 'Error removing item from cart');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                    });
-                } else {
-                    // Add to cart
-                    const formData = new FormData();
-                    formData.append('product_id', productId);
-                    formData.append('quantity', 1);
-                    
-                    fetch('./add-to-cart.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Update button appearance
-                            this.classList.remove('bg-[#1A237E]', 'text-white');
-                            this.classList.add('bg-[#1A237E]','text-white');
-                            this.textContent = 'Added to Cart';
-                            this.setAttribute('data-in-cart', 'true');
-                            
-                            if (data.cart_id) {
-                                this.setAttribute('data-cart-id', data.cart_id);
-                            }
-                            
-                            // Update cart count
-                            if (cartCountElement) {
-                                cartCountElement.textContent = data.cart_count;
-                                cartBadge.classList.remove('hidden');
-                            }
-                            
-                            // Show toast notification
-                            cartToast.classList.remove('hidden', 'bg-orange-500');
-                            cartToast.classList.add('bg-green-600');
-                            
-                            setTimeout(() => {
-                                cartToast.classList.add('hidden');
-                            }, 3000);
-                        } else {
-                            if (data.redirect) {
-                                window.location.href = data.redirect;
-                            } else {
-                                alert(data.message || 'Error adding item to cart');
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                    });
-                }
-            });
-        });
-    });
     </script>
 
     <script src="<?php echo DOMAIN; ?>/functions/modals.js"></script>

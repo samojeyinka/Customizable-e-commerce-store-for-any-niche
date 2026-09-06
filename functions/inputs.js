@@ -5,6 +5,7 @@ const indicators = document.querySelectorAll(".indicators div");
 const carouselInner = document.querySelector(".carousel-inner");
 
 function updateCarousel() {
+    if (!carouselInner) return;
     carouselInner.style.transform = `translateX(-${index * 100}vw)`;
     indicators.forEach((dot, i) => dot.classList.toggle("active", i === index));
 }
@@ -19,14 +20,19 @@ function prevSlide() {
     updateCarousel();
 }
 
-document.getElementById("next").addEventListener("click", nextSlide);
-document.getElementById("prev").addEventListener("click", prevSlide);
+var nextBtn = document.getElementById("next");
+var prevBtn = document.getElementById("prev");
+
+if (nextBtn) nextBtn.addEventListener("click", nextSlide);
+if (prevBtn) prevBtn.addEventListener("click", prevSlide);
 indicators.forEach(dot => dot.addEventListener("click", (e) => {
-    index = parseInt(e.target.dataset.index);
+    index = parseInt(e.target.dataset.index) || 0;
     updateCarousel();
 }));
 
-setInterval(nextSlide, 3000);
+if (totalSlides > 0 && carouselInner) {
+    setInterval(nextSlide, 3000);
+}
 
 
 function openSidemenu() {

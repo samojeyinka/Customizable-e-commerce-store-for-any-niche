@@ -104,7 +104,8 @@ else {
     LEFT JOIN product_images i ON p.product_id = i.product_id AND i.is_main = 1
     LEFT JOIN product_variants v ON c.variant_id = v.variant_id
     WHERE c.user_id = ?
-    GROUP BY c.cart_id";
+    GROUP BY c.cart_id, c.quantity, p.product_id, p.product_name, 
+    i.image_path, v.size, v.variant_id, v.status, v.discount_price, v.original_price";
 
 $stmt = mysqli_prepare($con, $cart_query);
 mysqli_stmt_bind_param($stmt, "i", $user_id);
@@ -114,12 +115,7 @@ $result = mysqli_stmt_get_result($stmt);
 $cart_items = [];
 $subtotal = 0;
 
-// Debug information to monitor the cart items
-$cart_item_ids = [];
-
 while ($item = mysqli_fetch_assoc($result)) {
-    // Debug - save cart item IDs to check for duplicates
-    $cart_item_ids[] = $item['cart_id'];
     
     // Use price logic with fallback to minimum variant price
     if (!empty($item['price']) && $item['price'] > 0) {
@@ -222,7 +218,7 @@ if (isset($_GET['order_success']) && isset($_GET['order_id'])) {
     $result = mysqli_stmt_get_result($stmt);
     
     if ($order_data = mysqli_fetch_assoc($result)) {
-        $order_total = number_format($order_data['order_total'], 2);
+        $order_total = number_format((float)$order_data['order_total'], 2);
         $customer_name = trim($order_data['first_name'] . ' ' . $order_data['last_name']);
         if (empty($customer_name)) {
             $customer_name = "Customer #" . $user_id;
@@ -297,42 +293,19 @@ require_once "../includes/auth/google.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Checkout</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Checkout</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles/checkout.css">
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../styles/modal.css">
-    <link rel="stylesheet" href="../styles/tabs.css">
-    <link rel="stylesheet" href="../styles/styles.css">
-    <link rel="stylesheet" href="../styles/faq.css" />
-    <script src="https://js.paystack.co/v1/inline.js"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
     <script src="./paystack-checkout.js"></script>
 
 
-    <style>
-        /* CSS for the sticky order summary on mobile */
-@media (max-width: 768px) {
-  .mobile-order-summary {
-    position: fixed;
-    width: 100%;
-z-index: 10;
-    transition: top 0.3s ease-in-out;
-  }
-
-  #paysuccess{
-    z-index: 40 !important;
-  }
-  
-  .shadow-md {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-}
-    </style>
-
+    <?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -342,13 +315,13 @@ z-index: 10;
     include('../includes/options.php');
     ?>
         <section class="w-full bg-[#FFFFFFF] py-1">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="../products/cart.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Cart</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">Check Out</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Check Out</span>
                 </div>
             </div>
         </section>
@@ -383,7 +356,7 @@ z-index: 10;
 </div>
 <?php endif; ?>
 
-        <div class="w-[95%] md:w-[90%] mx-auto flex flex-col-reverse md:flex-row gap-3 py-5">
+        <div class="w-[95%] md:w-[90%] mx-auto max-w-[1440px] flex flex-col-reverse md:flex-row gap-3 py-5">
             <div class="w-full md:w-[55%] flex flex-col">
                 <form method="POST" action="" class="flex flex-col gap-3">
                     <div class="w-[95%] md:w-[90%] lg:w-[80%] border-[1px] border-[#E1E1E1] rounded-[8px] p-4 flex flex-col gap-2">
@@ -729,7 +702,7 @@ z-index: 10;
     <button 
         type="button" 
         id="update-profile-btn"
-        class="py-2 px-4 bg-gray-100 hover:bg-gray-200 text-[#1A237E] text-[14px] font-['Open Sans'] flex items-center gap-1 cursor-pointer rounded-[4px] border border-[#E1E1E1]">
+        class="py-2 px-4 bg-gray-100 hover:bg-gray-200 text-[#C2185B] text-[14px] font-['Open Sans'] flex items-center gap-1 cursor-pointer rounded-[4px] border border-[#E1E1E1]">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
         </svg>
@@ -741,7 +714,7 @@ z-index: 10;
                     <div id="delivery-status" class="mt-4 hidden">
                         <section class="flex flex-col items-center w-full bg-[#ECFDEF] border-[1px] border-[#C3FACE] py-3 px-4 rounded">
                             <div class="flex items-center gap-2 mr-auto">
-                                <img src="../assets/global/infosuccess.svg" alt="Success" class="w-[24px]" />
+                                <i class="fa-solid fa-circle-check text-[24px] text-[#4CAF50] leading-none" alt="Success"></i>
                                 <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
                                     Delivery Status
                                 </p>
@@ -785,17 +758,17 @@ z-index: 10;
     <!-- <button 
     type="button" 
     id="pay-button-desktop"
-    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex">
-    Pay Now ₦<?php echo number_format($total); ?>
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex">
+    Pay Now ₦<?php echo number_format((float)$total); ?>
 </button> -->
 
 <button 
     type="button" 
     id="pay-button-desktop"
-    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex <?php echo !$profileComplete ? 'opacity-50 cursor-not-allowed' : ''; ?>"
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex <?php echo !$profileComplete ? 'opacity-50 cursor-not-allowed' : ''; ?>"
     <?php echo !$profileComplete ? 'disabled' : ''; ?>
 >
-    <?php echo $profileComplete ? 'Pay Now ₦' . number_format($total) : 'Complete Profile to Checkout'; ?>
+    <?php echo $profileComplete ? 'Pay Now ₦' . number_format((float)$total) : 'Complete Profile to Checkout'; ?>
 </button>
 </div>
                 </form>
@@ -804,36 +777,36 @@ z-index: 10;
             <div class="w-full md:w-[45%] flex flex-col gap-3">
                <!-- Replace the existing mobile order summary div with this one -->
 <div class="w-full flex flex-col gap-2 bg-[#E8E9F2] p-2 z-50 fixed top-[120px] right-0 md:hidden mobile-order-summary">
-    <div class="w-[95%] mx-auto flex flex-col gap-2 rounded-[4px] border-[1px] border-[#E1E1E1] p-2">
+    <div class="w-[95%] mx-auto max-w-[1440px] flex flex-col gap-2 rounded-[4px] border-[1px] border-[#E1E1E1] p-2">
         <div class="flex items-center justify-between">
             <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Subtotal</p>
-            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="mobile-subtotal"><?php echo number_format($subtotal); ?></span></p>
+            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="mobile-subtotal"><?php echo number_format((float)$subtotal); ?></span></p>
         </div>
 
         <div class="flex items-center justify-between">
             <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Shipping fee</p>
-            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="mobile-shipping"><?php echo number_format($shipping_fee); ?></span></p>
+            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="mobile-shipping"><?php echo number_format((float)$shipping_fee); ?></span></p>
         </div>
 
         <div class="flex items-center justify-between">
             <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Total</p>
-            <p class="text-[#484F98] text-[18px] md:text-[22px] font-['Open Sans'] font-bold">₦<span id="mobile-total"><?php echo number_format($total); ?></span></p>
+            <p class="text-[#C2185B] text-[18px] md:text-[22px] font-['Open Sans'] font-bold">₦<span id="mobile-total"><?php echo number_format((float)$total); ?></span></p>
         </div>
     </div>
     <!-- <button 
     type="button" 
     id="pay-button-mobile"
-    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
-    Pay Now ₦<?php echo number_format($total); ?>
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+    Pay Now ₦<?php echo number_format((float)$total); ?>
 </button> -->
 
 <button 
     type="button" 
     id="pay-button-mobile"
-    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] <?php echo !$profileComplete ? 'opacity-50 cursor-not-allowed' : ''; ?>"
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] <?php echo !$profileComplete ? 'opacity-50 cursor-not-allowed' : ''; ?>"
     <?php echo !$profileComplete ? 'disabled' : ''; ?>
 >
-    <?php echo $profileComplete ? 'Pay Now ₦' . number_format($total) : 'Complete Profile to Checkout'; ?>
+    <?php echo $profileComplete ? 'Pay Now ₦' . number_format((float)$total) : 'Complete Profile to Checkout'; ?>
 </button>
 
 </div>
@@ -844,13 +817,13 @@ z-index: 10;
       <div class="w-full flex flex-col gap-3 rounded-[4px] bg-[#E8E9F2] md:bg-[#EEEEEE] md:mt-[9rem] md:mt-0 p-2">
     <div class="flex items-center justify-between">
         <p class="text-[#262626] text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Your Order</p>
-        <img src="../assets/products/down2.svg" class="rotate-[180deg] cursor-pointer md:hidden" />
+        <i class="fa-solid fa-chevron-down rotate-[180deg] text-[20px] text-[#262626] cursor-pointer md:hidden leading-none"></i>
     </div>
     
     <?php if (empty($cart_items)): ?>
         <div class="p-3 text-center">
             <p class="text-[#6b7280] text-[14px] md:text-[16px] font-['Open Sans']">Your cart is empty</p>
-            <a href="../products/index.php" class="text-[#1A237E] text-[14px] font-['Open Sans'] underline">Continue Shopping</a>
+            <a href="../products/index.php" class="text-[#C2185B] text-[14px] font-['Open Sans'] underline">Continue Shopping</a>
         </div>
     <?php else: ?>
         <?php foreach ($cart_items as $item): ?>
@@ -863,11 +836,11 @@ z-index: 10;
                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-medium"><?php echo htmlspecialchars($item['product_name']); ?></p>
                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Size: <?php echo htmlspecialchars(!empty($item['size']) ? $item['size'] : $item['first_variant_size']); ?></p>
                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Quantity: <?php echo $item['quantity']; ?></p>
-                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Price: ₦<?php echo number_format($item['price']); ?></p>
+                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Price: ₦<?php echo number_format((float)$item['price']); ?></p>
                     </div>
                 </div>
                 <div class="flex flex-col items-end gap-2">
-                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-medium">₦<?php echo number_format($item['item_total']); ?></p>
+                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-medium">₦<?php echo number_format((float)$item['item_total']); ?></p>
                     <?php if (isset($item['cart_id'])): ?>
                         <form method="POST" action="">
                             <input type="hidden" name="action" value="remove">
@@ -890,7 +863,7 @@ z-index: 10;
 <div class="w-full hidden md:flex flex-col gap-2 rounded-[4px] border-[1px] border-[#E1E1E1] p-2">
                     <div class="flex items-center justify-between">
                         <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Subtotal</p>
-                        <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="desktop-subtotal"><?php echo number_format($subtotal); ?></span></p>
+                        <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="desktop-subtotal"><?php echo number_format((float)$subtotal); ?></span></p>
                     </div>
 
               
@@ -899,18 +872,18 @@ z-index: 10;
 <div class="flex items-center justify-between">
     <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
         <?php if ($delivery_method === 'express'): ?>
-            Shipping fee (₦<?php echo number_format($base_shipping_fee); ?> x <?php echo $product_count; ?> products)
+            Shipping fee (₦<?php echo number_format((float)$base_shipping_fee); ?> x <?php echo $product_count; ?> products)
         <?php else: ?>
             Shipping fee
         <?php endif; ?>
     </p>
-    <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="desktop-shipping"><?php echo number_format($shipping_fee); ?></span></p>
+    <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-medium">₦<span id="desktop-shipping"><?php echo number_format((float)$shipping_fee); ?></span></p>
 </div>
 
 
                     <div class="flex items-center justify-between">
                         <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Total</p>
-                        <p class="text-[#484F98] text-[18px] md:text-[22px] font-['Open Sans'] font-bold">₦<span id="desktop-total"><?php echo number_format($total); ?></span></p>
+                        <p class="text-[#C2185B] text-[18px] md:text-[22px] font-['Open Sans'] font-bold">₦<span id="desktop-total"><?php echo number_format((float)$total); ?></span></p>
                     </div>
                 </div>
 
@@ -927,14 +900,14 @@ z-index: 10;
     <div id="paysuccess" class="payment ps" style="display: none;">
         <div class="payment-content pss overflow-hidden py-[4rem] flex flex-col gap-4 items-center">
             <div class="overflow-hidden flex flex-col items-center p-4">
-                <img src="../assets/global/success.svg" class="mx-auto w-[120px] md:w-[150px]" />
+                <i class="fa-solid fa-circle-check text-[120px] md:text-[150px] text-[#C2185B] mx-auto leading-none"></i>
                 <p class="font-['Open Sans'] text-[19px] text-[24px] font-medium text-center">
                     Order Confirmed
                 </p>
                 <p class="w-[95%] md:w-[67%] mx-auto text-[15px] text-center md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2">
                     Your order has been placed successfully. A confirmation email has been sent to you. Thank you for shopping with us
                 </p>
-                <a href="<?php echo DOMAIN; ?>/user/orders.php" class="w-[80%] text-center text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer" id="closepssucces">
+                <a href="<?php echo DOMAIN; ?>/user/orders.php" class="w-[80%] text-center text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer" id="closepssucces">
                     View Order
                 </a>
             </div>

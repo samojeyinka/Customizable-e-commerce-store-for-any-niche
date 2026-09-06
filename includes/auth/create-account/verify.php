@@ -2,33 +2,13 @@
 
 require_once "../../../config/config.php";
 
-// Start session at the beginning before any output
-session_start();
-
 // If user is already logged in, redirect to dashboard
 if(isset($_SESSION['user_id'])) {
     header("Location: " . DOMAIN . "/user/orders.php");
     exit();
 }
 
-// Include PHPMailer at the top of the file
-require './phpmailer/src/Exception.php';
-require './phpmailer/src/PHPMailer.php';
-require './phpmailer/src/SMTP.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-
-//db connection
-require_once "../../../config/servername.php";
-
-
-$conn = new mysqli($servername, $username, $dbpassword, $dbname);
-
-if($conn->connect_error){
-    die("Connection failed: " . $conn->connect_error);
-}
+$conn = db();
 
 // Initialize message variables
 $error_message = "";
@@ -119,65 +99,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
         $update_stmt = $conn->prepare($update_sql);
         $update_stmt->bind_param("ss", $new_otp, $email);
         
-        if($update_stmt->execute()) {
-            // Send email with PHPMailer
-            $mail = new PHPMailer(true);
+if($update_stmt->execute()) {
+            // Set success message
+            $success_message = "A new verification code has been saved to your account.";
             
-            try {
-                // Server settings
-                $mail->SMTPDebug = 0;
-                $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = 'samuelojeyinka@gmail.com';
-                $mail->Password   = 'teir bvqp ijrx rijl';
-                // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                // $mail->Port       = 587;
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL/TLS
-    $mail->Port = 465;
-                $mail->Timeout    = 60;
-                $mail->SMTPKeepAlive = true;
-                
-                $mail->SMTPOptions = array(
-                    'ssl' => array(
-                        'verify_peer' => false,
-                        'verify_peer_name' => false,
-                        'allow_self_signed' => true
-                    )
-                );
-                
-                // Recipients
-                $mail->setFrom('samuelojeyinka@gmail.com', 'Victosah');
-                $mail->addAddress($email);
-                
-                // Content
-                $mail->isHTML(true);
-                $mail->Subject = 'Your New OTP Verification Code';
-                $mail->Body    = "
-                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;'>
-                    <h2 style='color: #1A237E; text-align: center;'>Victosah Solution</h2>
-                    <p style='font-size: 16px; line-height: 1.5;'>Hello,</p>
-                    <p style='font-size: 16px; line-height: 1.5;'>You requested a new verification code. Please use the following OTP code:</p>
-                    <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
-                        {$new_otp}
-                    </div>
-                    <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this code, please ignore this email.</p>
-                    <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
-                </div>
-                ";
-                $mail->AltBody = "Your new OTP Verification code is: {$new_otp}";
-                
-                $mail->send();
-                
-                // Set success message
-                $success_message = "New verification code has been sent to your email.";
-                
-                // Redirect to prevent form resubmission
-                header("Location: " . $_SERVER['PHP_SELF'] . "?resent=1");
-                exit();
-            } catch(Exception $e) {
-                $error_message = "Error sending email: {$mail->ErrorInfo}";
-            }
+            // Redirect to prevent form resubmission
+            header("Location: " . $_SERVER['PHP_SELF'] . "?resent=1");
+            exit();
         } else {
             $error_message = "Error updating OTP";
         }
@@ -190,7 +118,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
 
 // Display messages based on URL parameter after redirect
 if(isset($_GET['resent']) && $_GET['resent'] == 1) {
-    $success_message = "New verification code has been sent to your email.";
+    $success_message = "A new verification code has been saved to your account.";
 }
 
 // Check if email is stored in session, if not - redirect to registration
@@ -212,69 +140,12 @@ if(isset($_POST['resend'])) {
         $update_stmt = $conn->prepare($update_sql);
         $update_stmt->bind_param("ss", $new_otp, $email);
         
-        if($update_stmt->execute()) {
-            // PHPMailer already included at the top of the file
-            
-            $mail = new PHPMailer(true);
-            
-            try {
-                // Server settings
-                $mail->SMTPDebug = 0;
-                $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = 'samuelojeyinka@gmail.com';
-                $mail->Password   = 'teir bvqp ijrx rijl';
-                // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                // $mail->Port       = 587;
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL/TLS
-    $mail->Port = 465;
-                $mail->Timeout    = 60;
-                $mail->SMTPKeepAlive = true;
-                
-                $mail->SMTPOptions = array(
-                    'ssl' => array(
-                        'verify_peer' => false,
-                        'verify_peer_name' => false,
-                        'allow_self_signed' => true
-                    )
-                );
-                
-                // Recipients
-                $mail->setFrom('samuelojeyinka@gmail.com', 'Victosah');
-                $mail->addAddress($email);
-                
-                // Content
-                $mail->isHTML(true);
-                $mail->Subject = 'Your New OTP Verification Code';
-                $mail->Body    = "
-                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;'>
-                    <h2 style='color: #1A237E; text-align: center;'>Victosah Solution</h2>
-                    <p style='font-size: 16px; line-height: 1.5;'>Hello,</p>
-                    <p style='font-size: 16px; line-height: 1.5;'>You requested a new verification code. Please use the following OTP code:</p>
-                    <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
-                        {$new_otp}
-                    </div>
-                    <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this code, please ignore this email.</p>
-                    <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
-                </div>
-                ";
-                $mail->AltBody = "Your new OTP Verification code is: {$new_otp}";
-                
-                $mail->send();
-                
-                echo "
-                <script>
-                alert('New verification code has been sent to your email.');
-                </script>
-                ";
-            } catch(Exception $e) {
-                echo "
-                <script>
-                alert('Error sending email: {$mail->ErrorInfo}');
-                </script>
-                ";
-            }
+if($update_stmt->execute()) {
+            echo "
+            <script>
+            alert('A new verification code has been saved to your account.');
+            </script>
+            ";
         } else {
             echo "
             <script>
@@ -307,16 +178,14 @@ if(!isset($_SESSION['email'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH - Verify Account</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY - Verify Account</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../../style.css" />
-    <link rel="stylesheet" href="../../../styles/faq.css" />
-    <link rel="stylesheet" href="../../../styles/modal.css">
-    <link rel="stylesheet" href="../../../styles/tabs.css">
-    <link rel="stylesheet" href="../../../styles/inputs.css">
+<?php include '../../../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     
@@ -390,7 +259,7 @@ if(!isset($_SESSION['email'])) {
                 
                 <button
                     type="submit"
-                    class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
+                    class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
                     Verify me
                 </button>
             </form>
@@ -400,8 +269,8 @@ if(!isset($_SESSION['email'])) {
             </form>
             
             <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-center">
-                <span id="countdown-text">Resend code in <span class="text-[#1A237E]" id="countdown">60</span>sec</span>
-                <a href="#" id="resendLink" class="text-[#1A237E] hidden" onclick="document.getElementById('resendForm').submit(); return false;">Resend code</a>
+                <span id="countdown-text">Resend code in <span class="text-[#C2185B]" id="countdown">60</span>sec</span>
+                <a href="#" id="resendLink" class="text-[#C2185B] hidden" onclick="document.getElementById('resendForm').submit(); return false;">Resend code</a>
             </p>
         </div>
     </div>

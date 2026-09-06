@@ -24,17 +24,14 @@ require_once "./includes/auth/google.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css" />
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/inputs.css">
-
+<?php include 'includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -68,8 +65,6 @@ require_once "./includes/auth/google.php";
     <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/dropdown.js"></script>
     <script type="text/javascript" src="<?php echo DOMAIN; ?>/functions/inputs.js"></script>
 
-    
-</body>
 </body>
 
 </html>

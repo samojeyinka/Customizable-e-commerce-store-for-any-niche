@@ -16,7 +16,7 @@ if (isset($_POST['send'])) {
     $name = htmlspecialchars($_POST['name']);
     $phoneNumber = htmlspecialchars($_POST['phoneNumber']);
     $message = htmlspecialchars($_POST['message']);
-    $subject = isset($_POST['subject']) ? htmlspecialchars($_POST['subject']) : 'Message from VICTOSAH';
+    $subject = isset($_POST['subject']) ? htmlspecialchars($_POST['subject']) : 'Message from GLOREFY';
     
     // Record IP address for logging
     $ip_address = $_SERVER['REMOTE_ADDR'];
@@ -70,7 +70,7 @@ if (isset($_POST['send'])) {
         // Create a nicely formatted HTML email body
         $mail->Body = "
         <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;'>
-            <h2 style='color: #1A237E; text-align: center;'>New Contact Form Submission</h2>
+            <h2 style='color: #C2185B; text-align: center;'>New Contact Form Submission</h2>
             <p style='font-size: 16px; line-height: 1.5;'><strong>From:</strong> {$name}</p>
             <p style='font-size: 16px; line-height: 1.5;'><strong>Email:</strong> {$email}</p>
             <p style='font-size: 16px; line-height: 1.5;'><strong>Phone:</strong> {$phoneNumber}</p>

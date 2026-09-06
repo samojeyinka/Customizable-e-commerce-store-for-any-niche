@@ -20,7 +20,7 @@ $latest_notifications = get_notifications($con, true, null, 5, 0);
 <!-- Notification Icon in Header -->
 <div class="relative">
     <button id="notificationButton" class="p-2 relative">
-        <img src="../assets/dash/notification.svg" alt="Notifications" class="w-[20px] h-[20px]" />
+        <i class="fa-regular fa-bell text-[20px]" alt="Notifications"></i>
         <?php if ($unread_count > 0): ?>
             <span class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
                 <?php echo $unread_count > 9 ? '9+' : $unread_count; ?>

@@ -12,7 +12,7 @@ if(isset($_GET['logout'])) {
 }
 ?> 
 
-<header class="w-full bg-[#E8E9F2] flex items-center justify-center p-3">
+<header class="w-full bg-[#F5EEF2] flex items-center justify-center p-3">
 
 
     <!-- The nav and sidemenu -->
@@ -30,11 +30,11 @@ if(isset($_GET['logout'])) {
         <!-- Modal content -->
         <div class="modal-content overflow-hidden p-4">
 
-            <img src="<?php echo DOMAIN; ?>/assets/global/close-circle.svg" alt="close" id="closeauth" class="w-[26px] md:w-[32px] cursor-pointer absolute right-4" />
+            <i class="fa-solid fa-xmark text-[26px] md:text-[32px] text-[#262626] cursor-pointer absolute right-4 leading-none" id="closeauth" alt="close"></i>
 
             <div class="w-[fit-content] flex items-center mx-auto gap-10 tab">
                 <button class="tablinks text-[16px] font-['Open Sans'] font-medium" onclick="openTab(event, 'SignUp')" id="defaultOpen">Create an account</button>
-                <button class="tablinks text-[16px] font-['Open Sans'] font-medium" onclick="openTab(event, 'SignIn')">Sign In</button>
+                <button class="tablinks text-[16px] font-['Open Sans'] font-medium" onclick="openTab(event, 'SignIn')" id="signinTab">Sign In</button>
             </div>
 
             <!-- The signup and signin directory -->
@@ -92,6 +92,15 @@ if(isset($_GET['logout'])) {
         }
     }
     
+    // Open the auth modal directly on the requested tab (SignIn / SignUp)
+    function openAuthModal(which) {
+        var tabBtn = which === 'SignIn' ? document.getElementById('signinTab') : document.getElementById('defaultOpen');
+        modal.style.display = "block";
+        if (tabBtn) {
+            openTab({ currentTarget: tabBtn }, which);
+        }
+    }
+    
     // Close button functionality
     close.onclick = function() {
         modal.style.display = "none";
@@ -104,6 +113,7 @@ if(isset($_GET['logout'])) {
         }
     }
 </script>
-</script>
+
+<?php include __DIR__ . '/cart-drawer.php'; ?>
 
 

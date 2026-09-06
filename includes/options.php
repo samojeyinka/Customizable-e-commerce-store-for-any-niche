@@ -1,23 +1,9 @@
 <?php
-// Complete solution for category-brand navigation menu with click-based dropdowns
+$pdo = pdo_db();
 
-// ===== DATABASE CONNECTION =====
-
-require_once __DIR__ . '/../config/servername.php';
-
-
-try {
-    $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $dbpassword);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
-
-// ===== FETCH CATEGORIES WITH THEIR ASSOCIATED BRANDS =====
 if (!function_exists('getCategoriesWithBrands')) {
 function getCategoriesWithBrands($pdo) {
     try {
-        // Get all categories
         $categoriesQuery = "SELECT category_id, category_title FROM categories ORDER BY category_id";
         $categoriesStmt = $pdo->query($categoriesQuery);
         $categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -38,7 +24,6 @@ function getCategoriesWithBrands($pdo) {
             $brandsStmt->execute();
             $brands = $brandsStmt->fetchAll(PDO::FETCH_ASSOC);
             
-            // Add to results
             $result[] = [
                 'category_id' => $category['category_id'],
                 'category_title' => $category['category_title'],
@@ -71,71 +56,29 @@ $topCategories = array_slice($categoriesWithBrands, 0, 5);
 // Optional: Convert to JSON for client-side use
 $topCategoriesJson = json_encode($topCategories);
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Store</title>
 
- <style>
-    /* Custom dropdown styles */
-    .custom-dropdown {
-        position: relative;
-        cursor: pointer;
-    }
-    
-    .dropdown-content {
-        position: absolute;
-        top: 30px !important;
-        left: 0;
-        background-color: white;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        border-radius: 0.375rem;
-        z-index: 50;
-        display: none;
-    }
-    
-    .custom-dropdown.open .dropdown-content {
-        display: block;
-    }
-    
-    .custom-dropdown.open .arrow-down {
-        transform: rotate(180deg);
-    }
-    
-
-    .mobileOnlySearchResults{
-        z-index: 100 !important;
-    }
-    /* Add any additional styles you need */
- </style>
-</head>
-<body>
-
-
-<!-- The big screen -->
+<!-- The main category bar -->
 <section class="w-full py-4 border-b-[1px] border-[#E1E1E1]">
-    <div class="w-[90%] mx-auto hidden md:flex items-center justify-between">
+    <div class="w-[90%] mx-auto max-w-[1440px] hidden md:flex items-center justify-between">
         <div class="w-[70%] flex items-center gap-10">
             <?php foreach ($topCategories as $category): ?>
             <div class="custom-dropdown shrink-0">
                 <div class="flex items-center gap-2 dropdown-toggle">
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium pointer-events-none">
+                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium pointer-events-none hover:text-[#C2185B] transition-colors">
                         <?php echo htmlspecialchars($category['category_title']); ?>
                     </span>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/down.svg" class="arrow-down w-[12px] h-[6px] transition-transform duration-200 pointer-events-none" />
+                    <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none transition-transform duration-200 pointer-events-none"></i>
                 </div>
-                <div class="dropdown-content min-w-[10rem] p-2">
-                    <div class="flex flex-col gap-3">
+                <div class="dropdown-content top-[30px] z-[50] min-w-[10rem] p-2">
+                    <div class="flex flex-col gap-1">
                         <?php if (!empty($category['brands'])): ?>
                             <?php foreach ($category['brands'] as $brand): ?>
-                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>&brand=<?php echo $brand['brand_id']; ?>" class="text-nowrap">
+                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>&brand=<?php echo $brand['brand_id']; ?>" class="text-nowrap text-[14px] font-['Open Sans'] text-[#262626]">
                                 <?php echo htmlspecialchars($brand['brand_title']); ?>
                             </a>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>" class="text-center">View All</a>
+                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>" class="text-center text-[14px] font-['Open Sans'] text-[#262626]">View All</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -144,259 +87,68 @@ $topCategoriesJson = json_encode($topCategories);
         </div>
 
         <?php if (isAuthenticated()): ?>
-    <div class="flex items-center gap-2 cursor-pointer pt-4">
-        <img src="<?php echo DOMAIN; ?>/assets/home/truck-fast.svg" class='w-[24px] h-[24px]' />
-        <!-- <strong class='text-[13px] md:text-[14px] font-["Open Sans"] text-[#1A237E] font-medium underline'>Track your order</strong> -->
-        <a href="<?php echo DOMAIN; ?>/user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans"] text-[#1A237E] font-medium underline'>Track your order</a>
-    </div>
-<?php else: ?>
-<?php endif; ?>
+            <div class="flex items-center gap-2 cursor-pointer pt-4">
+                <i class="fa-solid fa-truck-fast text-[24px] text-[#C2185B] leading-none"></i>
+                <a href="<?php echo DOMAIN; ?>/user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans"] text-[#C2185B] font-medium underline'>Track your order</a>
+            </div>
+        <?php endif; ?>
     </div>
 
-    <div class="w-[90%] mx-auto flex items-center gap-10  md:hidden">
-                <img src="<?php echo DOMAIN; ?>/assets/global/menu.svg" alt="menu" class="cursor-pointer w-[24px]" onclick="openMobileMenu()" />
+    <div class="w-[90%] mx-auto max-w-[1440px] flex items-center gap-10 md:hidden">
+        <i class="fa-solid fa-bars cursor-pointer text-[24px] text-[#262626]" onclick="openMobileMenu()" alt="menu"></i>
 
-
-                <!-- The mobile nav starts -->
-                <div id="menuNav" class="dropdown-menu border-t-[1px] border-[#E1E1E1] bg-white">
-
-                    <div class="w-[92%] mx-auto">
-                    <?php foreach ($topCategories as $category): ?>
-                        <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium"><?php echo htmlspecialchars($category['category_title']); ?></button>
-                        <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
-                        <?php if (!empty($category['brands'])): ?>
-                            <?php foreach ($category['brands'] as $brand): ?>    
-                                <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>&brand=<?php echo $brand['brand_id']; ?>" class="text-nowrap">
-                                <?php echo htmlspecialchars($brand['brand_title']); ?>
-                            </a>
-                        <?php endforeach; ?>
-                        <?php else: ?>
-                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>" class="text-left">View All</a>
-                        <?php endif; ?>
-                      
-                        </div>
-                        <?php endforeach; ?>
-
-
-                        <?php if (isAuthenticated()): ?>
-    <div class="flex items-center gap-2 cursor-pointer pt-4">
-        <img src="<?php echo DOMAIN; ?>/assets/home/truck-fast.svg" class='w-[24px] h-[24px]' />
-        <a href="<?php echo DOMAIN; ?>/user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans"] text-[#1A237E] font-medium underline'>Track your order</a>
-    </div>
-<?php else: ?>
-<?php endif; ?>
-
+        <!-- The mobile nav starts -->
+        <div id="menuNav" class="dropdown-menu border-t-[1px] border-[#E1E1E1] bg-white overflow-y-auto">
+            <div class="w-[92%] mx-auto max-w-[1440px] py-4">
+                <?php foreach ($topCategories as $category): ?>
+                    <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626] font-['Open Sans'] font-medium"><?php echo htmlspecialchars($category['category_title']); ?></button>
+                    <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
+                    <?php if (!empty($category['brands'])): ?>
+                        <?php foreach ($category['brands'] as $brand): ?>    
+                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>&brand=<?php echo $brand['brand_id']; ?>" class="text-nowrap">
+                            <?php echo htmlspecialchars($brand['brand_title']); ?>
+                        </a>
+                    <?php endforeach; ?>
+                    <?php else: ?>
+                        <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>" class="text-left">View All</a>
+                    <?php endif; ?>
                     </div>
+                <?php endforeach; ?>
 
-                </div>
-                <!-- The mobile nav ends -->
+                <?php if (isAuthenticated()): ?>
+                    <div class="flex items-center gap-2 cursor-pointer pt-4">
+                        <i class="fa-solid fa-truck-fast text-[24px] text-[#C2185B] leading-none"></i>
+                        <a href="<?php echo DOMAIN; ?>/user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans"] text-[#C2185B] font-medium underline'>Track your order</a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <!-- The mobile nav ends -->
 
-
-                <?php
-// Hardcoded categories and brands data specifically for mobile search
-// Different variable names to avoid conflicts
-$mobileSearchCategories = [
-    ['category_id' => 17, 'category_title' => 'Bedsheets'],
-    ['category_id' => 18, 'category_title' => 'Foams'],
-    ['category_id' => 19, 'category_title' => 'Pillows'],
-    ['category_id' => 20, 'category_title' => 'Lightings'],
-    ['category_id' => 21, 'category_title' => 'Duvets'],
-    ['category_id' => 22, 'category_title' => 'Mattress'],
-    ['category_id' => 23, 'category_title' => 'Duvet Bedsheet & Pillowcases'],
-    ['category_id' => 24, 'category_title' => 'Toppers']
-];
-
-// Brands data with unique variable name
-$mobileSearchBrands = [
-    ['brand_id' => 23, 'brand_title' => 'Mattress'],
-    ['brand_id' => 24, 'brand_title' => 'Duvet & Bedsheet & Pillowcases'],
-    ['brand_id' => 25, 'brand_title' => 'Duvet & Bedsheet'],
-    ['brand_id' => 26, 'brand_title' => 'Bedsheet & Pillowcases'],
-    ['brand_id' => 27, 'brand_title' => 'Duvet & Pillowcases'],
-    ['brand_id' => 28, 'brand_title' => 'Mattress Topper'],
-    ['brand_id' => 29, 'brand_title' => 'Throw Pillow'],
-    ['brand_id' => 30, 'brand_title' => 'Pillows'],
-    ['brand_id' => 31, 'brand_title' => 'Duvets']
-];
-?>
-
-<!-- Mobile Search Input - Uses different IDs to avoid conflicts -->
-<div class="mobile-search-container flex items-center gap-0 relative w-full">
-    <div class="flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#B8BBD7] rounded-l-[4px] p-2 w-full">
-        <img src="<?php echo DOMAIN; ?>/assets/global/search.svg" alt="Search" class="w-[24px]" />
+<!-- Mobile live search (driven by functions/search.js) -->
+<div class="mobile-search-container flex items-center gap-0 relative w-full" data-glor-search data-glor-domain="<?php echo DOMAIN; ?>">
+    <div class="flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#D8C4CE] rounded-l-[4px] p-2 w-full bg-white">
+        <i class="fa-solid fa-magnifying-glass text-[24px] text-[#777777] leading-none" alt="Search"></i>
         <input 
             type="text" 
             id="mobileOnlySearchInput" 
-            placeholder="What are you shopping for?" 
-            class="w-full text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" 
+            data-glor-q
+            placeholder="Search skincare, makeup, beauty..." 
+            class="w-full text-[14px] border-none outline-none placeholder:text-[#B8BBD7] bg-transparent" 
             autocomplete="off"
         />
     </div>
-    <button type="submit" id="mobileOnlySearchButton" class="py-2 px-4 bg-[#1A237E] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
+    <button type="submit" id="mobileOnlySearchButton" data-glor-btn class="py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
     
-    <!-- Search Results Dropdown - Unique ID -->
-    <div id="mobileOnlySearchResults" class="absolute top-full left-0 w-full bg-white shadow-md rounded-b-md z-50 mt-1 hidden">
-        <div class="p-3">
-            <!-- Categories Section -->
-            <div class="mb-3">
-                <h4 class="text-[#1A237E] font-medium text-[14px] mb-2 font-Onest">Categories</h4>
-                <div id="mobileOnlyCategoryList" class="flex flex-col gap-2"></div>
-            </div>
-            
-            <!-- Tags Section -->
-            <div>
-                <h4 class="text-[#1A237E] font-medium text-[14px] mb-2 font-Onest">Tags</h4>
-                <div id="mobileOnlyBrandList" class="flex flex-col gap-2"></div>
-            </div>
-            
-            <!-- No Results Message -->
-            <div id="mobileOnlyNoResults" class="hidden text-center py-2">
-                <p class="text-[14px] text-[#777]">No matching results found</p>
-            </div>
-        </div>
-    </div>
+    <!-- Search Results Dropdown - content rendered by search.js -->
+    <div id="mobileOnlySearchResults" data-glor-panel class="absolute top-full left-0 w-full bg-white shadow-md rounded-b-md z-[100] mt-1 hidden"></div>
 </div>
-
-<script>
-// Use an IIFE to isolate variables and avoid global scope conflicts
-(function() {
-    document.addEventListener('DOMContentLoaded', function() {
-        // Using unique variable names to avoid conflicts
-        const mobileCategories = <?php echo json_encode($mobileSearchCategories); ?>;
-        const mobileBrands = <?php echo json_encode($mobileSearchBrands); ?>;
-        const mobileDomain = '<?php echo DOMAIN; ?>';
-        
-        // DOM Elements with unique IDs
-        const mobileSearchInput = document.getElementById('mobileOnlySearchInput');
-        const mobileSearchResults = document.getElementById('mobileOnlySearchResults');
-        const mobileCategoryList = document.getElementById('mobileOnlyCategoryList');
-        const mobileBrandList = document.getElementById('mobileOnlyBrandList');
-        const mobileNoResults = document.getElementById('mobileOnlyNoResults');
-        const mobileSearchButton = document.getElementById('mobileOnlySearchButton');
-        
-        // Skip initialization if elements don't exist (prevents errors)
-        if (!mobileSearchInput || !mobileSearchResults) return;
-        
-        // Filter function with unique name
-        function filterMobileResults(query) {
-            query = query.toLowerCase().trim();
-            
-            if (query.length < 2) {
-                mobileSearchResults.classList.add('hidden');
-                return;
-            }
-            
-            // Show results container
-            mobileSearchResults.classList.remove('hidden');
-            
-            // Filter categories
-            const filteredCategories = mobileCategories.filter(category => 
-                category.category_title.toLowerCase().includes(query)
-            );
-            
-            // Filter brands
-            const filteredBrands = mobileBrands.filter(brand => 
-                brand.brand_title.toLowerCase().includes(query)
-            );
-            
-            displayMobileResults(filteredCategories, filteredBrands);
-        }
-        
-        // Display results function with unique name
-        function displayMobileResults(filteredCategories, filteredBrands) {
-            mobileCategoryList.innerHTML = '';
-            mobileBrandList.innerHTML = '';
-            
-            const hasCategories = filteredCategories.length > 0;
-            const hasBrands = filteredBrands.length > 0;
-            
-            // Display categories
-            if (hasCategories) {
-                filteredCategories.forEach(category => {
-                    const item = document.createElement('a');
-                    item.href = `${mobileDomain}/products/index.php?category=${category.category_id}`;
-                    item.className = 'text-[13px] hover:text-[#1A237E] transition-colors';
-                    item.textContent = category.category_title;
-                    mobileCategoryList.appendChild(item);
-                });
-            }
-            
-            // Display brands
-            if (hasBrands) {
-                filteredBrands.forEach(brand => {
-                    const item = document.createElement('a');
-                    item.href = `${mobileDomain}/products/index.php?brand=${brand.brand_id}`;
-                    item.className = 'text-[13px] hover:text-[#1A237E] transition-colors';
-                    item.textContent = brand.brand_title;
-                    mobileBrandList.appendChild(item);
-                });
-            }
-            
-            // Show/hide no results message
-            if (!hasCategories && !hasBrands) {
-                mobileNoResults.classList.remove('hidden');
-            } else {
-                mobileNoResults.classList.add('hidden');
-            }
-        }
-        
-        // Debounce function with unique name
-        function debounceMobile(func, wait) {
-            let timeout;
-            return function() {
-                const context = this;
-                const args = arguments;
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    func.apply(context, args);
-                }, wait);
-            };
-        }
-        
-        // Create debounced version with unique name
-        const debouncedMobileFilter = debounceMobile(function(query) {
-            filterMobileResults(query);
-        }, 300);
-        
-        // Event listeners
-        mobileSearchInput.addEventListener('input', function() {
-            debouncedMobileFilter(this.value);
-        });
-        
-        mobileSearchInput.addEventListener('focus', function() {
-            if (this.value.trim().length >= 2) {
-                filterMobileResults(this.value);
-            }
-        });
-        
-        // Hide search results when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!mobileSearchInput.contains(event.target) && !mobileSearchResults.contains(event.target)) {
-                mobileSearchResults.classList.add('hidden');
-            }
-        });
-        
-        // Handle Enter key press
-        mobileSearchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                window.location.href = `${mobileDomain}/products/index.php?search=${encodeURIComponent(this.value.trim())}`;
-            }
-        });
-        
-        // Handle search button click
-        mobileSearchButton.addEventListener('click', function() {
-            window.location.href = `${mobileDomain}/products/index.php?search=${encodeURIComponent(mobileSearchInput.value.trim())}`;
-        });
-    });
-})(); // Immediately invoked function to isolate scope
-</script>
-            </div>
+    </div>
 </section>
-    
+
 <script>
 // Store the categories and brands data in JavaScript for potential client-side use
 const categoriesData = <?php echo $topCategoriesJson; ?>;
-
 
 // Dropdown functionality
 document.querySelectorAll(".custom-dropdown").forEach((dropdown) => {
@@ -408,7 +160,6 @@ document.querySelectorAll(".custom-dropdown").forEach((dropdown) => {
             if (dd !== dropdown) dd.classList.remove("open");
         });
         dropdown.classList.toggle("open");
-        console.log("clickin")
     });
 });
 
@@ -425,5 +176,3 @@ function selectOption(element) {
     dropdown.classList.remove("open");
 }
 </script>
-</body>
-</html>

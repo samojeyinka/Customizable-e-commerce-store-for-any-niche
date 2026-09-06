@@ -11,8 +11,10 @@ requireAuth();
 $user = getCurrentUser();
 $user_id = $user['id'];
 
+
+
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die(mysqli_error($conn));
 }
@@ -29,8 +31,7 @@ if (!$order_id) {
 // Get the order details
 $sql = "SELECT o.id, o.order_total, o.delivery_method, o.pickup_location, 
                o.payment_reference, o.order_status, o.created_at, o.updated_at,
-               o.payment_transaction_id, o.delivery_email, o.order_note,o.status_notes,o.dispatcher_details,
-               o.processed_at, o.shipped_at, o.delivered_at, o.cancelled_at, o.returned_at
+               o.payment_transaction_id, o.delivery_email, o.order_note,o.status_notes
         FROM orders o
         WHERE o.id = ? AND o.user_id = ?";
 
@@ -50,7 +51,7 @@ $order = $result->fetch_assoc();
 // Function to get order items for a specific order
 function getOrderItems($conn, $order_id) {
     $sql = "SELECT oi.id, oi.product_id, oi.variant_id, oi.quantity, oi.price,
-                  p.product_name, pv.size, pv.texture,
+                  p.product_name, p.product_slug, pv.size, pv.texture,
                   (SELECT image_path FROM product_images WHERE product_id = p.product_id AND is_main = 1 LIMIT 1) as image_path
            FROM order_items oi
            JOIN products p ON oi.product_id = p.product_id
@@ -81,15 +82,26 @@ function getProductColor($conn, $product_id) {
     return $product ? $product['colors'] : 'N/A';
 }
 
-// Initialize status timestamps using the status-specific timestamp columns
+// Read actual per-status timestamps from order_status_history
+// (the admin status updater logs every change to this table)
 $status_timestamps = [];
 
-// Direct mapping to timestamp columns with fallbacks
-$status_timestamps['Processing'] = !empty($order['processed_at']) ? $order['processed_at'] : $order['created_at'];
-$status_timestamps['Shipped'] = !empty($order['shipped_at']) ? $order['shipped_at'] : null;
-$status_timestamps['Delivered'] = !empty($order['delivered_at']) ? $order['delivered_at'] : null;
-$status_timestamps['Returned'] = !empty($order['returned_at']) ? $order['returned_at'] : null;
-$status_timestamps['Cancelled'] = !empty($order['cancelled_at']) ? $order['cancelled_at'] : null;
+$hist_sql = "SELECT new_status, changed_at FROM order_status_history
+             WHERE order_id = ?
+             ORDER BY changed_at ASC";
+$hist_stmt = $conn->prepare($hist_sql);
+$hist_stmt->bind_param("i", $order_id);
+$hist_stmt->execute();
+$hist_result = $hist_stmt->get_result();
+foreach ($hist_result as $hist_row) {
+    $status_timestamps[$hist_row['new_status']] = $hist_row['changed_at'];
+}
+$hist_stmt->close();
+
+// The order always starts in 'Processing' at the time it was created
+if (!isset($status_timestamps['Processing'])) {
+    $status_timestamps['Processing'] = $order['created_at'];
+}
 
 // Get the current order status
 $current_status = $order['order_status'];
@@ -97,7 +109,8 @@ $current_status = $order['order_status'];
 // Define status colors
 $status_colors = [
     'Processing' => 'bg-[#E8B006]',
-    'Shipped' => 'bg-[#1A237E]',
+    'Confirmed' => 'bg-[#1A7E79]',
+    'Shipped' => 'bg-[#C2185B]',
     'Delivered' => 'bg-[#39D959]',
     'Cancelled' => 'bg-red-500',
     'Returned' => 'bg-[#9C27B0]'
@@ -112,14 +125,15 @@ function formatDate($date) {
     return date('M d, Y h:i A', strtotime($date));
 }
 
-$processing_date = formatDate($status_timestamps['Processing']);
-$shipped_date = formatDate($status_timestamps['Shipped']);
-$delivered_date = formatDate($status_timestamps['Delivered']);
-$returned_date = formatDate($status_timestamps['Returned']);
-$cancelled_date = formatDate($status_timestamps['Cancelled']);
+$processing_date = formatDate($status_timestamps['Processing'] ?? null);
+$confirmed_date = formatDate($status_timestamps['Confirmed'] ?? null);
+$shipped_date = formatDate($status_timestamps['Shipped'] ?? null);
+$delivered_date = formatDate($status_timestamps['Delivered'] ?? null);
+$returned_date = formatDate($status_timestamps['Returned'] ?? null);
+$cancelled_date = formatDate($status_timestamps['Cancelled'] ?? null);
 
 // Define the status sequence and determine current progress
-$status_sequence = ['Processing', 'Shipped', 'Delivered'];
+$status_sequence = ['Processing', 'Confirmed', 'Shipped', 'Delivered'];
 $current_status_index = array_search($current_status, $status_sequence);
 
 // If the order is cancelled, we need special handling
@@ -133,48 +147,15 @@ require_once "../includes/auth/google.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Track Order</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Track Order</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/styles.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
-
-    <style>
-        .status-icon {
-            transition: background-color 0.3s ease;
-        }
-        
-        .status-line {
-            position: absolute;
-            left: 20px;
-            top: 40px;
-            width: 2px;
-            height: calc(100% - 40px);
-            background-color: #E1E1E1;
-            z-index: 0;
-        }
-        
-        /* Active line style */
-        .status-line-active {
-            background-color: #1A237E;
-        }
-        
-        /* Cancelled state styles */
-        .status-cancelled .status-icon {
-            background-color: #E1E1E1 !important;
-        }
-        
-        .status-cancelled .status-content h4,
-        .status-cancelled .status-content p {
-            color: #8F8F8F;
-        }
-    </style>
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -186,18 +167,18 @@ require_once "../includes/auth/google.php";
     ?>
 
         <section class="w-full bg-[#FFFFFFF] py-1">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./orders.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">Track Order</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Track Order</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto bg-[#FFFFFF] py-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] bg-[#FFFFFF] py-5">
             <div class="w-full md:w-[80%] lg:w-[70%] mx-auto">
                 <h1 class="text-[24px] md:text-[28px] text-[#2C2C2C] font-['Open Sans'] font-medium mb-6 text-center">Track Your Order</h1>
                 
@@ -240,9 +221,9 @@ require_once "../includes/auth/google.php";
                     
                     <?php if (isset($order['order_note']) && !empty($order['status_notes'])): ?>
     <div class="mb-4 bg-blue-100 border-l-4 border-blue-700 p-3 rounded-lg flex items-start gap-2">
-        <img src="../assets/user/info.svg" alt="Note Icon" class="w-6 h-6 mt-1"> 
+        <i class="fa-solid fa-circle-info text-[24px] text-[#C2185B] leading-none" alt="Note Icon"></i> 
         <div>
-            <p class="text-[14px] md:text-[16px] text-[#1A237E] font-['Open Sans'] font-semibold">Order Notes:</p>
+            <p class="text-[14px] md:text-[16px] text-[#C2185B] font-['Open Sans'] font-semibold">Order Notes:</p>
             <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">
                 <?php echo $order['status_notes']; ?>
             </p>
@@ -262,29 +243,45 @@ require_once "../includes/auth/google.php";
                           <!-- Status Progress Line -->
                           <div class="status-line"></div>
                           
-                          <!-- Processing Status -->
+<!-- Processing Status -->
                           <div class="status-item relative flex mb-12">
-                              <div class="status-icon w-[40px] h-[40px] rounded-full <?php echo ($current_status_index >= 0) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> flex items-center justify-center z-10">
+                              <div class="status-icon w-[40px] h-[40px] rounded-full <?php echo ($current_status_index >= 0) ? 'bg-[#C2185B]' : 'bg-[#E1E1E1]'; ?> flex items-center justify-center z-10">
                                   <!-- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                       <path d="M9 16.2L4.8 12L3.4 13.4L9 19L21 7L19.6 5.6L9 16.2Z" fill="white"/>
                                   </svg> -->
-                                  <img src="../assets/user/processed.svg" alt="processing"/>
+                                  <i class="fa-solid fa-clock <?php echo ($current_status_index >= 0) ? 'text-white' : 'text-[#C5C5C5]'; ?> text-[20px] leading-none" alt="processing"></i>
                               </div>
                               <div class="status-content ml-4">
                                   <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Processing</h4>
                                   <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $processing_date; ?></p>
                               </div>
                           </div>
-                          
+
+                          <!-- Confirmed Status -->
+                          <div class="status-item relative flex mb-12">
+                              <div class="status-icon w-[40px] h-[40px] rounded-full 
+  <?php echo ($current_status_index >= 1) ? 'bg-[#C2185B]' : 'bg-[#E1E1E1]'; ?> 
+  flex items-center justify-center z-10">
+
+<i class="fa-solid fa-circle-check <?php echo ($current_status_index >= 1) ? 'text-white' : 'text-[#C5C5C5]'; ?> text-[20px] leading-none" 
+       alt="Confirmed Status"></i>
+</div>
+
+                              <div class="status-content ml-4">
+                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Confirmed</h4>
+                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $confirmed_date; ?></p>
+                              </div>
+
+                          </div>
+
                           <!-- Shipped Status -->
                           <div class="status-item relative flex mb-12">
                           <div class="status-icon w-[40px] h-[40px] rounded-full 
-  <?php echo ($current_status_index >= 1) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> 
+  <?php echo ($current_status_index >= 2) ? 'bg-[#C2185B]' : 'bg-[#E1E1E1]'; ?> 
   flex items-center justify-center z-10">
   
-  <img src="../assets/user/<?php echo ($current_status_index >= 1) ? 'shipped.svg' : 'not-shipped.svg'; ?>" 
-       alt="Shipping Status" 
-       class="min-w-[50px] h-[20px]" />
+<i class="fa-solid fa-truck-fast <?php echo ($current_status_index >= 2) ? 'text-white' : 'text-[#C5C5C5]'; ?> text-[20px] leading-none" 
+       alt="Shipping Status"></i>
 </div>
 
                               <div class="status-content ml-4">
@@ -301,15 +298,14 @@ require_once "../includes/auth/google.php";
                   
                           </div>
                           
-                          <!-- Delivered Status -->
+<!-- Delivered Status -->
                           <div class="status-item relative flex">
                           <div class="status-icon w-[40px] h-[40px] rounded-full 
-  <?php echo ($current_status_index >= 2) ? 'bg-[#1A237E]' : 'bg-[#E1E1E1]'; ?> 
+  <?php echo ($current_status_index >= 3) ? 'bg-[#C2185B]' : 'bg-[#E1E1E1]'; ?> 
   flex items-center justify-center z-10">
 
-  <img src="../assets/user/<?php echo ($current_status_index >= 2) ? 'shipped.svg' : 'not-shipped.svg'; ?>" 
-       alt="Delivery Status" 
-       class="w-[20px] h-[20px]" />
+<i class="fa-solid fa-box <?php echo ($current_status_index >= 3) ? 'text-white' : 'text-[#C5C5C5]'; ?> text-[20px] leading-none" 
+       alt="Delivery Status"></i>
 </div>
 
                               <div class="status-content ml-4">
@@ -328,7 +324,7 @@ require_once "../includes/auth/google.php";
                               </div>
                               <div class="status-content ml-4">
                                   <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Returned</h4>
-                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo formatDate($status_timestamps['Returned'] ?? $order['updated_at']); ?></p>
+                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo formatDate($status_timestamps['Returned'] ?? null); ?></p>
                                   <?php if (isset($order['order_note']) && !empty($order['order_note'])): ?>
                                   <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] mt-2 max-w-[300px] md:max-w-[500px]"><?php echo $order['order_note']; ?></p>
                                   <?php endif; ?>
@@ -344,7 +340,7 @@ require_once "../includes/auth/google.php";
                               </div>
                               <div class="status-content ml-4">
                                   <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Cancelled</h4>
-                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo formatDate($status_timestamps['Cancelled'] ?? $order['updated_at']); ?></p>
+                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo formatDate($status_timestamps['Cancelled'] ?? null); ?></p>
                                   <?php if (isset($order['order_note']) && !empty($order['order_note'])): ?>
                                   <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] mt-2 max-w-[300px] md:max-w-[500px]"><?php echo $order['order_note']; ?></p>
                                   <?php endif; ?>
@@ -375,7 +371,7 @@ require_once "../includes/auth/google.php";
                                 </div>
                             </div>
                             <div class="mt-3 md:mt-0 ml-0 md:ml-auto">
-                                <p class="text-[16px] font-['Open Sans'] font-medium">₦<?php echo number_format($item['price']); ?></p>
+                                <p class="text-[16px] font-['Open Sans'] font-medium">₦<?php echo number_format((float)$item['price']); ?></p>
                             </div>
                         </div>
                         <?php endforeach; ?>
@@ -383,7 +379,7 @@ require_once "../includes/auth/google.php";
                     
                     <div class="mt-6 flex justify-between">
                         <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Total Amount:</p>
-                        <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-bold">₦<?php echo number_format($order['order_total']); ?></p>
+                        <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-bold">₦<?php echo number_format((float)$order['order_total']); ?></p>
                     </div>
                 </div> -->
                 
@@ -423,16 +419,16 @@ require_once "../includes/auth/google.php";
                     <?php if ($can_request_return): ?>
                     <div class="mt-2">
                         <?php if ($has_return_request): ?>
-                        <span class="text-[13px] text-[#1A237E] font-['Open Sans'] italic">Return request pending</span>
+                        <span class="text-[13px] text-[#C2185B] font-['Open Sans'] italic">Return request pending</span>
                         <?php else: ?>
-                        <a href="./return-request.php?order_id=<?php echo $order_id; ?>&item_id=<?php echo $item['id']; ?>" class="inline-block py-1 px-3 bg-[#1A237E] text-white text-[13px] font-['Open Sans'] rounded-[4px]">Request Return</a>
+                        <a href="./return-request.php?order_id=<?php echo $order_id; ?>&item_id=<?php echo $item['id']; ?>" class="inline-block py-1 px-3 bg-[#C2185B] text-white text-[13px] font-['Open Sans'] rounded-[4px]">Request Return</a>
                         <?php endif; ?>
                     </div>
                     <?php endif; ?>
                 </div>
             </div>
             <div class="mt-3 md:mt-0 ml-0 md:ml-auto">
-                <p class="text-[16px] font-['Open Sans'] font-medium">₦<?php echo number_format($item['price']); ?></p>
+                <p class="text-[16px] font-['Open Sans'] font-medium">₦<?php echo number_format((float)$item['price']); ?></p>
             </div>
         </div>
         <?php endforeach; ?>
@@ -440,7 +436,7 @@ require_once "../includes/auth/google.php";
     
     <div class="mt-6 flex justify-between">
         <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Total Amount:</p>
-        <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-bold">₦<?php echo number_format($order['order_total']); ?></p>
+        <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-bold">₦<?php echo number_format((float)$order['order_total']); ?></p>
     </div>
 </div>
               
@@ -453,7 +449,7 @@ require_once "../includes/auth/google.php";
                     <a href="./report-issue.php?id=<?php echo $order_id; ?>" class="w-full py-2 px-4 bg-[#E8B006] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px] text-nowrap">Report an Issue</a>
                     <?php endif; ?>
                     
-                    <a href="../products/show.php?id=<?php echo $order_items[0]['product_id']; ?>" class="w-full py-2 px-4 bg-[#1A237E] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Re-Order</a>
+                    <a href="<?php echo product_url($order_items[0]); ?>" class="w-full py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Re-Order</a>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,5 @@
 <?php
 require_once "../../../config/config.php";
-session_start();
 
 // If user is already logged in, redirect to dashboard
 if(isset($_SESSION['user_id'])) {
@@ -8,10 +7,8 @@ if(isset($_SESSION['user_id'])) {
     exit();
 }
 
-//db connection
-require_once "../../../config/servername.php";
-
-$conn = new mysqli($servername, $username, $dbpassword, $dbname);
+// Use the project's existing db() helper from config.php
+$conn = db();
 
 if($conn->connect_error){
     die("Connection failed: " . $conn->connect_error);
@@ -67,7 +64,7 @@ if(isset($_POST['login'])) {
                 } else {
                     // Store email in session for verification page
                     $_SESSION['email'] = $email;
-                    $error = "Please verify your account first. <a href='" . DOMAIN . "/includes/auth/verify.php' class='text-[#1A237E]'>Verify now</a>";
+                    $error = "Please verify your account first. <a href='" . DOMAIN . "/includes/auth/verify.php' class='text-[#C2185B]'>Verify now</a>";
                 }
             } else {
                 $error = "Invalid email or password";
@@ -85,23 +82,20 @@ require_once "../google.php";
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH - Sign In</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY - Sign In</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../../style.css" />
-    <link rel="stylesheet" href="../../../styles/faq.css" />
-    <link rel="stylesheet" href="../../../styles/modal.css">
-    <link rel="stylesheet" href="../../../styles/tabs.css">
-    <link rel="stylesheet" href="../../../styles/inputs.css">
+<?php include '../../../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
 <?php
     include(__DIR__ . '/../../header.php');
     include(__DIR__ . '/../../options.php');
-   
-?>
+   ?>
 
 <div class="w-full bg-[#FEFEFE]">
     <div class="md:w-[50%] mx-auto p-4 bg-white border border-[1px] border-[#EFEFEF] my-5 rounded-md">
@@ -162,10 +156,10 @@ require_once "../google.php";
                     <input type="checkbox" name="remember" id="remember" class="w-4 h-4" />
                     <label for="remember" class="font-['Open Sans'] text-[14px] text-[#2C2C2C]">Remember me</label>
                 </div>
-                <a href="<?php echo DOMAIN; ?>/includes/auth/password-reset/mail.php" class="font-['Open Sans'] text-[14px] text-[#1A237E]">Forgot password?</a>
+                <a href="<?php echo DOMAIN; ?>/includes/auth/password-reset/mail.php" class="font-['Open Sans'] text-[14px] text-[#C2185B]">Forgot password?</a>
             </div>
             
-            <button type="submit" name="login" value="1" class="w-full py-[8px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">
+            <button type="submit" name="login" value="1" class="w-full py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">
                 Sign In
             </button>
         </form>
@@ -182,7 +176,7 @@ require_once "../google.php";
         </a>
         
         <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#7A7A7A] mt-4">
-            Don't have an account? <a href="../create-account/sign-up.php" class="text-[#1A237E]">Create an account</a>
+            Don't have an account? <a href="../create-account/sign-up.php" class="text-[#C2185B]">Create an account</a>
         </p>
     </div>
 </div>

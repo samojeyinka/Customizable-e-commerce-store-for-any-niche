@@ -18,11 +18,7 @@ $admin_role = $_SESSION['admin_role'] ?? 'admin';
 
 // Connect to the database for admin info
 require_once "../../config/servername.php";
-$admin_conn = new mysqli($servername, $username, $dbpassword, $dbname);
-
-if ($admin_conn->connect_error) {
-    die("Connection failed: " . $admin_conn->connect_error);
-}
+$admin_conn = db();
 
 // Fetch admin details
 $sql = "SELECT * FROM administrators WHERE admin_id = ?";
@@ -33,7 +29,7 @@ $admin_result = $stmt->get_result();
 $admin = $admin_result->fetch_assoc();
 
 // Close the admin database connection
-$admin_conn->close();
+
 
 // Set profile photo path with fallback to default if not available
 $profile_photo = "../assets/home/user.svg"; // Default image
@@ -144,9 +140,9 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
         echo "<tr>
                 <td>".htmlspecialchars($product['product_name'])."</td>
                 <td>".htmlspecialchars($product['sku'])."</td>
-                <td>".number_format($product['total_quantity'])."</td>
+                <td>".number_format((float)$product['total_quantity'])."</td>
                 <td>".htmlspecialchars($product['category_title'])."</td>
-                <td>₦".number_format($product['min_price'])."</td>
+                <td>₦".number_format((float)$product['min_price'])."</td>
                 <td>".$status_text."</td>
                 <td>".date('d/m/Y h:i a', strtotime($product['date_added']))."</td>
               </tr>";
@@ -159,8 +155,9 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
 function buildProductQuery($con, $category_filter, $status_filter, $date_filter, $search_query, $all = false) {
     $query = "
         SELECT 
-            p.product_id,
+p.product_id,
             p.product_name,
+            p.product_slug,
             p.sku,
             p.date_added,
             c.category_title,
@@ -364,47 +361,11 @@ $result = mysqli_query($con, $query);
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-    <link rel="stylesheet" href="../styles/overlay.css">
-    <link rel="stylesheet" href="../styles/dropdown.css" />
-    <link rel="stylesheet" href="../styles/graph.css" />
-    <link rel="stylesheet" href="../styles/dash.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-    <title>Document</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Document</title>
 
-    <style>
-        .categoryLists,
-        .editCategory,
-        .createBrand {
-            padding-top: 5%;
-        }
-
-
-
-        .createCategory .modal-content,
-        .createBrand .modal-content {
-            width: 40%;
-
-        }
-
-
-        .categoryLists .modal-content,
-        .editCategory .modal-content {
-            width: 50%;
-        }
-
-        @media screen and (max-width:765px) {
-
-            .createCategory .modal-content,
-            .categoryLists .modal-content,
-            .editCategory .modal-content,
-            .createBrand .modal-content {
-                width: 90%;
-            }
-        }
-    </style>
-
+<?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 
@@ -416,18 +377,17 @@ $result = mysqli_query($con, $query);
 
         <div class="flex items-center gap-5 md:gap-8 lg:gap-10">
             <a href="./index.php" class="flex items-center gap-1 md:gap-2">
-                <img src="../assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-                <h1 class="hidden md:block text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                <img src="../assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
             </a>
 
-            <img onclick="toggleNav()" src="../assets/home/menu.svg" alt="Search" class="w-[28px] cursor-pointer" />
+            <i class="fa-solid fa-bars text-[24px] cursor-pointer" onclick="toggleNav()" alt="Search"></i>
             <h1 class="hidden md:block text-[16px] md:text-[20px] font-Onest font-semibold">Orders</h1>
         </div>
 
 
         <div class="flex items-center gap-0">
             <div class="flex items-center gap-2 border-[1px] border-[#F3F3F3] rounded-[25px] p-2">
-                <img src="../assets/global/search-normal.svg" alt="Search" class="w-[18px]" />
+                <i class="fa-solid fa-magnifying-glass text-[18px]" alt="Search"></i>
                 <input type="text" placeholder="Search name, Order ID..." class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
             </div>
 
@@ -435,8 +395,8 @@ $result = mysqli_query($con, $query);
         <div class="flex items-center gap-6 md:bg-[#F3F3F3] rounded-[4px] py-1 px-4">
 
             <span class="cursor-pointer relative" onclick="openNotification()">
-                <img src="../assets/global/bell.svg" class="w-[18px] md:w-[20px]" alt="bag" />
-                <div class="w-[8px] h-[8px] bg-[#1A237E] rounded-full absolute top-[-.1rem] left-3"></div>
+                <i class="fa-regular fa-bell text-[20px]" alt="bag"></i>
+                <div class="w-[8px] h-[8px] bg-[#C2185B] rounded-full absolute top-[-.1rem] left-3"></div>
             </span>
 
            
@@ -464,7 +424,7 @@ $result = mysqli_query($con, $query);
 <div class="flex items-center gap-1">
     <h1 class="text-[18px] md:text-[20px] font-['Open Sans'] font-medium">Notifications</h1>
     <?php if ($unread_count > 0): ?>
-        <div class="flex items-center justify-center bg-[#1A237E] w-[20px] h-[20px] rounded-[50%]">
+        <div class="flex items-center justify-center bg-[#C2185B] w-[20px] h-[20px] rounded-[50%]">
             <h1 class="text-white text-[11px] md:text-[12px] font-['Open Sans'] font-medium">
                 <?php echo $unread_count > 99 ? '99+' : $unread_count; ?>
             </h1>
@@ -472,7 +432,7 @@ $result = mysqli_query($con, $query);
     <?php endif; ?>
 </div>
 
-    <a href="./notifications.php" class="text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[#1A237E]">See all</a>
+    <a href="./notifications.php" class="text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[#C2185B]">See all</a>
 
 
 </div>
@@ -493,7 +453,7 @@ $result = mysqli_query($con, $query);
                                     $created_at = new DateTime($notification['created_at']);
                                     echo $created_at->format('d M, Y h:i A'); 
                                     ?></span>
-                    <img src="../assets/user/action.svg" class="cursor-pointer" onclick="openNotimenu(this)" />
+                    <i class="fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer" onclick="openNotimenu(this)"></i>
                     <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                                         <div class="flex flex-col gap-3">
                                         <?php if ($notification['type'] === 'order' && !empty($notification['reference_id'])): ?>
@@ -551,21 +511,21 @@ include(__DIR__ . "/sidebar.php");
 
                 <div id="myBtn" class="w-full md:w-[274px] border-[1px] border-[#F3F3F3] cursor-pointer rounded-[8px] p-2 flex justify-between items-center">
                     <h1 class="text-[16px] font-Onest font-regular">Product Overview</h1>
-                    <img src="../assets/dash/Vector 6905.svg" />
+<i class="fa-solid fa-ellipsis-vertical text-[20px]"></i>
                 </div>
             </div>
 
             <div class="flex flex-col md:flex-row md:items-center gap-3">
                 <div class="flex  items-center gap-3">
-                    <button id="openCategory" class="ml-4 md:ml-0 w-[fit-content] text-[#1A237E] shrink-0 flex items-center gap-2 px-4 py-2 border-[1px] border-[#1A237E] rounded-lg cursor-pointer">
+                    <button id="openCategory" class="ml-4 md:ml-0 w-[fit-content] text-[#C2185B] shrink-0 flex items-center gap-2 px-4 py-2 border-[1px] border-[#C2185B] rounded-lg cursor-pointer">
                         Add Category
                     </button>
-                    <button id="openBrand" class="ml-4 md:ml-0 w-[fit-content] text-[#1A237E] shrink-0 flex items-center gap-2 px-4 py-2 border-[1px] border-[#1A237E] rounded-lg cursor-pointer">
+                    <button id="openBrand" class="ml-4 md:ml-0 w-[fit-content] text-[#C2185B] shrink-0 flex items-center gap-2 px-4 py-2 border-[1px] border-[#C2185B] rounded-lg cursor-pointer">
                         Add Tag
                     </button>
                 </div>
                 <a href="./new-product.php" class="ml-4 md:ml-0 w-[fit-content] shrink-0 flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
-                    <img src="../assets/dash/icon (1).svg" />
+<i class="fa-solid fa-plus text-[20px]"></i>
                     Add New Product
                 </a>
             </div>
@@ -578,7 +538,7 @@ include(__DIR__ . "/sidebar.php");
     <form method="get" action="products.php" class="w-full flex flex-col md:flex-row md:items-center gap-3 md:gap-5 justify-between">
         <div class="flex items-center gap-0">
             <div class="w-full flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[24px] p-2">
-                <img src="../assets/dash/search-normal (1).svg" alt="Search" class="w-[18px]" />
+                <i class="fa-solid fa-magnifying-glass text-[18px]" alt="Search"></i>
                 <input type="text" name="search" placeholder="Search" value="<?php echo htmlspecialchars($search_query); ?>" class="w-full md:w-[250px] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
                 <input type="hidden" name="category" value="<?php echo htmlspecialchars($category_filter); ?>">
                 <input type="hidden" name="status" value="<?php echo htmlspecialchars($status_filter); ?>">
@@ -589,13 +549,13 @@ include(__DIR__ . "/sidebar.php");
         <div class="w-full flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <span class="text-[#2c2c2c] text-[14px] md:text-[16px] font-Onest font-medium">Filter by:</span>
-                <img src="../assets/dash/filter-horizontal.svg" class="md:hidden" />
+                <i class="fa-solid fa-filter md:hidden"></i>
 
                 <div class="hidden md:flex items-center gap-2 md:gap-3 lg:gap-4">
                     <div class="custom-dropdown">
                         <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular"><?php echo !empty($category_filter) ? $category_filter : 'Category'; ?></span>
-                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                            <i class="fa-solid fa-chevron-down arrow-down"></i>
                         </div>
                         <div class="dropdown-content">
                             <div class="flex items-center gap-3">
@@ -621,7 +581,7 @@ include(__DIR__ . "/sidebar.php");
                                     }
                                 ?>
                             </span>
-                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                            <i class="fa-solid fa-chevron-down arrow-down"></i>
                         </div>
                         <div class="dropdown-content">
                             <div class="flex items-center gap-3">
@@ -647,7 +607,7 @@ include(__DIR__ . "/sidebar.php");
                                     }
                                 ?>
                             </span>
-                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                            <i class="fa-solid fa-chevron-down arrow-down"></i>
                         </div>
                         <div class="dropdown-content">
                             <div class="flex items-center gap-3">
@@ -664,12 +624,12 @@ include(__DIR__ . "/sidebar.php");
             </div>
 
             <div class="flex items-center gap-1">
-                <img src="../assets/dash/Path.svg" />
+                <i class="fa-solid fa-xmark text-[14px] text-[#262626]"></i>
                 <a href="products.php" class="text-[#262626] text-[14px] font-Onest font-regular">Clear filter</a>
             </div>
 
             <a href="products.php?export=excel&category=<?php echo urlencode($category_filter); ?>&status=<?php echo urlencode($status_filter); ?>&date=<?php echo urlencode($date_filter); ?>&search=<?php echo urlencode($search_query); ?>" class="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg cursor-pointer">
-                <img src="../assets/dash/send-square.svg" />
+                <i class="fa-solid fa-download text-[16px]"></i>
                 Export
             </a>
         </div>
@@ -692,7 +652,7 @@ include(__DIR__ . "/sidebar.php");
                             <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Status</th>
                             <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Date</th>
                             <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">
-                                <img src="../assets/dash/column.svg" class="min-w-[24px] min-h-[24px]" />
+                                <i class="fa-solid fa-table-columns text-[20px]"></i>
                             </th>
                         </thead>
 
@@ -737,9 +697,9 @@ include(__DIR__ . "/sidebar.php");
             </div>
         </td>
         <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo htmlspecialchars($product['sku']); ?></td>
-        <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo number_format($product['total_quantity']); ?></td>
+        <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo number_format((float)$product['total_quantity']); ?></td>
         <td class="text-nowrap text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2"><?php echo htmlspecialchars($product['category_title']); ?></td>
-        <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">₦<?php echo number_format($product['min_price']); ?></td>
+        <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular px-2">₦<?php echo number_format((float)$product['min_price']); ?></td>
 
         <td>
             <button type="button" class="py-1 px-4 text-nowrap <?php echo $status_class; ?> text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px] <?php if ($stock_status !== 'available') echo 'text-nowrap'; ?>">
@@ -750,12 +710,12 @@ include(__DIR__ . "/sidebar.php");
         <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-nowrap"><?php echo $formatted_date; ?></td>
 
         <td class="relative">
-            <img src="../assets/user/action.svg" class="w-[20px] cursor-pointer" onclick="openOrdermenu(this)" />
+            <i class="fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer" onclick="openOrdermenu(this)"></i>
 
             <!-- Order Menu (specific to this row) -->
             <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                 <div class="flex flex-col gap-3">
-                    <a href="../../products/show.php?id=<?php echo $product['product_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
+                    <a href="<?php echo product_url($product); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
                     <a href="./reviews.php?product_id=<?php echo $product['product_id']; ?>" class="text-[16px] font-medium text-[#262626]">View Review</a>
                     <a href="./edit-product.php?id=<?php echo $product['product_id']; ?>" class="text-[16px] font-medium text-[#262626]">Edit</a>
                     <a href="javascript:void(0);" onclick="confirmDelete(<?php echo $product['product_id']; ?>, '<?php echo addslashes($product['product_name']); ?>')" class="text-[16px] font-medium text-[#D93939]">Delete</a>
@@ -796,7 +756,7 @@ include(__DIR__ . "/sidebar.php");
     <div class="w-full md:w-[fit-content] ml-auto flex items-center justify-between gap-5">
         <?php if ($page > 1): ?>
             <div class="flex items-center gap-2 cursor-pointer">
-                <img src="../assets/products/prev.svg" class="w-[6px] h-[11px]" />
+                <i class="fa-solid fa-chevron-left text-[12px]"></i>
                 <a href="products.php?page=<?php echo $page-1; ?>&category=<?php echo urlencode($category_filter); ?>&status=<?php echo urlencode($status_filter); ?>&date=<?php echo urlencode($date_filter); ?>&search=<?php echo urlencode($search_query); ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Prev</a>
             </div>
         <?php endif; ?>
@@ -812,7 +772,7 @@ include(__DIR__ . "/sidebar.php");
             // Show pages around current page
             for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++) {
                 if ($i == $page) {
-                    echo '<span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#1A237E]">'.$i.'</span>';
+                    echo '<span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#C2185B]">'.$i.'</span>';
                 } else {
                     echo '<a href="products.php?page='.$i.'&category='.urlencode($category_filter).'&status='.urlencode($status_filter).'&date='.urlencode($date_filter).'&search='.urlencode($search_query).'" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">'.$i.'</a>';
                 }
@@ -829,7 +789,7 @@ include(__DIR__ . "/sidebar.php");
         <?php if ($page < $total_pages): ?>
             <div class="flex items-center gap-2 cursor-pointer">
                 <a href="products.php?page=<?php echo $page+1; ?>&category=<?php echo urlencode($category_filter); ?>&status=<?php echo urlencode($status_filter); ?>&date=<?php echo urlencode($date_filter); ?>&search=<?php echo urlencode($search_query); ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">Next</a>
-                <img src="../assets/products/next.svg" class="w-[6px] h-[11px]" />
+                <i class="fa-solid fa-chevron-right text-[12px]"></i>
             </div>
         <?php endif; ?>
     </div>
@@ -845,7 +805,7 @@ include(__DIR__ . "/sidebar.php");
     <!-- Modal content -->
     <div class="modal-content overflow-hidden p-4">
         <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Product Overview</h1>
-        <img src="../assets/global/close-circle.svg" alt="close" id="closmyModalhere" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+        <i class="fa-solid fa-xmark text-[24px] cursor-pointer absolute top-4 right-4" id="closmyModalhere" alt="close"></i>
 
         <div class="grid grid-cols-1 md:grid-cols-2 p-2 gap-4 mt-2">
             <?php
@@ -886,11 +846,11 @@ include(__DIR__ . "/sidebar.php");
                 <div class="flex flex-col gap-[1px]">
                     <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Products</span>
                     <div class="flex items-center gap-2">
-                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($stats['total_products']); ?></h2>
-                        <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">Listed items</p>
+                        <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((float)$stats['total_products']); ?></h2>
+                        <p class="text-[#C2185B] text-[15px] text-[17px] font-regular font-['Open Sans']">Listed items</p>
                     </div>
                     <div class="flex items-center gap-1">
-                        <img src="../assets/dash/<?php echo $total_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <i class="fa-solid <?php echo $total_change >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                         <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                             <span class="text-<?php echo $total_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                 <?php echo abs($total_percentage); ?>%
@@ -908,11 +868,11 @@ include(__DIR__ . "/sidebar.php");
                 <div class="flex flex-col gap-[1px]">
                     <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Out-of-Stock Products</span>
                     <div class="flex items-center gap-2">
-                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($stats['out_of_stock']); ?></h2>
-                        <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">items need restocking</p>
+                        <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((int)$stats['out_of_stock']); ?></h2>
+                        <p class="text-[#C2185B] text-[15px] text-[17px] font-regular font-['Open Sans']">items need restocking</p>
                     </div>
                     <div class="flex items-center gap-1">
-                        <img src="../assets/dash/<?php echo $out_of_stock_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <i class="fa-solid <?php echo $out_of_stock_change >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                         <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                             <span class="text-<?php echo $out_of_stock_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                 <?php echo abs($out_of_stock_percentage); ?>%
@@ -930,11 +890,11 @@ include(__DIR__ . "/sidebar.php");
                 <div class="flex flex-col gap-[1px]">
                     <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">In-Stock Products</span>
                     <div class="flex items-center gap-2">
-                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($stats['in_stock']); ?></h2>
-                        <p class="text-[#1A237E] text-[15px] text-[17px] font-regular font-['Open Sans']">available for purchase</p>
+                        <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((int)$stats['in_stock']); ?></h2>
+                        <p class="text-[#C2185B] text-[15px] text-[17px] font-regular font-['Open Sans']">available for purchase</p>
                     </div>
                     <div class="flex items-center gap-1">
-                        <img src="../assets/dash/<?php echo $in_stock_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <i class="fa-solid <?php echo $in_stock_change >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                         <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                             <span class="text-<?php echo $in_stock_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                 <?php echo abs($in_stock_percentage); ?>%
@@ -952,11 +912,11 @@ include(__DIR__ . "/sidebar.php");
                 <div class="flex flex-col gap-[1px]">
                     <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Low Stock Warnings</span>
                     <div class="flex items-center gap-2">
-                        <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format($stats['low_stock']); ?></h2>
-                        <p class="text-[#1A237E] text-[14px] text-[15px] font-regular font-['Open Sans']">products have less than 10 items left</p>
+                        <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']"><?php echo number_format((int)$stats['low_stock']); ?></h2>
+                        <p class="text-[#C2185B] text-[14px] text-[15px] font-regular font-['Open Sans']">products have less than 10 items left</p>
                     </div>
                     <div class="flex items-center gap-1">
-                        <img src="../assets/dash/<?php echo $low_stock_change >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <i class="fa-solid <?php echo $low_stock_change >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                         <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                             <span class="text-<?php echo $low_stock_change >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                 <?php echo abs($low_stock_percentage); ?>%
@@ -983,7 +943,7 @@ include(__DIR__ . "/sidebar.php");
         <!-- Modal content -->
         <div class="modal-content overflow-hidden p-4">
             <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Edit Category</h1>
-            <img src="../assets/global/close-circle.svg" alt="close" id="closeEC" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+            <i class="fa-solid fa-xmark text-[24px] cursor-pointer absolute top-4 right-4" id="closeEC" alt="close"></i>
 
             <form method="post" enctype="multipart/form-data">
                 <div class="flex flex-col gap-4">
@@ -1001,7 +961,7 @@ include(__DIR__ . "/sidebar.php");
                             <div class="w-full h-[120px] border-[1px] border-dashed border-[#E1E1E1] rounded-lg flex items-center justify-center relative">
                                 <input type="file" name="edit_cat_image" id="edit_cat_image" accept="image/*" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" onchange="previewEditImage(this)" />
                                 <div id="edit-upload-placeholder" class="flex flex-col items-center justify-center gap-2">
-                                    <img src="../../assets/global/folder-2.svg" alt="upload" class="w-[24px] h-[24px]" />
+                                    <i class="fa-regular fa-folder-open text-[30px] mx-auto" alt="upload"></i>
                                     <span class="text-[14px] text-[#9A9A9A] font-['Open Sans']">Click to upload or drag and drop</span>
                                     <span class="text-[12px] text-[#9A9A9A] font-['Open Sans']">SVG, PNG, JPG or GIF (max. 2MB)</span>
                                 </div>
@@ -1027,7 +987,7 @@ include(__DIR__ . "/sidebar.php");
         <!-- Modal content -->
         <div class="modal-content overflow-hidden p-4">
             <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Edit Brand</h1>
-            <img src="../assets/global/close-circle.svg" alt="close" id="closeEB" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+            <i class="fa-solid fa-xmark text-[24px] cursor-pointer absolute top-4 right-4" id="closeEB" alt="close"></i>
 
             <form method="post" enctype="multipart/form-data">
                 <div class="flex flex-col gap-4">
@@ -1045,7 +1005,7 @@ include(__DIR__ . "/sidebar.php");
                             <div class="w-full h-[120px] border-[1px] border-dashed border-[#E1E1E1] rounded-lg flex items-center justify-center relative">
                                 <input type="file" name="edit_brand_image" id="edit_brand_image" accept="image/*" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" onchange="previewEditBrandImage(this)" />
                                 <div id="edit-brand-upload-placeholder" class="flex flex-col items-center justify-center gap-2">
-                                    <img src="../../assets/global/folder-2.svg" alt="upload" class="w-[24px] h-[24px]" />
+                                    <i class="fa-regular fa-folder-open text-[30px] mx-auto" alt="upload"></i>
                                     <span class="text-[14px] text-[#9A9A9A] font-['Open Sans']">Click to upload or drag and drop</span>
                                     <span class="text-[12px] text-[#9A9A9A] font-['Open Sans']">SVG, PNG, JPG or GIF (max. 2MB)</span>
                                 </div>

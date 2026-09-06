@@ -1,5 +1,5 @@
 <div id="SignUp" class="tabcontent">
-    <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Welcome to Victosah Solution</h3>
+    <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Welcome to Glorefy</h3>
 
     <form action="<?php echo DOMAIN; ?>/includes/auth/create-account/send.php" method="POST" class="flex flex-col gap-4 pt-4" id="userCreationForm">
 
@@ -54,7 +54,7 @@
         
        
        
-        <button type="submit" class="w-full py-[8px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Create an account</button>
+        <button type="submit" class="w-full py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Create an account</button>
 
    
 

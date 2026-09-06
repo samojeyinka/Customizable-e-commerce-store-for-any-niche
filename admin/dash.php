@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "../config/config.php";
 
@@ -18,11 +18,7 @@ $admin_role = $_SESSION['admin_role'] ?? 'admin';
 // Connect to the database
 require_once "../config/servername.php";
 
-$conn = new mysqli($servername, $username, $dbpassword, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$conn = db();
 
 // Fetch admin details
 $sql = "SELECT * FROM administrators WHERE admin_id = ?";
@@ -33,7 +29,7 @@ $result = $stmt->get_result();
 $admin = $result->fetch_assoc();
 
 // Close the database connection
-$conn->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -42,128 +38,13 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH ADMIN | Dashboard</title>
+    <title>GLOREFY ADMIN | Dashboard</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css" />
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    
-    <style>
-        .sidebar {
-            background-color: #1A237E;
-            color: white;
-            height: 100vh;
-            width: 250px;
-            position: fixed;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-        }
-        
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-        }
-        
-        .sidebar-menu {
-            padding: 0;
-            list-style: none;
-        }
-        
-        .sidebar-menu li {
-            padding: 10px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar-menu li.active {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar-menu li a {
-            color: white;
-            text-decoration: none;
-            display: block;
-        }
-        
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .stat-value {
-            font-size: 28px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .admin-profile {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-        
-        .profile-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .profile-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 20px;
-        }
-        
-        .mobile-menu-toggle {
-            display: none;
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 1000;
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .mobile-menu-toggle {
-                display: block;
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                z-index: 1001;
-                background-color: #1A237E;
-                color: white;
-                border: none;
-                width: 40px;
-                height: 40px;
-                border-radius: 5px;
-                cursor: pointer;
-            }
-        }
-    </style>
+<link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+<?php include 'tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body class="bg-gray-100">
@@ -173,8 +54,7 @@ $conn->close();
 
     <div class="sidebar" id="sidebar">
         <div class="flex items-center justify-center py-5 border-b border-white/10">
-            <img src="<?php echo DOMAIN; ?>/assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-            <h1 class="text-[20px] md:text-[24px] font-Onest font-semibold text-white ml-2">VICTOSAH</h1>
+            <img src="<?php echo DOMAIN; ?>/assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
         </div>
         
         <ul class="sidebar-menu mt-5">

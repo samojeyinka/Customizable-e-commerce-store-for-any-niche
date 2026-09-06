@@ -1,8 +1,12 @@
 <?php
 // dashboard_stats.php - Include this at the top of your overview.php file
 
+if (!function_exists('db')) {
+    require_once __DIR__ . '/../../config/config.php';
+}
+
 // Database connection is already established from config.php
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
@@ -39,8 +43,8 @@ switch ($time_period) {
 // User Statistics 
 $user_stats_query = "SELECT 
     COUNT(*) as total_users,
-    SUM(CASE WHEN is_disabled = 0 THEN 1 ELSE 0 END) as active_users,
-    SUM(CASE WHEN is_disabled = 1 THEN 1 ELSE 0 END) as disabled_users,
+    SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_users,
+    SUM(CASE WHEN status = 'suspended' THEN 1 ELSE 0 END) as disabled_users,
     (SELECT COUNT(*) FROM users WHERE last_login >= '$last_28_days') as recent_users,
     (SELECT COUNT(*) FROM users WHERE last_login >= '$last_56_days' AND last_login < '$last_28_days') as previous_period_users
 FROM users";

@@ -10,8 +10,9 @@ requireAuth();
 $user = getCurrentUser();
 $user_id = $user['id'];
 
+
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die(mysqli_error($conn));
 }
@@ -157,17 +158,15 @@ require_once "../includes/auth/google.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Request Return</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Request Return</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/styles.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -179,20 +178,20 @@ require_once "../includes/auth/google.php";
     ?>
 
         <section class="w-full bg-[#FFFFFF] py-1">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./orders.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./track-order.php?id=<?php echo $order_id; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Track Order</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">Request Return</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Request Return</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto bg-[#FFFFFF] py-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] bg-[#FFFFFF] py-5">
             <div class="w-full md:w-[80%] lg:w-[60%] mx-auto">
                 <h1 class="text-[24px] md:text-[28px] text-[#2C2C2C] font-['Open Sans'] font-medium mb-6 text-center">Request Product Return</h1>
                 
@@ -229,7 +228,7 @@ require_once "../includes/auth/google.php";
                         <div>
                             <h4 class="text-[16px] font-['Open Sans'] font-medium"><?php echo $item['product_name']; ?></h4>
                             <p class="text-[14px] text-[#262626] font-['Open Sans']">Size: <?php echo $item['size']; ?> • Color: <?php echo $item['colors']; ?></p>
-                            <p class="text-[14px] text-[#262626] font-['Open Sans']">Price: ₦<?php echo number_format($item['price']); ?></p>
+                            <p class="text-[14px] text-[#262626] font-['Open Sans']">Price: ₦<?php echo number_format((float)$item['price']); ?></p>
                             <p class="text-[14px] text-[#262626] font-['Open Sans']">Quantity: <?php echo $item['quantity']; ?></p>
                         </div>
                     </div>
@@ -289,7 +288,7 @@ require_once "../includes/auth/google.php";
                     
                     <div class="flex justify-end mt-6">
                         <a href="./track-order.php?id=<?php echo $order_id; ?>" class="mr-3 py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[16px] font-['Open Sans'] rounded-[4px]">Cancel</a>
-                        <button type="submit" class="py-2 px-4 bg-[#1A237E] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Submit Return Request</button>
+                        <button type="submit" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Submit Return Request</button>
                     </div>
                 </form>
             </div>

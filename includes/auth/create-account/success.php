@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
     <title>Document</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
 
@@ -15,7 +17,7 @@
 <div id="regSuccess" class="modal regsuccess">
     <div class="modal-content overflow-hidden p-4 flex flex-col items-center">
 
-        <img src="./assets/global/success.svg" class="mx-auto w-[120px]" />
+        <i class="fa-solid fa-circle-check text-[120px] text-[#C2185B] mx-auto leading-none"></i>
 
         <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
             Account Creation Successful
@@ -27,7 +29,7 @@
 
 
 
-        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer"
+        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer"
             id="closeregsucces">
             Continue Shopping
         </span>

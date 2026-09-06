@@ -1,8 +1,6 @@
 <?php
-// Check if the current URL contains '/includes/' or is under includes path
-$currentUrl = $_SERVER['REQUEST_URI'];
-$isIncludesPath = strpos($currentUrl, '/includes/') !== false || 
-                  preg_match('#^/victosah/includes/#', $currentUrl);
+// Check if the current URL contains '/includes/' or is served from within the includes directory
+$isIncludesPath = strpos($_SERVER['REQUEST_URI'], '/includes/') !== false;
 
 // Side menu implementation with conditional links
 ?>
@@ -10,25 +8,25 @@ $isIncludesPath = strpos($currentUrl, '/includes/') !== false ||
     <div class="relative flex flex-col">
         <?php if (isAuthenticated()): ?>
             <a href="<?php echo DOMAIN; ?>/user/profile.php" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#262626] font-['Open Sans']">
-                <img src="<?php echo DOMAIN; ?>/assets/global/user.svg" class="" />
+                <i class="fa-solid fa-user text-[16px] text-[#262626] leading-none"></i>
                 <span>My Profile</span>
             </a>
             <a href="<?php echo DOMAIN; ?>/user/orders.php" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#262626] font-['Open Sans']">
-                <img src="<?php echo DOMAIN; ?>/assets/global/invoice.svg" class="" />
+                <i class="fa-solid fa-receipt text-[16px] text-[#262626] leading-none"></i>
                 <span>My Orders</span>
             </a>
             <a href="<?php echo DOMAIN; ?>/user/my-issues.php" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#262626] font-['Open Sans']">
-                <img src="<?php echo DOMAIN; ?>/assets/global/issues.svg" class="" />
+                <i class="fa-solid fa-circle-exclamation text-[16px] text-[#262626] leading-none"></i>
                 <span>My Issues</span>
             </a>
 
             <a href="<?php echo DOMAIN; ?>/user/returns.php" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#262626] font-['Open Sans']">
-                <img src="<?php echo DOMAIN; ?>/assets/global/return.svg" class="w-[18px]" />
+                <i class="fa-solid fa-rotate-left text-[16px] text-[#262626] leading-none"></i>
                 <span>Returned Items</span>
             </a>
 
             <a id="logooutBtn" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#EE3F3F] font-['Open Sans']">
-                <img src="<?php echo DOMAIN; ?>/assets/global/logout.svg" class="" />
+                <i class="fa-solid fa-right-from-bracket text-[16px] text-[#EE3F3F] leading-none"></i>
                 <span>Log Out</span>
             </a>
         <?php else: ?>
@@ -38,8 +36,8 @@ $isIncludesPath = strpos($currentUrl, '/includes/') !== false ||
                 <a href="../create-account/sign-up.php" class="menulink text-[16px] font-regular text-[#262626] font-['Open Sans']">Create an Account</a>
             <?php else: ?>
                 <!-- Modal triggers for other pages -->
-                <p class="menulink text-[16px] font-regular text-[#262626] font-['Open Sans'] modal-open-btn">Sign In</p>
-                <p class="menulink text-[16px] font-regular text-[#262626] font-['Open Sans'] modal-open-btn">Create an Account</p>
+                <p class="menulink text-[16px] font-regular text-[#262626] font-['Open Sans'] cursor-pointer" onclick="openAuthModal('SignIn')">Sign In</p>
+                <p class="menulink text-[16px] font-regular text-[#262626] font-['Open Sans'] cursor-pointer" onclick="openAuthModal('SignUp')">Create an Account</p>
             <?php endif; ?>
         <?php endif; ?>
         
@@ -53,7 +51,7 @@ $isIncludesPath = strpos($currentUrl, '/includes/') !== false ||
 
 <div id="logout" class="modal logout">
     <div class="modal-content overflow-hidden px-5 py-10 flex flex-col">
-        <img src="<?php echo DOMAIN; ?>/assets/global/close-circle.svg" alt="close" id="closelogout" class="w-[26px] md:w-[32px] cursor-pointer absolute top-10 right-4" />
+        <i class="fa-solid fa-xmark text-[26px] md:text-[32px] text-[#262626] cursor-pointer absolute top-10 right-4 leading-none" id="closelogout" alt="close"></i>
         
         <p class="text-[#EE3F3F] font-['Open Sans'] text-[19px] text-[24px] font-medium text-center">
             Log Out

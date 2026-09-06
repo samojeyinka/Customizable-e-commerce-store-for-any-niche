@@ -31,8 +31,10 @@ var dangeralert = document.getElementById("dangeralert");
 var closedangeralert = document.getElementById("closedangeralert");
 
 
-closedangeralert.onclick = function () {
-  dangeralert.style.display = "none";
+if (closedangeralert) {
+  closedangeralert.onclick = function () {
+    dangeralert.style.display = "none";
+  }
 }
 
 var regSuccess = document.getElementById("regSuccess");
@@ -45,86 +47,112 @@ var closeauth = document.getElementById("closeauth");
 
 
 
-btn.onclick = function () {
-  modal.style.display = "block";
-  regVerify.style.display = "none";
+if (btn) {
+  btn.onclick = function () {
+    modal.style.display = "block";
+    regVerify.style.display = "none";
+  }
 }
 
-rvbtn.onclick = function () {
-  modal.style.display = "none";
-  regVerify.style.display = "block";
-}
-
-
-
-
-
-
-openpsrmail.onclick = function () {
-  modal.style.display = "none";
-  passwordRequestMail.style.display = "block";
+if (rvbtn) {
+  rvbtn.onclick = function () {
+    modal.style.display = "none";
+    regVerify.style.display = "block";
+  }
 }
 
 
 
 
-openpsrv.onclick = function () {
-  passwordRequestMail.style.display = "none";
-  passwordRequestverify.style.display = "block";
-}
 
-backtologin.onclick = function () {
-  passwordRequestMail.style.display = "none";
-  modal.style.display = "block";
-}
-
-backtomail.onclick = function () {
-  passwordRequestverify.style.display = "none";
-  passwordRequestMail.style.display = "block";
-}
-
-
-openPasswordRequestNP.onclick = function () {
-  passwordRequestverify.style.display = "none";
-  passwordRequestNP.style.display = "block";
-}
-
-openpasswordresetsuccess.onclick = function () {
-  passwordRequestNP.style.display = "none";
-  passwordresetsuccess.style.display = "block";
-}
-
-backtoprverify.onclick = function () {
-  passwordRequestNP.style.display = "none";
-  passwordRequestverify.style.display = "block";
-}
-
-regsuccessbtn.onclick = function () {
-  regVerify.style.display = "none";
-  regSuccess.style.display = "block";
-
-}
-
-closeauth.onclick = function () {
-  modal.style.display = "none";
-}
-
-backtoreg.onclick = function () {
-  modal.style.display = "block";
-  regVerify.style.display = "none";
+if (openpsrmail) {
+  openpsrmail.onclick = function () {
+    modal.style.display = "none";
+    passwordRequestMail.style.display = "block";
+  }
 }
 
 
 
 
-closeregsucces.onclick = function () {
-  regSuccess.style.display = "none";
-  window.location.href = './products/index.php';
+if (openpsrv) {
+  openpsrv.onclick = function () {
+    passwordRequestMail.style.display = "none";
+    passwordRequestverify.style.display = "block";
+  }
 }
 
-closeprsucces.onclick = function () {
-  passwordresetsuccess.style.display = "none";
-  window.location.href = '../user/profile.php';
+if (backtologin) {
+  backtologin.onclick = function () {
+    passwordRequestMail.style.display = "none";
+    modal.style.display = "block";
+  }
+}
+
+if (backtomail) {
+  backtomail.onclick = function () {
+    passwordRequestverify.style.display = "none";
+    passwordRequestMail.style.display = "block";
+  }
+}
+
+
+if (openPasswordRequestNP) {
+  openPasswordRequestNP.onclick = function () {
+    passwordRequestverify.style.display = "none";
+    passwordRequestNP.style.display = "block";
+  }
+}
+
+if (openpasswordresetsuccess) {
+  openpasswordresetsuccess.onclick = function () {
+    passwordRequestNP.style.display = "none";
+    passwordresetsuccess.style.display = "block";
+  }
+}
+
+if (backtoprverify) {
+  backtoprverify.onclick = function () {
+    passwordRequestNP.style.display = "none";
+    passwordRequestverify.style.display = "block";
+  }
+}
+
+if (regsuccessbtn) {
+  regsuccessbtn.onclick = function () {
+    regVerify.style.display = "none";
+    regSuccess.style.display = "block";
+  }
+}
+
+if (closeauth) {
+  closeauth.onclick = function () {
+    modal.style.display = "none";
+  }
+}
+
+if (backtoreg) {
+  backtoreg.onclick = function () {
+    modal.style.display = "block";
+    regVerify.style.display = "none";
+  }
+}
+
+
+
+
+if (closeregsucces) {
+  closeregsucces.onclick = function () {
+    regSuccess.style.display = "none";
+    window.location.href = './products/index.php';
+  }
+}
+
+if (closeprsucces) {
+  closeprsucces.onclick = function () {
+    passwordresetsuccess.style.display = "none";
+    window.location.href = '../user/profile.php';
+  }
 }
 
 

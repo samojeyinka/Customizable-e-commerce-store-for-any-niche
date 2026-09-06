@@ -1,53 +1,24 @@
 <?php
-// Get category and brand from URL parameters
+$con = db();
 $category_id = isset($_GET['category']) ? (int)$_GET['category'] : null;
 $brand_id = isset($_GET['brand']) ? (int)$_GET['brand'] : null;
-
 $current_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// Debug line - uncomment to see the exact path
-// error_log("Current path: " . $current_path);
-
-// PRODUCTION ROUTES ONLY
-// Set default products per page based on the page context
 if ($current_path == '/products/show.php') {
-    // Show page - display all related products without pagination
-    $products_per_page = 100; // High number to essentially show all
-    $show_related_only = true; // Flag to indicate we're on show page
-    
-    // Get the current product ID from the URL
+    $products_per_page = 100;
+    $show_related_only = true;
     $current_product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-    
-    // Debug line
-    // error_log("Matched product show page, ID: " . $current_product_id);
-} 
-elseif ($current_path == '/' || $current_path == '/index.php') {
-    // Homepage - fewer products
+} elseif ($current_path == '/' || $current_path == '/index.php') {
     $products_per_page = 4;
     $show_related_only = false;
-    
-    // Debug line
-    // error_log("Matched homepage");
-} 
-elseif ($current_path == '/products/' || $current_path == '/products/index.php') {
-    // Products listing page
+} elseif ($current_path == '/products/' || $current_path == '/products/index.php') {
     $products_per_page = 12;
     $show_related_only = false;
-    
-    // Debug line
-    // error_log("Matched products listing page");
-} 
-else {
-    // Default case - any other page
+} else {
     $products_per_page = 12;
     $show_related_only = false;
-    
-    // Debug line
-    // error_log("Matched default case for path: " . $current_path);
 }
 
-
-// Get the current page from URL parameter, default to 1 if not set
 $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 
 // Ensure current_page is at least 1
@@ -63,6 +34,7 @@ $query = "
     SELECT 
         p.product_id,
         p.product_name, 
+        p.product_slug,
         p.is_featured,
         p.colors,
         c.category_title,
@@ -100,7 +72,7 @@ if (function_exists('applyFiltersToQuery')) {
 // Complete the query with GROUP BY clause
 $query .= "
     GROUP BY 
-        p.product_id, p.product_name, p.is_featured, p.colors, c.category_title, b.brand_title, i.image_path
+        p.product_id, p.product_name, p.product_slug, p.is_featured, p.colors, c.category_title, b.brand_title, i.image_path
 ";
 
 // Apply sorting

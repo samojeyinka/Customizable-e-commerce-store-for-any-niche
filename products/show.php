@@ -27,34 +27,40 @@ if (isset($_SESSION['user_id'])) {
 }
 
 
-// Get product ID from URL
+// Get product slug or ID from URL
+$product_slug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
 $product_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// Check if product ID is valid
-if ($product_id <= 0) {
-    // echo "<script>alert('Invalid product ID'); window.location.href='./index.php';</script>";
+// Check if product identifier is valid
+if ($product_slug === '' && $product_id <= 0) {
     echo "<script>alert('Invalid product ID'); window.location.href='" . DOMAIN . "/index.php';</script>";
     exit;
 }
 
-// Fetch product details
+// Fetch product details (by slug when available, otherwise keep ID as fallback)
+$by_slug = ($product_slug !== '');
 $product_query = "SELECT p.*, c.category_title, b.brand_title 
                  FROM products p 
                  LEFT JOIN categories c ON p.category_id = c.category_id 
                  LEFT JOIN brands b ON p.brand_id = b.brand_id 
-                 WHERE p.product_id = ?";
+                 WHERE " . ($by_slug ? "p.product_slug = ?" : "p.product_id = ?");
 $stmt = mysqli_prepare($con, $product_query);
-mysqli_stmt_bind_param($stmt, "i", $product_id);
+if ($by_slug) {
+    mysqli_stmt_bind_param($stmt, "s", $product_slug);
+} else {
+    mysqli_stmt_bind_param($stmt, "i", $product_id);
+}
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
 if (mysqli_num_rows($result) == 0) {
-    // echo "<script>alert('Product not found'); window.location.href='../index.php';</script>";
     echo "<script>alert('Product not found'); window.location.href='" . DOMAIN . "/index.php';</script>";
     exit;
 }
 
 $product = mysqli_fetch_assoc($result);
+$product_id = (int) $product['product_id'];
+$product_slug = isset($product['product_slug']) ? $product['product_slug'] : $product_slug;
 
 // Fetch product variants
 $variants_query = "SELECT * FROM product_variants WHERE product_id = ? ORDER BY original_price";
@@ -149,9 +155,9 @@ function generateStarRating($rating) {
     $html = '<div class="flex items-center gap-1">';
     for ($i = 1; $i <= 5; $i++) {
         if ($i <= $rating) {
-            $html .= '<img src="' . DOMAIN . '/assets/products/star.svg" class="w-[16px]" />';
+$html .= '<i class="fa-solid fa-star text-[#FFC107] text-[16px] leading-none"></i>';
         } else {
-            $html .= '<img src="' . DOMAIN . '/assets/products/lstar.svg" class="w-[16px]" />';
+            $html .= '<i class="fa-solid fa-star text-[#E0E0E0] text-[16px] leading-none"></i>';
         }
     }
     $html .= '</div>';
@@ -166,131 +172,15 @@ require_once "../includes/auth/google.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Product</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Product</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/styles.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
-
-    <style>
-                .custom-dropdown {
-            display: inline-flex;
-            align-items: center;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .arrow-down {
-            margin-left: 5px;
-            font-size: 14px;
-            transition: transform 0.3s ease;
-            color: gray;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            top: 40px;
-            left: 0;
-            background: white;
-
-            border-radius: 4px;
-            min-width: 120px;
-            width: fit-content;
-            z-index: 10;
-            text-wrap: nowrap;
-            border: 1px solid #E1E1E1;
-            padding: 10px;
-        }
-
-
-        .open .arrow-down {
-            transform: rotate(180deg);
-        }
-
-        .open .dropdown-content {
-            display: block;
-        }
-
-
-        .faqext,
-        .menufaqext {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height .5s ease;
-        }
-
-        .faqext p {
-            text-align: left;
-            padding-left: 2%;
-            padding-right: 2%;
-            padding: 0px;
-        }
-
-
-
-        .accordion:after,
-        .menu-accordion:after {
-            content: '\2039';
-            font-size: 2.4rem;
-            color: #9A9A9A;
-            font-weight: 100;
-            transform: rotate(-90deg);
-        }
-
-
-        .reviews-container {
-margin: auto;
-width: 90%;
-max-width: 90%;
-overflow-x: auto;
-white-space: nowrap;
-scroll-behavior: smooth;
-padding: 10px 0;
-cursor: grab;
-}
-
-.reviews-wrapper {
-display: inline-flex;
-gap: 15px;
-padding: 10px;
-}
-
-.review {
-min-width: 282px;
-max-width: 282px;
-text-wrap: wrap;
-user-select: none;
-}
-
-
-.reviews-container::-webkit-scrollbar {
-display: none;
-}
-
-
-.active-thumbnail {
-    border: 2px solid #3498db; /* or any color that matches your design */
-    opacity: 1;
-}
-
-.thumbnail-image {
-    opacity: 0.7;
-    transition: all 0.3s ease;
-}
-
-.thumbnail-image:hover {
-    opacity: 0.9;
-}
-
-
-    </style>
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -306,25 +196,25 @@ display: none;
 </div>
 
         <section class="w-full bg-[#FFFFFFF] py-4">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
 
 <div class="hidden md:flex items-center gap-1 cursor-pointer">
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium"><?php echo $product['category_title']; ?></a>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
               
-                    <a href="./show.php?id=<?php echo $product['product_id']; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">      <?php
+                    <a href="./show.php?slug=<?php echo urlencode($product['product_slug']); ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">      <?php
                     $product_name = htmlspecialchars($product['product_name']);
     echo (strlen($product_name) > 20) ? substr($product_name, 0, 30) . '...' : $product_name; 
 ?></a>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
                 </div>
 
                 <div class="flex items-center gap-1 cursor-pointer md:hidden">
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">
 <?php 
     // Truncate the category title to 10 characters maximum
@@ -334,19 +224,19 @@ display: none;
     echo $truncated_title; 
 ?>
 </a>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
               
-                    <a href="./show.php?id=<?php echo $product['product_id']; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">      <?php
+                    <a href="./show.php?slug=<?php echo urlencode($product['product_slug']); ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">      <?php
                     $product_name = htmlspecialchars($product['product_name']);
     echo (strlen($product_name) > 9) ? substr($product_name, 0, 10) . '...' : $product_name; 
 ?></a>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto flex flex-col md:flex-row gap-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] flex flex-col md:flex-row gap-5">
 
             <div class="w-full flex flex-col gap-3">
             <div class="flex flex-col gap-2">
@@ -380,7 +270,7 @@ display: none;
             <div class="text-center py-4">
                 <p class="text-[#5B5B5B] text-[14px] font-['Montserrat']">No reviews yet for this product.</p>
                 <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[#1A237E] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
+                <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[#C2185B] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
                 <?php endif; ?>
             </div>
         <?php else: ?>
@@ -407,7 +297,7 @@ display: none;
             
             <?php if ($total_reviews > count($reviews)): ?>
                 <div class="text-center mt-2">
-                    <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[#1A237E] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
+                    <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[#C2185B] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
                 </div>
             <?php endif; ?>
         <?php endif; ?>
@@ -425,7 +315,7 @@ display: none;
                             <button class="w-[fit-content] h-[fit-content] bg-[#D51E5E]  rounded-[28px] text-white text-[12px] md:text-[13px] font-Onest font-regular py-[1.5px] px-2 text-nowrap">Featured</button>
                             <?php endif; ?>
  </div>
-                    <span class="text-[#262626] text-[18px] md:text-[20px] font-['Montserrat'] font-medium">₦<?php echo number_format($lowest_price, 2); ?></span>
+                    <span class="text-[#262626] text-[18px] md:text-[20px] font-['Montserrat'] font-medium">₦<?php echo number_format((float)$lowest_price, 2); ?></span>
                     <div class="text-[#5B5B5B] text-[14px] font-['Montserrat']">
                         <!-- Category: <?php echo $product['category_title']; ?> -->
                         <?php if (!empty($product['brand_title'])): ?>
@@ -538,14 +428,14 @@ display: none;
 </div>
 
 
-                        <span class="text-[#262626] text-[16px] md:text-[17px] font-['Montserrat'] font-medium"> Total: ₦<span id="total-price"><?php echo number_format($lowest_price, 2); ?></span></span>
+                        <span class="text-[#262626] text-[16px] md:text-[17px] font-['Montserrat'] font-medium"> Total: ₦<span id="total-price"><?php echo number_format((float)$lowest_price, 2); ?></span></span>
 
                     </div>
 
                     <!-- <div class="flex items-center gap-4">
                         <a href="./products/cart.php" class="w-[180px] bg-[#E8E9F2] border-[1px] border-[#969AC4] rounded-[8px] text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2 text-center">Add to cart</a>
 
-                        <a href="./checkout.php" class="text-center w-[180px] bg-[#1A237E] rounded-[8px] text-white text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2">Buy now</a>
+                        <a href="./checkout.php" class="text-center w-[180px] bg-[#C2185B] rounded-[8px] text-white text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2">Buy now</a>
                         <img src="../assets/products/fav.svg" class="w-[24px] cursor-pointer" />
                     </div> -->
 
@@ -559,11 +449,12 @@ display: none;
 
     <button 
         id="buy-now-btn"
-        class="w-[180px] bg-[#1A237E] rounded-[8px] text-white text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2 text-center"
+        class="w-[180px] bg-[#C2185B] rounded-[8px] text-white text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2 text-center"
     >
         Buy now
     </button>
-    <img src="<?php echo DOMAIN; ?>/assets/products/fav.svg" class="w-[24px] cursor-pointer" />
+    <?php $show_fav = isset($favorites[$product_id]) ? 'fa-solid text-[#C2185B] favorite-active' : 'fa-regular text-[#262626]'; ?>
+<i id="product-fav-heart" data-product-id="<?php echo (int)$product_id; ?>" class="<?php echo $show_fav; ?> fa-heart text-[24px] cursor-pointer leading-none"></i>
 </div>
                 </div>
 
@@ -659,7 +550,7 @@ display: none;
             <div class="text-center py-4">
                 <p class="text-[#5B5B5B] text-[14px] font-['Montserrat']">No reviews yet for this product.</p>
                 <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[#1A237E] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
+                <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[#C2185B] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
                 <?php endif; ?>
             </div>
         <?php else: ?>
@@ -685,7 +576,7 @@ display: none;
             
             <?php if ($total_reviews > count($reviews)): ?>
                 <div class="text-center mt-2">
-                    <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[#1A237E] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
+                    <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[#C2185B] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
                 </div>
             <?php endif; ?>
         <?php endif; ?>
@@ -695,13 +586,13 @@ display: none;
         </div>
 
 
-        <div class="w-[90%] mx-auto mt-[3rem]"> <span class="text-[#262626] text-[22px]  md:text-[27px] font-Onest font-regular">You May Also Like</span></div>
+        <div class="w-[90%] mx-auto max-w-[1440px] mt-[3rem]"> <span class="text-[#262626] text-[22px]  md:text-[27px] font-Onest font-regular">You May Also Like</span></div>
 
         
 
         <!-- The similar produts starts -->
          <div class="reviews-container" id="reviews">
-         <!-- <div class="reviews-wrapper w-[90%] mx-auto flex items-center gap-5 bg-[#FFFFFF] py-3 overflow-scroll mb-5"> -->
+         <!-- <div class="reviews-wrapper w-[90%] mx-auto max-w-[1440px] flex items-center gap-5 bg-[#FFFFFF] py-3 overflow-scroll mb-5"> -->
         <div class="reviews-wrapper">
             <!-- The products cards -->
 
@@ -995,155 +886,40 @@ function validateSelection() {
     return true;
 }
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Cart functionality
-    const addToCartBtn = document.getElementById('add-to-cart-btn');
-    const buyNowBtn = document.getElementById('buy-now-btn');
-    
-    if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', function() {
-            if (!validateSelection()) return;
-            
-            // Get selected values
-            const productId = <?php echo $product_id; ?>;
-            const variantId = document.getElementById('product-size').value;
-            const quantity = document.getElementById('quantity-select').value;
-            
-            // Create form data for AJAX request
-            const formData = new FormData();
-            formData.append('product_id', productId);
-            formData.append('variant_id', variantId);
-            formData.append('quantity', quantity);
-            
-            // Change button text to indicate loading
-            const originalText = addToCartBtn.textContent;
-            addToCartBtn.textContent = 'Adding...';
-            addToCartBtn.disabled = true;
-            
-            // Send AJAX request to add to cart
-            fetch('./add-to-cart.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show success message
-                    const cartMessage = document.getElementById('cart-message');
-                    cartMessage.textContent = 'Product added to cart successfully!';
-                    cartMessage.classList.remove('hidden');
-                    
-                    // Change button text to "Added to cart"
-                    addToCartBtn.textContent = 'Added to cart';
-                    
-                    // Add a visual indicator class to the button
-                    addToCartBtn.classList.remove('bg-[#E8E9F2]');
-                    addToCartBtn.classList.add('bg-[#E1F5E6]');
-                    addToCartBtn.classList.add('border-[#4CAF50]');
-                    
-                    // Hide message after 3 seconds
-                    setTimeout(() => {
-                        cartMessage.classList.add('hidden');
-                    }, 3000);
-                    
-                    // Reset button text after 3 seconds
-                    setTimeout(() => {
-                        addToCartBtn.textContent = originalText;
-                        addToCartBtn.disabled = false;
-                        addToCartBtn.classList.add('bg-[#E8E9F2]');
-                        addToCartBtn.classList.remove('bg-[#E1F5E6]');
-                        addToCartBtn.classList.remove('border-[#4CAF50]');
-                    }, 3000);
-                    
-                    // Update cart count in header if it exists
-                    const cartCountElement = document.getElementById('cart-count');
-                    if (cartCountElement) {
-                        cartCountElement.textContent = data.cart_count;
-                        
-                        // Make sure the cart badge is visible
-                        const cartBadgeElement = document.getElementById('cart-badge');
-                        if (cartBadgeElement) {
-                            cartBadgeElement.classList.remove('hidden');
-                        }
-                    }
-                } else {
-                    // Reset button text
-                    addToCartBtn.textContent = originalText;
-                    addToCartBtn.disabled = false;
-                    
-                    // Handle error
-                    if (data.redirect) {
-                        window.location.href = data.redirect;
-                    } else {
-                        alert(data.message || 'Error adding product to cart.');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-                
-                // Reset button text
-                addToCartBtn.textContent = originalText;
-                addToCartBtn.disabled = false;
-            });
+(function(){
+    function waitCart(){
+        return new Promise(function(res){
+            function chk(){if(window.GlorifyCart)res(window.GlorifyCart);else setTimeout(chk,60);}
+            chk();
         });
     }
-    
-    // Buy Now functionality remains the same
-    if (buyNowBtn) {
-        buyNowBtn.addEventListener('click', function() {
-            if (!validateSelection()) return;
-            
-            // First add to cart
-            const productId = <?php echo $product_id; ?>;
-            const variantId = document.getElementById('product-size').value;
-            const quantity = document.getElementById('quantity-select').value;
-            
-            const formData = new FormData();
-            formData.append('product_id', productId);
-            formData.append('variant_id', variantId);
-            formData.append('quantity', quantity);
-            
-            // Send AJAX request to add to cart
-            fetch('./add-to-cart.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Redirect to checkout
-                    window.location.href = '../products/checkout.php';
-                } else {
-                    // Handle error
-                    if (data.redirect) {
-                        window.location.href = data.redirect;
-                    } else {
-                        alert(data.message || 'Error adding product to cart.');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            });
+    document.addEventListener('DOMContentLoaded', function(){
+        waitCart().then(function(C){
+            var pid=<?php echo (int)$product_id; ?>;
+            C.setDetailPid(pid);
+            var addBtn=document.getElementById('add-to-cart-btn');
+            var buyBtn=document.getElementById('buy-now-btn');
+            if(addBtn){
+                addBtn.addEventListener('click', function(){
+                    if(typeof validateSelection==='function'&&!validateSelection())return;
+                    var vid=document.getElementById('product-size')?document.getElementById('product-size').value:null;
+                    var qty=document.getElementById('quantity-select')?document.getElementById('quantity-select').value:1;
+                    if(C.has(pid,vid||null))C.remove(pid,vid||null);
+                    else C.add(pid,vid||null,qty,{toast:'Added to cart'});
+                });
+            }
+            if(buyBtn){
+                buyBtn.addEventListener('click', function(){
+                    if(typeof validateSelection==='function'&&!validateSelection())return;
+                    var vid=document.getElementById('product-size')?document.getElementById('product-size').value:null;
+                    var qty=document.getElementById('quantity-select')?document.getElementById('quantity-select').value:1;
+                    C.add(pid,vid||null,qty,{onSuccess:function(){window.location.href='<?php echo DOMAIN; ?>/products/checkout.php';}});
+                });
+            }
+            C.syncDetailBtn();
         });
-    }
-});
-
-// Update cart count in header if it exists
-const cartCountElement = document.getElementById('cart-count');
-if (cartCountElement) {
-    cartCountElement.textContent = data.cart_count;
-    
-    // Make sure the cart badge is visible
-    const cartBadgeElement = document.getElementById('cart-badge');
-    if (cartBadgeElement) {
-        cartBadgeElement.classList.remove('hidden');
-    }
-}
+    });
+})();
 </script>
 </body>
 

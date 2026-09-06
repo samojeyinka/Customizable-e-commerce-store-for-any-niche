@@ -8,7 +8,7 @@ require_once "../../config/config.php";
 
 
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
@@ -24,10 +24,10 @@ $user_id = (int)$_GET['id'];
 
 // Get user details with profile information
 $user_sql = "SELECT 
-    users.id,
+users.id,
     users.email,
     users.last_login,
-    users.is_disabled,
+    users.status,
     profiles.first_name,
     profiles.last_name,
     profiles.phone,
@@ -82,7 +82,7 @@ $recent_orders = $orders_result->fetch_all(MYSQLI_ASSOC);
 $status_classes = [
     'Confirmed' => 'bg-[#1A7E79]',
     'Processing' => 'bg-[#E8B006]',
-    'Shipped' => 'bg-[#1A237E]',
+    'Shipped' => 'bg-[#C2185B]',
     'Delivered' => 'bg-[#39D959]',
     'Cancelled' => 'bg-red-500',
     'Returned' => 'bg-[#9C27B0]'
@@ -98,13 +98,9 @@ $status_classes = [
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-    <link rel="stylesheet" href="../styles/overlay.css">
-    <link rel="stylesheet" href="../styles/dropdown.css" />
-    <link rel="stylesheet" href="../styles/graph.css" />
-    <link rel="stylesheet" href="../styles/dash.css" />
-    <title>User Details</title>
+<title>User Details</title>
+    <?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body class="relative">
@@ -117,7 +113,7 @@ include "./sidebar.php"
     <div id="main" class="md:p-4 flex flex-col gap-3 bg-[#FAFAFA]">
         <!-- Breadcrumb navigation -->
         <div class="w-full flex items-center gap-2 mb-4">
-            <a href="users.php" class="text-[#1A237E] text-[14px] md:text-[16px] font-Onest font-medium">Users</a>
+            <a href="users.php" class="text-[#C2185B] text-[14px] md:text-[16px] font-Onest font-medium">Users</a>
             <span class="text-[#262626] text-[14px] md:text-[16px] font-Onest font-regular">></span>
             <span class="text-[#262626] text-[14px] md:text-[16px] font-Onest font-regular">User Details</span>
         </div>
@@ -125,7 +121,7 @@ include "./sidebar.php"
         <!-- User header section -->
         <div class="w-full rounded-[16px] bg-white mx-auto p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
-                <div class="w-[60px] h-[60px] md:w-[80px] md:h-[80px] rounded-full bg-[#1A237E] text-white flex items-center justify-center text-[24px] md:text-[32px] font-bold">
+                <div class="w-[60px] h-[60px] md:w-[80px] md:h-[80px] rounded-full bg-[#C2185B] text-white flex items-center justify-center text-[24px] md:text-[32px] font-bold">
                     <?php 
                     $initials = '';
                     if (!empty($user['first_name'])) {
@@ -154,10 +150,10 @@ include "./sidebar.php"
             </div>
 
             <div class="flex items-center gap-3">
-                <a href="users.php" class="px-4 py-2 border border-[#1A237E] text-[#1A237E] rounded-lg">
+                <a href="users.php" class="px-4 py-2 border border-[#C2185B] text-[#C2185B] rounded-lg">
                     Back to Users
                 </a>
-                <?php if ($user['is_disabled'] == 0): ?>
+<?php if ($user['status'] != 'suspended'): ?>
                     <button onclick="confirmAction(<?php echo $user['id']; ?>, 'disable')" class="px-4 py-2 bg-[#E8B006] text-white rounded-lg">
                         Disable User
                     </button>
@@ -217,8 +213,8 @@ include "./sidebar.php"
 
                     <div class="flex flex-col">
                         <span class="text-[14px] font-Onest font-medium text-[#666666]">Status</span>
-                        <span class="inline-block mt-1 px-3 py-1 rounded-full text-white text-[14px] font-Onest font-medium <?php echo $user['is_disabled'] == 0 ? 'bg-[#39D959]' : 'bg-[#D93939]'; ?>">
-                            <?php echo $user['is_disabled'] == 0 ? 'Active' : 'Disabled'; ?>
+<span class="inline-block mt-1 px-3 py-1 rounded-full text-white text-[14px] font-Onest font-medium <?php echo $user['status'] != 'suspended' ? 'bg-[#39D959]' : 'bg-[#D93939]'; ?>">
+                            <?php echo $user['status'] != 'suspended' ? 'Active' : 'Disabled'; ?>
                         </span>
                     </div>
                 </div>
@@ -246,7 +242,7 @@ include "./sidebar.php"
                     <div class="flex flex-col">
                         <span class="text-[14px] font-Onest font-medium text-[#666666]">Total Orders</span>
                         <span class="text-[16px] font-Onest font-regular text-[#262626]">
-                            <?php echo number_format($user['total_orders']); ?>
+                            <?php echo number_format((float)$user['total_orders']); ?>
                         </span>
                     </div>
 
@@ -285,7 +281,7 @@ include "./sidebar.php"
                             <?php foreach ($recent_orders as $order): ?>
                                 <tr>
                                     <td class="p-3 text-[13px] md:text-[14px] font-regular font-['Open Sans']">
-                                        <a href="../orders/order-details.php?id=<?php echo $order['order_id']; ?>" class="text-[#1A237E]">
+                                        <a href="../orders/order-details.php?id=<?php echo $order['order_id']; ?>" class="text-[#C2185B]">
                                             #<?php echo $order['order_id']; ?>
                                         </a>
                                     </td>

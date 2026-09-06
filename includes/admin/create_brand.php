@@ -53,9 +53,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title'])) {
         
         // Insert brand with image and date
         if($brand_image != "") {
-            $insert_query = "INSERT INTO brands (brand_title, brand_image, date_added) VALUES ('$brand_title', '$brand_image', '$date_added')";
+            $insert_query = "INSERT INTO brands (brand_title, brand_image, created_at) VALUES ('$brand_title', '$brand_image', '$date_added')";
         } else {
-            $insert_query = "INSERT INTO brands (brand_title, date_added) VALUES ('$brand_title', '$date_added')";
+            $insert_query = "INSERT INTO brands (brand_title, created_at) VALUES ('$brand_title', '$date_added')";
         }
         
         $result = mysqli_query($con, $insert_query);
@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title'])) {
     <!-- Modal content -->
     <div class="modal-content overflow-hidden p-4">
         <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Add Tag</h1>
-        <img src="../assets/global/close-circle.svg" alt="close" id="closeCB" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+        <i class="fa-solid fa-xmark text-[24px] cursor-pointer absolute top-4 right-4" id="closeCB" alt="close"></i>
 
         <form method="post" enctype="multipart/form-data">
             <div class="flex flex-col gap-4">
@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title'])) {
                         <div class="w-full h-[120px] border-[1px] border-dashed border-[#E1E1E1] rounded-lg flex items-center justify-center relative">
                             <input type="file" name="brand_image" id="brand_image" accept="image/*" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" onchange="previewBrandImage(this)" />
                             <div id="brand-upload-placeholder" class="flex flex-col items-center justify-center gap-2">
-                                <img src="../../assets/global/folder-2.svg" alt="upload" class="w-[24px] h-[24px]" />
+                                <i class="fa-regular fa-folder-open text-[30px] mx-auto" alt="upload"></i>
                                 <span class="text-[14px] text-[#9A9A9A] font-['Open Sans']">Click to upload or drag and drop</span>
                                 <span class="text-[12px] text-[#9A9A9A] font-['Open Sans']">SVG, PNG, JPG or GIF (max. 2MB)</span>
                             </div>
@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_title'])) {
 
         <button id="openBrandsLists" class="ml-4 md:ml-0 w-[fit-content] shrink-0 flex items-center gap-2 px-4 py-2 bg-[#F3F3F3] text-[#262626] rounded-lg cursor-pointer mt-3">
             View all Tags
-            <img src="../../assets/home/arrow-right.svg" />
+            <i class="fa-solid fa-arrow-right text-[16px]" alt="Arrow"></i>
         </button>
     </div>
 </div>

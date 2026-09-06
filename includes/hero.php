@@ -7,22 +7,34 @@
         <div class="carousel-item slide4"></div>
     </div>
 
+    <!-- Rose gradient overlay for readability -->
+    <div class="absolute inset-0 bg-linear-to-r from-[#3D1A2A]/80 via-[#3D1A2A]/40 to-[#C2185B]/30"></div>
+
     <!-- Static text overlay -->
     <div class="absolute inset-0 flex items-center justify-center flex-col text-center text-white">
-        <h1 class="w-[75%] text-[40px] md:text-[65px] font-Onest font-bold">Upgrade Your Home with Style & Comfort</h1>
-        <p class="w-[90%] md:w-[80%] lg:w-[60%] text-[16px] md:text-[18px] font-['Open Sans']">
-            Shop premium duvets, bedsheets, pillows, foams, and elegant chandeliers to create the perfect living space.
+        
+        <h1 class="w-[90%] md:w-[70%] text-[36px] md:text-[58px] leading-tight font-Onest font-bold drop-shadow-sm">
+            Glow Up Your Beauty Routine
+        </h1>
+        <p class="w-[90%] md:w-[70%] lg:w-[55%] text-[15px] md:text-[18px] font-['Open Sans'] font-light mt-3">
+            Discover premium skincare, makeup, and beauty essentials that bring out your natural radiance.
         </p>
-        <a href="<?php echo DOMAIN; ?>/products/index.php"
-            class="text-center mt-[3rem] mx-auto w-[70%] md:max-w-[377px] py-2 px-4 bg-[#1A237E] text-white text-[18px] md:text-[20px] font-medium font-['Open Sans'] cursor-pointer rounded-[8px]">
-            Shop Now
-        </a>
+        <div class="flex items-center gap-4 mt-8 flex-col sm:flex-row w-[80%] md:w-auto justify-center">
+            <a href="<?php echo DOMAIN; ?>/products/index.php"
+                class="text-center w-full sm:w-auto py-3 px-8 bg-[#C2185B] text-white text-[16px] md:text-[18px] font-medium font-['Open Sans'] cursor-pointer rounded-full shadow-lg hover:bg-[#A01548] hover:scale-[1.02] transition-all">
+                Shop Now
+            </a>
+            <a href="<?php echo DOMAIN; ?>/details/about-us.php"
+                class="text-center w-full sm:w-auto py-3 px-8 bg-white/15 backdrop-blur-sm border border-white/40 text-white text-[16px] md:text-[18px] font-medium font-['Open Sans'] cursor-pointer rounded-full hover:bg-white/25 transition-all">
+                Our Story
+            </a>
+        </div>
     </div>
 
     <!-- Navigation Controls -->
     <div class="controls">
-        <button id="prev">❮</button>
-        <button id="next">❯</button>
+        <button id="prev">&#10094;</button>
+        <button id="next">&#10095;</button>
     </div>
     <div class="indicators">
         <div data-index="0" class="active"></div>
@@ -32,4 +44,3 @@
     </div>
 </div>
 <!-- ======================== The hero ends ======================== -->
-

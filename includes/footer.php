@@ -1,280 +1,186 @@
 <?php
-// Database connection parameters
+// Newsletter subscription: handled only when the form is posted to the current page.
+$response = ['success' => false, 'message' => ''];
 
-
-
-
-// Initialize response array
-$response = [
-    'success' => false,
-    'message' => ''
-];
-
-// Process form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email']) && !empty($_POST['email'])) {
-    // Get and sanitize email
-    $email = trim(htmlspecialchars(stripslashes($_POST['email'])));
-    
-    // Validate email
+    $email = trim(filter_var($_POST['email'], FILTER_SANITIZE_EMAIL));
+
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $response['success'] = false;
-        $response['message'] = "Invalid email format";
-    } else {
+        $response['message'] = "Please enter a valid email address";
+    } elseif (function_exists('pdo_db')) {
         try {
-            // Create database connection
-            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $dbpassword);
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
-            // Check if subscriptions table exists
-            $stmt = $conn->query("SHOW TABLES LIKE 'subscriptions'");
-            if ($stmt->rowCount() == 0) {
-                // Create subscriptions table if it doesn't exist
-                $conn->exec("CREATE TABLE IF NOT EXISTS subscriptions (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    email VARCHAR(255) NOT NULL UNIQUE,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    status ENUM('active', 'unsubscribed') DEFAULT 'active'
-                )");
-            }
-            
-            // Check if email already exists
-            $checkStmt = $conn->prepare("SELECT id FROM subscriptions WHERE email = :email");
-            $checkStmt->bindParam(':email', $email);
-            $checkStmt->execute();
-            
-            if ($checkStmt->rowCount() > 0) {
-                // Email already exists
-                $response['success'] = true; // Still consider it a success
+            $pdo = pdo_db();
+            $pdo->exec("CREATE TABLE IF NOT EXISTS subscriptions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                email VARCHAR(255) NOT NULL UNIQUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status ENUM('active', 'unsubscribed') DEFAULT 'active'
+            )");
+
+            $check = $pdo->prepare("SELECT id FROM subscriptions WHERE email = :email");
+            $check->execute([':email' => $email]);
+
+            if ($check->fetchColumn()) {
+                $response['success'] = true;
                 $response['message'] = "You are already subscribed!";
             } else {
-                // Insert email into database
-                $stmt = $conn->prepare("INSERT INTO subscriptions (email) VALUES (:email)");
-                $stmt->bindParam(':email', $email);
-                $stmt->execute();
-                
+                $insert = $pdo->prepare("INSERT INTO subscriptions (email) VALUES (:email)");
+                $insert->execute([':email' => $email]);
                 $response['success'] = true;
                 $response['message'] = "Thank you for subscribing!";
             }
-            
-        } catch(PDOException $e) {
-            // Handle any database errors
-            $response['success'] = false;
-            $response['message'] = "Database error: " . $e->getMessage();
+        } catch (PDOException $e) {
             error_log("Subscription error: " . $e->getMessage());
+            $response['message'] = "Something went wrong. Please try again later.";
         }
-        
-        // Close connection
-        $conn = null;
+    } else {
+        $response['message'] = "Subscription is temporarily unavailable.";
     }
-    
-    // Make sure there's no output before JSON
+
     if (ob_get_length()) ob_clean();
-    
-    // Return JSON response for AJAX requests
     header('Content-Type: application/json');
     echo json_encode($response, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-// Define DOMAIN constant if not already defined
 if (!defined('DOMAIN')) {
-    define('DOMAIN', '');  // Set to your domain or leave empty for relative paths
+    define('DOMAIN', '');
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Newsletter Subscription</title>
-    <style>
-        /* Some basic styling to match your design */
-        body {
-            font-family: 'Open Sans', sans-serif;
-        }
-        .success-message {
-            color: green;
-            margin-top: 10px;
-        }
-        .error-message {
-            color: red;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-      
-      <footer class="w-full bg-[#E8E9F2] py-7">
-            <div class="w-[90%] flex gap-4 flex-col md:flex-row justify-between mx-auto">
-                <div class="flex flex-col gap-3">
-                    <div class="flex items-center gap-1">
-                        <img src="<?php echo DOMAIN; ?>/assets/global/logo.svg" class="w-[50px] h-[48.15px]" />
-                        <h1 class="text-[20px] text-[24px] font-Onest font-semibold">VICTOSAH</h1>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <div class="flex items-center gap-1">
-                            <img src="<?php echo DOMAIN; ?>/assets/global/location.svg" class="w-[24px] h-[24px]" />
-                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">Tejuosho Main Complex Yaba.</p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <img src="<?php echo DOMAIN; ?>/assets/global/call.svg" class="w-[24px] h-[24px]" />
-                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">09125559982</p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <img src="<?php echo DOMAIN; ?>/assets/global/mail.svg" class="w-[24px] h-[24px]" />
-                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">support@victosah.com</p>
-                        </div>
-
-                    </div>
-
+<!-- ========================  The Footer section starts ======================== -->
+<footer class="w-full bg-[#F5EEF2] pt-8 mt-10 border-t-[1px] border-[#EADEE5]">
+    <div class="w-[90%] flex gap-6 flex-col md:flex-row justify-between mx-auto pb-8">
+        <div class="flex flex-col gap-3 md:max-w-[20rem]">
+            <a href="<?php echo DOMAIN; ?>/index.php" class="flex items-center gap-2">
+                <img src="<?php echo DOMAIN; ?>/assets/global/logo.png" alt="GLOREFY" class="w-[46px] h-[46px]" />
+            </a>
+            <p class="text-[14px] md:text-[15px] font-['Open Sans'] text-[#777777] leading-relaxed">
+                Premium skincare, makeup and beauty essentials that help you glow with confidence.
+            </p>
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-location-dot text-[22px] text-[#777777]" alt="location"></i>
+                    <p class="text-[14px] font-['Open Sans'] text-[#777777]">245 Fifth Avenue, New York, NY 10016</p>
                 </div>
-
-                <div class="flex flex-col gap-2">
-                    <h1 class="text-[#262626] text-[20px] md:text-[24px] font-['Montserrat'] font-medium">Quick Links</h1>
-                    <ul class="flex flex-col gap-2">
-                        <li class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium"><a href="<?php echo DOMAIN; ?>/details/about-us.php" class="text-[#777777]">About Us</a></li>
-                        <li class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium"><a href="<?php echo DOMAIN; ?>/user/orders.php" class="text-[#777777]">Track Your Order</a></li>
-                        <li class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium"><a href="<?php echo DOMAIN; ?>/details/refund-and-return-policy.php" class="text-[#777777]">Return Policy</a></li>
-                        <li class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium"><a href="<?php echo DOMAIN; ?>/details/contact-us.php" class="text-[#777777]">Contact Us</a></li>
-
-                    </ul>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-phone text-[22px] text-[#777777]" alt="phone"></i>
+                    <p class="text-[14px] font-['Open Sans'] text-[#777777]">+1 (212) 555-0147</p>
                 </div>
-
-                <div class="flex flex-col gap-2">
-                    <h1 class="text-[#262626] text-[20px] md:text-[24px] font-['Montserrat'] font-medium">Get on the List</h1>
-                    <p class="text-[#777777] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Sign up to know when we have new products</p>
-                    <div id="response-message"></div>
-                    <form id="subscription-form" class="flex items-center gap-2 mt-2">
-                        <div class="flex items-center gap-2 border-[1px] border-[#B8BBD7] rounded-[4px] p-1">
-                            <input type="email" placeholder="Enter your email address"  name="email" 
-                                class="lg:w-[12rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
-                        </div>
-                        <button type="submit" class="py-1 px-4 bg-[#1A237E] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]">
-                            Subscribe
-                        </button>
-                    </form>
-                 
-                </div>
-
-            </div>
-            <div class="w-[90%] flex flex-col py-4 mx-auto">
-                <div class="flex flex-col gap-2">
-                    <h1 class="text-[#262626] text-[20px] md:text-[24px] font-['Montserrat'] font-medium">Connect with us on:</h1>
-                    <div class="flex items-center gap-7">
-                        <a href="https://www.facebook.com/victosahsols/" target="_blank"><img src="<?php echo DOMAIN; ?>/assets/global/e1.svg" alt="Search" class="w-[13.83px]" /></a>
-                        <a href="https://www.instagram.com/victosahsols/" target="_blank"><img src="<?php echo DOMAIN; ?>/assets/global/e2.svg" alt="Search" class="w-[21.83px]" /></a>
-                        <a href="https://wa.me/09125559982" target="_blank"><img src="<?php echo DOMAIN; ?>/assets/global/e3.svg" alt="Search" class="w-[21.83px]" /></a>
-                        <a href="#"><img src="<?php echo DOMAIN; ?>/assets/global/e4.svg" alt="Search" class="w-[21.83px]" /></a>
-                        <a href="#"><img src="<?php echo DOMAIN; ?>/assets/global/e5.svg" alt="Search" class="w-[17.83px]" /></a>
-                        <a href="https://www.x.com/victosahsols/" target="_blank"><img src="<?php echo DOMAIN; ?>/assets/global/e6.svg" alt="Search" class="w-[30.22px]" /></a>
-                    </div>
-                </div>
-                <div class="flex md:items-center flex-col gap-3 md:gap-0 md:flex-row justify-between mt-10">
-                    <div class="flex items-center gap-[4rem]">
-                        <p class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#777777]">Terms & Conditions</p>
-                        <p class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#777777]">Privacy Policy</p>
-                    </div>
-                    <p class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#777777]">© 2025 Victosah Solutions | All Rights Reserved</p>
-
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-envelope text-[22px] text-[#777777]" alt="email"></i>
+                    <p class="text-[14px] font-['Open Sans'] text-[#777777]">support@glorefy.com</p>
                 </div>
             </div>
+        </div>
 
-            <a href="https://wa.me/09125559982" target="_blank" class="fixed top-[55%] md:top-[70%] right-5 md:right-10">
-            <img src="<?php echo DOMAIN; ?>/assets/global/whatsapp.svg" class="w-[50px] md:w-[60px] rounded-[50%] shadow-lg" />
-        </a>
-        </footer>
-        <!-- ========================  The Footer section ends ======================== -->
+        <div class="flex flex-col gap-3">
+            <h1 class="text-[#3D1A2A] text-[18px] md:text-[20px] font-['Montserrat'] font-semibold">Quick Links</h1>
+            <ul class="flex flex-col gap-3">
+                <li><a href="<?php echo DOMAIN; ?>/details/about-us.php" class="text-[14px] md:text-[15px] font-['Open Sans'] text-[#777777] hover:text-[#C2185B] transition-colors">About Us</a></li>
+                <li><a href="<?php echo DOMAIN; ?>/user/orders.php" class="text-[14px] md:text-[15px] font-['Open Sans'] text-[#777777] hover:text-[#C2185B] transition-colors">Track Your Order</a></li>
+                <li><a href="<?php echo DOMAIN; ?>/details/refund-and-return-policy.php" class="text-[14px] md:text-[15px] font-['Open Sans'] text-[#777777] hover:text-[#C2185B] transition-colors">Return Policy</a></li>
+                <li><a href="<?php echo DOMAIN; ?>/details/contact-us.php" class="text-[14px] md:text-[15px] font-['Open Sans'] text-[#777777] hover:text-[#C2185B] transition-colors">Contact Us</a></li>
+            </ul>
+        </div>
+
+        <div class="flex flex-col gap-3 md:max-w-[22rem]">
+            <h1 class="text-[#3D1A2A] text-[18px] md:text-[20px] font-['Montserrat'] font-semibold">Get on the List</h1>
+            <p class="text-[#777777] text-[14px] md:text-[15px] font-['Open Sans']">Beauty tips, new arrivals and exclusive offers, straight to your inbox.</p>
+            <div id="response-message"></div>
+            <form id="subscription-form" class="flex items-center gap-2 mt-1">
+                <div class="flex items-center gap-2 border-[1px] border-[#D8C4CE] rounded-[6px] px-3 py-2 bg-white flex-1">
+                    <input type="email" placeholder="Enter your email address" name="email" class="w-full text-[14px] border-none outline-none placeholder:text-[#B8BBD7] bg-transparent" autocomplete="email" />
+                </div>
+                <button type="submit" class="py-2 px-5 bg-[#C2185B] text-white text-[15px] font-['Open Sans'] font-medium cursor-pointer rounded-[6px] hover:bg-[#A01548] transition-colors whitespace-nowrap">
+                    Subscribe
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="w-[90%] mx-auto max-w-[1440px] border-t-[1px] border-[#EADEE5] py-5">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <h1 class="text-[#3D1A2A] text-[16px] md:text-[18px] font-['Montserrat'] font-semibold">Connect with us:</h1>
+            <div class="flex items-center gap-6">
+                <a href="https://www.facebook.com/glorefy" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook-f text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+                <a href="https://www.instagram.com/glorefy" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+                <a href="https://wa.me/08004567339" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+                <a href="#" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+                <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+                <a href="https://www.x.com/glorefy" target="_blank" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+            </div>
+        </div>
+        <div class="flex flex-col md:flex-row items-center justify-between gap-3 mt-5">
+            <div class="flex items-center gap-6">
+                <span class="text-[14px] font-['Open Sans'] text-[#777777] cursor-pointer hover:text-[#C2185B]">Terms &amp; Conditions</span>
+                <span class="text-[14px] font-['Open Sans'] text-[#777777] cursor-pointer hover:text-[#C2185B]">Privacy Policy</span>
+            </div>
+            <p class="text-[14px] font-['Open Sans'] font-medium text-[#777777]">© <?php echo date('Y'); ?> Glorefy | All Rights Reserved</p>
+        </div>
+    </div>
+
+    <a href="https://wa.me/08004567339" target="_blank" class="fixed top-[55%] md:top-[70%] right-5 md:right-10 z-40" aria-label="Chat on WhatsApp">
+        <i class="fa-brands fa-whatsapp text-[48px] md:text-[58px] text-[#25D366] drop-shadow-lg hover:scale-105 transition-transform"></i>
+    </a>
+</footer>
+<!-- ========================  The Footer section ends ======================== -->
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('subscription-form');
         const responseMessage = document.getElementById('response-message');
-        
-        if (!form || !responseMessage) {
-            console.error('Could not find form or response message element');
-            return;
-        }
-        
-        // Add some styling to the response message
+
+        if (!form || !responseMessage) return;
+
         responseMessage.style.padding = '8px';
         responseMessage.style.marginTop = '10px';
-        responseMessage.style.borderRadius = '4px';
-        
-        form.addEventListener('submit', function(e) {
+        responseMessage.style.borderRadius = '6px';
+
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
-            
-            // Show loading state
+
+            const emailInput = form.querySelector('input[name="email"]');
+            const email = emailInput ? emailInput.value.trim() : '';
+
+            if (!email) {
+                responseMessage.textContent = 'Please enter an email address';
+                responseMessage.style.color = '#B00020';
+                responseMessage.style.backgroundColor = '#FDE8EC';
+                return;
+            }
+
             responseMessage.textContent = 'Processing...';
             responseMessage.style.color = '#666';
             responseMessage.style.backgroundColor = '#f8f8f8';
-            
-            const emailInput = form.querySelector('input[name="email"]');
-            const email = emailInput ? emailInput.value : '';
-            
-            if (!email) {
-                responseMessage.textContent = 'Please enter an email address';
-                responseMessage.style.color = 'red';
-                responseMessage.style.backgroundColor = '#ffeeee';
-                return;
-            }
-            
-            // Create form data
+
             const formData = new FormData();
             formData.append('email', email);
-            
-            // Send AJAX request to the same page
-            fetch(window.location.href, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.text();
-            })
-            .then(text => {
-                console.log('Raw response:', text);
-                
-                // Find the JSON part of the response if there's extra content
-                let jsonText = text;
-                const jsonStart = text.indexOf('{');
-                const jsonEnd = text.lastIndexOf('}');
-                
-                if (jsonStart >= 0 && jsonEnd >= 0 && jsonEnd > jsonStart) {
-                    jsonText = text.substring(jsonStart, jsonEnd + 1);
-                    console.log('Extracted JSON:', jsonText);
-                }
-                
-                // Try to parse as JSON
-                try {
+
+            fetch(window.location.href, { method: 'POST', body: formData })
+                .then(response => response.text())
+                .then(text => {
+                    let jsonText = text;
+                    const start = text.indexOf('{');
+                    const end = text.lastIndexOf('}');
+                    if (start >= 0 && end > start) {
+                        jsonText = text.substring(start, end + 1);
+                    }
                     const data = JSON.parse(jsonText);
-                    console.log('Parsed JSON response:', data);
-                    
                     if (data.success) {
-                        responseMessage.style.color = 'white';
-                        responseMessage.style.backgroundColor = '#4CAF50';
+                        responseMessage.style.color = '#1B7A3D';
+                        responseMessage.style.backgroundColor = '#E7F6EC';
                         form.reset();
                     } else {
-                        responseMessage.style.color = 'white';
-                        responseMessage.style.backgroundColor = '#F44336';
+                        responseMessage.style.color = '#B00020';
+                        responseMessage.style.backgroundColor = '#FDE8EC';
                     }
-                    
                     responseMessage.textContent = data.message;
-                } catch (e) {
-                    console.error('Error parsing JSON response:', e);
-                    responseMessage.style.color = 'black';
-                    responseMessage.style.backgroundColor = '#d4edda';
-                    responseMessage.innerHTML = 'Thank you for subscribing to our newsletter!';
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                responseMessage.style.color = 'white';
-                responseMessage.style.backgroundColor = '#F44336';
-                responseMessage.textContent = 'Network error. Please try again later.';
-            });
+                })
+                .catch(() => {
+                    responseMessage.style.color = '#B00020';
+                    responseMessage.style.backgroundColor = '#FDE8EC';
+                    responseMessage.textContent = 'Network error. Please try again later.';
+                });
         });
     });
 </script>
-
-</body>
-</html>

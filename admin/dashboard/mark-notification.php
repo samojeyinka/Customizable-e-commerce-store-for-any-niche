@@ -1,14 +1,18 @@
 <?php
 // mark-notification.php
-session_start();
-require_once __DIR__ . './notifications.php';
-require_once __DIR__ . '../config/connect.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../includes/notifications.php';
 
 // Check if user is logged in as admin
 if (!isset($_SESSION['admin_id'])) {
     header('Location: ../login.php');
     exit;
 }
+
+$con = db();
 
 // Validate parameters
 $notification_id = isset($_GET['id']) ? intval($_GET['id']) : 0;

@@ -30,7 +30,7 @@ fputcsv($output, [
     'Delivery Method',
     'Transaction Date',
     'Notes'
-]);
+], ',', '"', '\\');
 
 // Determine which transactions to export
 if (isset($_GET['ids']) && !empty($_GET['ids'])) {
@@ -120,7 +120,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         $row['delivery_method'],
         $row['transaction_date'],
         $row['notes']
-    ]);
+    ], ',', '"', '\\');
 }
 
 // Close database connection

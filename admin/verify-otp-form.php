@@ -13,76 +13,27 @@ if (!isset($_SESSION['setup_email'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH ADMIN | Verify OTP</title>
+    <title>GLOREFY ADMIN | Verify OTP</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Open Sans', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-image: url("./assets/global/bg.svg");
-            background-position: center;
-            background-size: cover;
-        }
-        
-        .container {
-            background-color: white;
-            border-radius: 24px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            width: 100%;
-            max-width: 500px;
-        }
-        
-        .otp-input {
-            width: 50px;
-            height: 50px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            border: 1px solid #E1E1E1;
-            border-radius: 8px;
-            margin: 0 6px;
-            background-color: transparent;
-            outline: none;
-        }
-        
-        .otp-input:focus {
-            border-color: #1A237E;
-            box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2);
-        }
-        
-        @media (max-width: 480px) {
-            .otp-input {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-                margin: 0 4px;
-            }
-        }
-    </style>
+
+    <?php include 'tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-[#262626] text-[20px] md:text-[24px] font-medium">Verify OTP</h3>
             <div class="flex items-center gap-2">
-                <img src="./assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-                <h1 class="text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                <img src="./assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
             </div>
         </div>
         
         <h3 class="text-[#262626] text-center text-[18px] md:text-[22px] font-medium pt-2 pb-4">ADMIN PANEL</h3>
         
         <div class="text-center mb-6">
-            <p class="text-[#1A237E] font-medium text-[18px]">Verification Required</p>
+            <p class="text-[#C2185B] font-medium text-[18px]">Verification Required</p>
             <p class="text-[#777777] mt-2">
                 Enter the 6-digit code sent to: <span class="font-semibold text-[#333333]"><?php echo htmlspecialchars($_SESSION['setup_email']); ?></span>
             </p>
@@ -115,21 +66,21 @@ if (!isset($_SESSION['setup_email'])) {
             </div>
             
             <input type="hidden" name="verify_otp" value="1">
-            <button type="submit" class="w-full py-[12px] px-3 bg-[#1A237E] text-white text-[16px] font-medium cursor-pointer rounded-[8px] hover:bg-[#0e1442] transition-colors">
+            <button type="submit" class="w-full py-[12px] px-3 bg-[#C2185B] text-white text-[16px] font-medium cursor-pointer rounded-[8px] hover:bg-[#0e1442] transition-colors">
                 Verify Code
             </button>
         </form>
         
         <div class="text-center text-[#777777] mt-6 text-[14px]" id="countdown">
-            OTP expires in: <span class="text-[#1A237E] font-medium" id="timer">15:00</span>
+            OTP expires in: <span class="text-[#C2185B] font-medium" id="timer">15:00</span>
         </div>
         
         <div class="text-center mt-6">
-            <a href="./request-password-setup.php?resend=true" class="text-[#1A237E] font-medium text-[14px] hidden" id="resend-link">
+            <a href="./request-password-setup.php?resend=true" class="text-[#C2185B] font-medium text-[14px] hidden" id="resend-link">
                 Resend verification code
             </a>
             <p class="text-[#777777] text-[14px]" id="resend-timer">
-                Resend code in <span class="text-[#1A237E] font-medium">03:00</span>
+                Resend code in <span class="text-[#C2185B] font-medium">03:00</span>
             </p>
         </div>
     </div>

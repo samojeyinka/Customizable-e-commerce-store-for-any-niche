@@ -13,7 +13,7 @@ $user_id = $user['id'];
 
 
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die(mysqli_error($conn));
 }
@@ -58,10 +58,10 @@ $image_path = isset($return['image_path']) ? "../assets/products/" . $return['im
 // Updated status colors including 'Received'
 $status_colors = [
     'Processing' => 'bg-[#E8B006]',
-    'Received' => 'bg-[#1A237E]',    // Added Received status with navy blue color
+    'Received' => 'bg-[#C2185B]',    // Added Received status with navy blue color
     'Accepted' => 'bg-[#39D959]',
     'Rejected' => 'bg-red-500',
-    'Completed' => 'bg-[#1A237E]'
+    'Completed' => 'bg-[#C2185B]'
 ];
 
 // Get the color for the current status
@@ -81,17 +81,15 @@ require_once "../includes/auth/google.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Return Details</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Return Details</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/styles.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -102,18 +100,18 @@ require_once "../includes/auth/google.php";
     ?>
 
         <section class="w-full bg-[#FFFFFF] py-1">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./returns.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Returns</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">Return Details</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Return Details</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto bg-[#FFFFFF] py-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] bg-[#FFFFFF] py-5">
             <div class="w-full md:w-[80%] lg:w-[60%] mx-auto">
                 <h1 class="text-[24px] md:text-[28px] text-[#2C2C2C] font-['Open Sans'] font-medium mb-6 text-center">Return Request Details</h1>
                 
@@ -145,7 +143,7 @@ require_once "../includes/auth/google.php";
                     
                     <?php if (!empty($return['admin_message'])): ?>
                     <div class="mt-4 bg-blue-50 border-l-4 border-blue-700 p-3 rounded-lg">
-                        <p class="text-[14px] text-[#1A237E] font-['Open Sans'] font-semibold">Message from Admin:</p>
+                        <p class="text-[14px] text-[#C2185B] font-['Open Sans'] font-semibold">Message from Admin:</p>
                         <p class="text-[14px] text-[#262626] font-['Open Sans'] mt-1"><?php echo $return['admin_message']; ?></p>
                     </div>
                     <?php endif; ?>
@@ -162,7 +160,7 @@ require_once "../includes/auth/google.php";
                         <div>
                             <h4 class="text-[16px] font-['Open Sans'] font-medium"><?php echo $return['product_name']; ?></h4>
                             <p class="text-[14px] text-[#262626] font-['Open Sans']">Size: <?php echo $return['size']; ?> • Color: <?php echo $return['colors']; ?></p>
-                            <p class="text-[14px] text-[#262626] font-['Open Sans']">Price: ₦<?php echo number_format($return['price']); ?></p>
+                            <p class="text-[14px] text-[#262626] font-['Open Sans']">Price: ₦<?php echo number_format((float)$return['price']); ?></p>
                             <p class="text-[14px] text-[#262626] font-['Open Sans']">Quantity to Return: <?php echo $return['return_quantity']; ?></p>
                             <p class="text-[14px] text-[#262626] font-['Open Sans'] mt-2">Total Refund: ₦<?php echo number_format($return['price'] * $return['return_quantity']); ?></p>
                         </div>
@@ -199,7 +197,7 @@ require_once "../includes/auth/google.php";
                 
                 <!-- Actions -->
                 <div class="actions mt-6 flex justify-end">
-                    <a href="./returns.php" class="py-2 px-4 bg-[#1A237E] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Returns</a>
+                    <a href="./returns.php" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Returns</a>
                 </div>
             </div>
         </div>

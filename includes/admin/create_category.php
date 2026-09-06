@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['cat_title'])) {
     <!-- Modal content -->
     <div class="modal-content overflow-hidden p-4">
         <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">Add Category</h1>
-        <img src="../assets/global/close-circle.svg" alt="close" id="closeCC" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+        <i class="fa-solid fa-xmark text-[24px] cursor-pointer absolute top-4 right-4" id="closeCC" alt="close"></i>
 
         <form method="post" enctype="multipart/form-data">
             <div class="flex flex-col gap-4">
@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['cat_title'])) {
                         <div class="w-full h-[120px] border-[1px] border-dashed border-[#E1E1E1] rounded-lg flex items-center justify-center relative">
                             <input type="file" name="cat_image" id="cat_image" accept="image/*" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" onchange="previewImage(this)" />
                             <div id="upload-placeholder" class="flex flex-col items-center justify-center gap-2">
-                                <img src="../../assets/global/folder-2.svg" alt="upload" class="w-[24px] h-[24px]" />
+                                <i class="fa-regular fa-folder-open text-[30px] mx-auto" alt="upload"></i>
                                 <span class="text-[14px] text-[#9A9A9A] font-['Open Sans']">Click to upload or drag and drop</span>
                                 <span class="text-[12px] text-[#9A9A9A] font-['Open Sans']">SVG, PNG, JPG or GIF (max. 2MB)</span>
                             </div>
@@ -113,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['cat_title'])) {
 
         <button id="openCategoriesLists" class="ml-4 md:ml-0 w-[fit-content] shrink-0 flex items-center gap-2 px-4 py-2 bg-[#F3F3F3] text-[#262626] rounded-lg cursor-pointer mt-3">
             View all Categories
-            <img src="../../assets/home/arrow-right.svg" />
+            <i class="fa-solid fa-arrow-right text-[16px]" alt="Arrow"></i>
         </button>
     </div>
 </div>

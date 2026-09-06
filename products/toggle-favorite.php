@@ -1,8 +1,8 @@
 <?php
 // Include database connection and auth
 
-include(dirname(__DIR__) . '/config/connect.php');
-include(dirname(__DIR__) . '/config/config.php');
+require_once(dirname(__DIR__) . '/config/connect.php');
+require_once(dirname(__DIR__) . '/config/config.php');
 require_once __DIR__ . '/../includes/auth/auth.php';
 
 // Check if user is logged in

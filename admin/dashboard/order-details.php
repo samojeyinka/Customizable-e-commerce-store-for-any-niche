@@ -7,8 +7,10 @@ ini_set('display_errors', 1);
 require_once '../../includes/auth/auth.php';
 require_once "../../config/config.php";
 
+
+
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
@@ -44,9 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
         } else {
             // Prepare timestamp column name based on status
             $timestamp_column = '';
-            switch ($new_status) {
+switch ($new_status) {
                 case 'Processing':
                     $timestamp_column = 'processed_at';
+                    break;
+                case 'Confirmed':
+                    $timestamp_column = 'confirmed_at';
                     break;
                 case 'Shipped':
                     $timestamp_column = 'shipped_at';
@@ -102,15 +107,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
             }
             $stmt->close();
             
-            // Log status update to order_status_history table (if you want to keep a history)
-            $history_sql = "INSERT INTO order_status_history (order_id, status, notes, dispatcher_details, updated_by, created_at) 
-                            VALUES (?, ?, ?, ?, ?, NOW())";
+// Log status update to order_status_history table (if you want to keep a history)
+            $history_sql = "INSERT INTO order_status_history (order_id, old_status, new_status, notes, dispatcher_details, changed_by, changed_at) 
+                            VALUES (?, ?, ?, ?, ?, ?, NOW())";
             
             // Assuming you have user authentication and can get the current user ID
-            $current_user = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
+            $current_user = isset($_SESSION['admin_id']) ? $_SESSION['admin_id'] : 0;
             
             $stmt = $conn->prepare($history_sql);
-            $stmt->bind_param("isssi", $order_id, $new_status, $status_notes, $dispatcher_details, $current_user);
+            $stmt->bind_param("isssis", $order_id, $current_status, $new_status, $status_notes, $dispatcher_details, $current_user);
             
             // This is optional - if the table doesn't exist, it will just fail silently
             $stmt->execute();
@@ -229,7 +234,8 @@ foreach ($order_items as &$item) {
 // Status classes configuration (same as in orders.php)
 $status_classes = [
     'Processing' => 'bg-[#E8B006]',
-    'Shipped' => 'bg-[#1A237E]',
+    'Confirmed' => 'bg-[#1A7E79]',
+    'Shipped' => 'bg-[#C2185B]',
     'Delivered' => 'bg-[#39D959]',
     'Cancelled' => 'bg-red-500',
     'Returned' => 'bg-[#9C27B0]'
@@ -251,23 +257,10 @@ $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'customer-details';
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-    <link rel="stylesheet" href="../styles/overlay.css">
-    <link rel="stylesheet" href="../styles/dropdown.css" />
-    <link rel="stylesheet" href="../styles/graph.css" />
-    <link rel="stylesheet" href="../styles/dash.css" />
-    <title>Order #<?php echo $order_id; ?> Details</title>
+<title>Order #<?php echo $order_id; ?> Details</title>
 
-    <style>
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .tab-button.active { 
-            border-bottom: 3px solid #1A7E79;
-            color: #1A7E79;
-            font-weight: 600;
-        }
-    </style>
+<?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body class="relative">
@@ -281,7 +274,7 @@ include "./sidebar.php"
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-[20px] font-Onest font-semibold">Order #<?php echo $order_id; ?> Details</h1>
             <a href="./orders.php" class="cursor-pointer">
-                <img src="../assets/global/close-circle.svg" alt="close" class="w-[24px]" />
+                <i class="fa-solid fa-xmark text-[24px]" alt="close"></i>
             </a>
         </div>
 
@@ -418,8 +411,9 @@ include "./sidebar.php"
 
                 <div class="space-y-2">
     <label for="new_status" class="block text-[14px] text-gray-700">New Status</label>
-    <select name="new_status" id="new_status" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+<select name="new_status" id="new_status" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
         <option value="Processing" <?php echo $order['order_status'] === 'Processing' ? 'selected' : ''; ?>>Processing</option>
+        <option value="Confirmed" <?php echo $order['order_status'] === 'Confirmed' ? 'selected' : ''; ?>>Confirmed</option>
         <option value="Shipped" <?php echo $order['order_status'] === 'Shipped' ? 'selected' : ''; ?>>Shipped</option>
         <option value="Delivered" <?php echo $order['order_status'] === 'Delivered' ? 'selected' : ''; ?>>Delivered</option>
         <option value="Cancelled" <?php echo $order['order_status'] === 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
@@ -432,12 +426,12 @@ include "./sidebar.php"
                     <textarea name="status_notes" id="status_notes" rows="4" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                 </div>
 
-                <div class="space-y-2">
-                    <label for="status_notes" class="block text-[14px] text-gray-700">Please enter the dispatcher details or shipping information (only required if order status is "Shipped")</label>
+<div id="dispatcherDetailsSection" class="space-y-2 hidden">
+                    <label for="dispatcher_details" class="block text-[14px] text-gray-700">Please enter the dispatcher details or shipping information (only required if order status is "Shipped")</label>
                     <textarea name="dispatcher_details" id="dispatcher_details" rows="4" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                 </div>
 
-                <button type="submit" name="update_status" class="px-4 py-2 bg-[#1A237E] text-white rounded-md hover:bg-blue-800 transition duration-200">
+                <button type="submit" name="update_status" class="px-4 py-2 bg-[#C2185B] text-white rounded-md hover:bg-blue-800 transition duration-200">
                     Update Status
                 </button>
             </form>
@@ -448,7 +442,7 @@ include "./sidebar.php"
                 
                 <div class="relative pl-8 border-l-2 border-gray-200">
                     <div class="mb-6 relative">
-                        <div class="absolute -left-[25px] top-0 w-4 h-4 rounded-full bg-[#1A237E]"></div>
+                        <div class="absolute -left-[25px] top-0 w-4 h-4 rounded-full bg-[#C2185B]"></div>
                         <div class="mb-1">
                             <span class="text-[16px] font-medium"><?php echo htmlspecialchars($order['order_status']); ?></span>
                             <span class="text-[14px] text-gray-500 ml-2"><?php echo $order['formatted_date'] . ' ' . $order['formatted_time']; ?></span>
@@ -471,7 +465,7 @@ include "./sidebar.php"
                     </div>
                     
                     <div class="mb-6 relative">
-                        <div class="absolute -left-[25px] top-0 w-4 h-4 rounded-full bg-[#1A237E]"></div>
+                        <div class="absolute -left-[25px] top-0 w-4 h-4 rounded-full bg-[#C2185B]"></div>
                         <div class="mb-1">
                             <span class="text-[16px] font-medium">Order Placed</span>
                             <span class="text-[14px] text-gray-500 ml-2"><?php echo $order['formatted_date'] . ' ' . $order['formatted_time']; ?></span>
@@ -509,8 +503,8 @@ include "./sidebar.php"
                                 <p class="text-[14px]">Quantity: <?php echo intval($item['quantity']); ?></p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[18px] font-medium">₦<?php echo number_format($item['total_price']); ?></p>
-                                <p class="text-[14px] text-gray-500">₦<?php echo number_format($item['item_price']); ?> each</p>
+                                <p class="text-[18px] font-medium">₦<?php echo number_format((float)$item['total_price']); ?></p>
+                                <p class="text-[14px] text-gray-500">₦<?php echo number_format((float)$item['item_price']); ?> each</p>
                             </div>
                         </div>
                     </div>
@@ -528,7 +522,7 @@ include "./sidebar.php"
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-[16px]">Subtotal:</span>
-                            <span class="text-[16px] font-medium">₦<?php echo number_format($order['order_total']); ?></span>
+                            <span class="text-[16px] font-medium">₦<?php echo number_format((float)$order['order_total']); ?></span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-[16px]">Delivery Fee:</span>
@@ -536,7 +530,7 @@ include "./sidebar.php"
                         </div>
                         <div class="flex justify-between items-center pt-2 border-t mt-2">
                             <span class="text-[18px] font-medium">Total:</span>
-                            <span class="text-[18px] font-bold">₦<?php echo number_format($order['order_total']); ?></span>
+                            <span class="text-[18px] font-bold">₦<?php echo number_format((float)$order['order_total']); ?></span>
                         </div>
                     </div>
                 </div>

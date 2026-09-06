@@ -19,11 +19,7 @@ $admin_role = $_SESSION['admin_role'] ?? 'admin';
 
 // Connect to the database for admin info
 require_once "../../config/servername.php";
-$admin_conn = new mysqli($servername, $username, $dbpassword, $dbname);
-
-if ($admin_conn->connect_error) {
-    die("Connection failed: " . $admin_conn->connect_error);
-}
+$admin_conn = db();
 
 // Fetch admin details
 $sql = "SELECT * FROM administrators WHERE admin_id = ?";
@@ -34,7 +30,7 @@ $admin_result = $stmt->get_result();
 $admin = $admin_result->fetch_assoc();
 
 // Close the admin database connection
-$admin_conn->close();
+
 
 // Set profile photo path with fallback to default if not available
 $profile_photo = "../assets/home/user.svg"; // Default image
@@ -74,16 +70,17 @@ if (isset($_GET['notification_action']) && isset($_GET['notification_id'])) {
 // Include notifications functions if not already included
 require_once __DIR__ . '/../../includes/notifications.php';
 
+
 // Get unread count
 // Make sure $conn is a mysqli connection before calling this
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 $unread_count = get_unread_count($conn, true);
 
 // Get latest notifications for dropdown
 $latest_notifications = get_notifications($conn, true, null, 5, 0);
 
 // Database connection for returns
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die(mysqli_error($conn));
 }
@@ -153,7 +150,7 @@ if ($result) {
 // Status colors
 $status_colors = [
     'Processing' => 'bg-[#E8B006]',
-    'Received' => 'bg-[#1A237E]',
+    'Received' => 'bg-[#C2185B]',
     'Accepted' => 'bg-[#39D959]',
     'Rejected' => 'bg-red-500',
     'Completed' => 'bg-[#39D959]'
@@ -171,18 +168,13 @@ function formatDate($date) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH Admin | Returns Management</title>
+    <title>GLOREFY Admin | Returns Management</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-    <link rel="stylesheet" href="../styles/overlay.css">
-    <link rel="stylesheet" href="../styles/dropdown.css" />
-    <link rel="stylesheet" href="../styles/graph.css" />
-    <link rel="stylesheet" href="../styles/dash.css" />
-    
+<?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body class="relative">
@@ -191,18 +183,17 @@ function formatDate($date) {
 
         <div class="flex items-center gap-5 md:gap-8 lg:gap-10">
             <a href="./index.php" class="flex items-center gap-1 md:gap-2">
-                <img src="../assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-                <h1 class="hidden md:block text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                <img src="../assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
             </a>
 
-            <img onclick="toggleNav()" src="../assets/home/menu.svg" alt="Search" class="w-[28px] cursor-pointer" />
+            <i class="fa-solid fa-bars text-[24px] cursor-pointer" onclick="toggleNav()" alt="Search"></i>
             <h1 class="hidden md:block text-[16px] md:text-[20px] font-Onest font-semibold">Orders</h1>
         </div>
 
 
         <div class="flex items-center gap-0">
             <div class="flex items-center gap-2 border-[1px] border-[#F3F3F3] rounded-[25px] p-2">
-                <img src="../assets/global/search-normal.svg" alt="Search" class="w-[18px]" />
+                <i class="fa-solid fa-magnifying-glass text-[18px]" alt="Search"></i>
                 <input type="text" placeholder="Search name, Order ID..." class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
             </div>
 
@@ -210,8 +201,8 @@ function formatDate($date) {
         <div class="flex items-center gap-6 md:bg-[#F3F3F3] rounded-[4px] py-1 px-4">
 
             <span class="cursor-pointer relative" onclick="openNotification()">
-                <img src="../assets/global/bell.svg" class="w-[18px] md:w-[20px]" alt="bag" />
-                <div class="w-[8px] h-[8px] bg-[#1A237E] rounded-full absolute top-[-.1rem] left-3"></div>
+                <i class="fa-regular fa-bell text-[20px]" alt="bag"></i>
+                <div class="w-[8px] h-[8px] bg-[#C2185B] rounded-full absolute top-[-.1rem] left-3"></div>
             </span>
 
            
@@ -239,7 +230,7 @@ function formatDate($date) {
 <div class="flex items-center gap-1">
     <h1 class="text-[18px] md:text-[20px] font-['Open Sans'] font-medium">Notifications</h1>
     <?php if ($unread_count > 0): ?>
-        <div class="flex items-center justify-center bg-[#1A237E] w-[20px] h-[20px] rounded-[50%]">
+        <div class="flex items-center justify-center bg-[#C2185B] w-[20px] h-[20px] rounded-[50%]">
             <h1 class="text-white text-[11px] md:text-[12px] font-['Open Sans'] font-medium">
                 <?php echo $unread_count > 99 ? '99+' : $unread_count; ?>
             </h1>
@@ -247,7 +238,7 @@ function formatDate($date) {
     <?php endif; ?>
 </div>
 
-    <a href="./notifications.php" class="text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[#1A237E]">See all</a>
+    <a href="./notifications.php" class="text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[#C2185B]">See all</a>
 
 
 </div>
@@ -268,7 +259,7 @@ function formatDate($date) {
                                     $created_at = new DateTime($notification['created_at']);
                                     echo $created_at->format('d M, Y h:i A'); 
                                     ?></span>
-                    <img src="../assets/user/action.svg" class="cursor-pointer" onclick="openNotimenu(this)" />
+                    <i class="fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer" onclick="openNotimenu(this)"></i>
                     <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                                         <div class="flex flex-col gap-3">
                                         <?php if ($notification['type'] === 'order' && !empty($notification['reference_id'])): ?>
@@ -464,7 +455,7 @@ include("./sidebar.php");
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-gray-900"><?php echo $request['product_name']; ?></div>
                                             <div class="text-sm text-gray-500">Size: <?php echo $request['size']; ?> • Color: <?php echo $request['colors']; ?></div>
-                                            <div class="text-sm text-gray-500">Qty: <?php echo $request['return_quantity']; ?> • ₦<?php echo number_format($request['price']); ?></div>
+                                            <div class="text-sm text-gray-500">Qty: <?php echo $request['return_quantity']; ?> • ₦<?php echo number_format((float)$request['price']); ?></div>
                                         </div>
                                     </div>
                                 </td>

@@ -13,124 +13,27 @@ if (!isset($_SESSION['admin_setup_id']) || !isset($_SESSION['setup_token'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH ADMIN | Set Password</title>
+    <title>GLOREFY ADMIN | Set Password</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Open Sans', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-image: url("./assets/global/bg.svg");
-            background-position: center;
-            background-size: cover;
-        }
-        
-        .container {
-            background-color: white;
-            border-radius: 24px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            width: 100%;
-            max-width: 500px;
-        }
-        
-        .password-container {
-            position: relative;
-        }
-        
-        .password-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #E1E1E1;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        
-        .password-input:focus {
-            border-color: #1A237E;
-            box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2);
-            outline: none;
-        }
-        
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #777777;
-            background: none;
-            border: none;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .requirement {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            transition: color 0.3s ease;
-        }
-        
-        .requirement.valid {
-            color: #28C76F;
-        }
-        
-        .requirement.invalid {
-            color: #EE3F3F;
-        }
-        
-        .requirement-icon {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .valid .requirement-icon {
-            background-color: #E0F8E9;
-            color: #28C76F;
-        }
-        
-        .invalid .requirement-icon {
-            background-color: #FDECEC;
-            color: #EE3F3F;
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-        }
-    </style>
+
+    <?php include 'tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-[#262626] text-[20px] md:text-[24px] font-medium">Set Password</h3>
             <div class="flex items-center gap-2">
-                <img src="./assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-                <h1 class="text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                <img src="./assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
             </div>
         </div>
         
         <h3 class="text-[#262626] text-center text-[18px] md:text-[22px] font-medium pt-2 pb-4">ADMIN PANEL</h3>
         
         <div class="text-center mb-6">
-            <p class="text-[#1A237E] font-medium text-[18px]">Welcome, <?php echo htmlspecialchars($_SESSION['admin_name'] ?? 'Administrator'); ?>!</p>
+            <p class="text-[#C2185B] font-medium text-[18px]">Welcome, <?php echo htmlspecialchars($_SESSION['admin_name'] ?? 'Administrator'); ?>!</p>
             <p class="text-[#777777] mt-2">Create a strong password for your administrator account</p>
         </div>
         
@@ -232,7 +135,7 @@ if (!isset($_SESSION['admin_setup_id']) || !isset($_SESSION['setup_token'])) {
                 </div>
             </div>
             
-            <button type="submit" id="submit-btn" class="w-full py-[12px] px-3 bg-[#1A237E] text-white text-[16px] font-medium cursor-pointer rounded-[8px] hover:bg-[#0e1442] transition-colors" disabled>
+            <button type="submit" id="submit-btn" class="w-full py-[12px] px-3 bg-[#C2185B] text-white text-[16px] font-medium cursor-pointer rounded-[8px] hover:bg-[#0e1442] transition-colors" disabled>
                 Set Password & Continue
             </button>
         </form>

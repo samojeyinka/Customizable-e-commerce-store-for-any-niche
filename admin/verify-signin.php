@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "../config/config.php";
 
@@ -65,11 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
         // Connect to database
         require_once "../config/servername.php";
         
-        $conn = new mysqli($servername, $username, $dbpassword, $dbname);
-        
-        if ($conn->connect_error) {
-            throw new Exception("Connection failed: " . $conn->connect_error);
-        }
+        $conn = db();
         
         // Debug query to see what's in the database
         $debug_sql = "SELECT admin_id, otp_code, otp_expires FROM administrators WHERE admin_id = ?";
@@ -137,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
             $error_message = "Invalid OTP. Please try again.";
         }
         
-        $conn->close();
+        
     } catch (Exception $e) {
         $error_message = "Error: " . $e->getMessage();
         error_log("Exception: " . $e->getMessage());
@@ -152,11 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
         // Connect to database
         require_once "../config/servername.php";
         
-        $conn = new mysqli($servername, $username, $dbpassword, $dbname);
-        
-        if ($conn->connect_error) {
-            throw new Exception("Connection failed: " . $conn->connect_error);
-        }
+        $conn = db();
         
         // Generate new OTP - 4 digits
         $otp = sprintf("%04d", rand(1000, 9999));
@@ -242,14 +234,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
                 // Use direct variable in string with concatenation
                 $mail->Body = "
                 <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;'>
-                    <h2 style='color: #1A237E; text-align: center;'>Victosah Solution</h2>
+                    <h2 style='color: #C2185B; text-align: center;'>Glorefy</h2>
                     <p style='font-size: 16px; line-height: 1.5;'>Hello " . $_SESSION['admin_fullname'] . ",</p>
                     <p style='font-size: 16px; line-height: 1.5;'>You requested a new OTP code. To verify your identity, please use the following code:</p>
                     <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
                         " . $otp . "
                     </div>
                     <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this, please contact the system administrator immediately.</p>
-                    <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
+                    <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Glorefy Team</p>
                 </div>
                 ";
                 $mail->AltBody = "Your admin login verification code is: " . $otp;
@@ -270,7 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
             throw new Exception("Error updating database: " . $conn->error);
         }
         
-        $conn->close();
+        
     } catch (Exception $e) {
         $error_message = "Error: " . $e->getMessage();
         debug_log("Exception in resend process: " . $e->getMessage());
@@ -286,89 +278,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH ADMIN | Verify Login</title>
+    <title>GLOREFY ADMIN | Verify Login</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css" />
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
+<link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
-    <style>
-            body {
-            font-family: 'Open Sans', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-image: url("./assets/global/bg.svg");
-            background-position: center;
-            background-size: cover;
-        }
-        
-        .otp-input-group {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-        }
-        
-        .otp-input {
-            width: 50px;
-            height: 50px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            border: 1px solid #E1E1E1;
-            border-radius: 8px;
-            background-color: transparent;
-            outline: none;
-        }
-        
-        .otp-input:focus {
-            border-color: #1A237E;
-            box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2);
-        }
-        
-        .timer {
-            font-size: 14px;
-            color: #777;
-            text-align: center;
-            margin: 15px 0;
-        }
-        
-        .timer-highlight {
-            color: #1A237E;
-            font-weight: 600;
-        }
-        
-        @media (max-width: 480px) {
-            .otp-input {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-        }
-    </style>
+<?php include 'tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
     <div class="w-[90%] lg:w-[450px] h-[fit-content] mx-auto bg-white rounded-[24px] p-6 shadow-lg">
-        <div class="w-[95%] mx-auto flex items-center justify-between mb-4">
+        <div class="w-[95%] mx-auto max-w-[1440px] flex items-center justify-between mb-4">
             <h3 class="text-[#262626] text-[20px] md:text-[24px] font-medium">Verify Login</h3>
             <div class="flex items-center gap-2">
-                <img src="<?php echo DOMAIN; ?>/assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-                <h1 class="text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                <img src="<?php echo DOMAIN; ?>/assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
             </div>
         </div>
         
         <h3 class="text-[#262626] text-center text-[18px] md:text-[22px] font-medium pt-2 pb-4">ADMIN PANEL</h3>
         
         <div class="text-center mb-6">
-            <p class="text-[#1A237E] font-medium text-[18px]">Login Verification</p>
+            <p class="text-[#C2185B] font-medium text-[18px]">Login Verification</p>
             <p class="text-[#777777] mt-2">
                 Enter the 4-digit code sent to: <span class="font-semibold text-[#333333]"><?php echo htmlspecialchars($_SESSION['admin_email']); ?></span>
             </p>
@@ -415,17 +346,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
                 OTP expires in: <span id="timer" class="timer-highlight">10:00</span>
             </div>
 
-            <button type="submit" class="w-full py-[12px] px-3 bg-[#1A237E] text-white text-[16px] font-medium cursor-pointer rounded-[8px] transition-colors hover:bg-[#0e1442]">
+            <button type="submit" class="w-full py-[12px] px-3 bg-[#C2185B] text-white text-[16px] font-medium cursor-pointer rounded-[8px] transition-colors hover:bg-[#0e1442]">
                 Verify & Continue
             </button>
         </form>
         
         <div class="text-center mt-6">
-            <a href="#" id="resendLink" class="text-[#1A237E] font-medium text-[14px] hidden">
+            <a href="#" id="resendLink" class="text-[#C2185B] font-medium text-[14px] hidden">
                 Resend verification code
             </a>
             <p class="text-[#777777] text-[14px]" id="resendTimer">
-                Resend code in <span class="text-[#1A237E] font-medium" id="resendCounter">60</span> seconds
+                Resend code in <span class="text-[#C2185B] font-medium" id="resendCounter">60</span> seconds
             </p>
         </div>
         

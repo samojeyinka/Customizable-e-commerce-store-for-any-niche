@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "../config/config.php";
 
@@ -47,11 +47,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Database connection
         require_once "../config/servername.php";
         
-        $conn = new mysqli($servername, $username, $dbpassword, $dbname);
-        
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
+        $conn = db();
         
         // Check if email exists in the administrators table
         $sql = "SELECT * FROM administrators WHERE email = ?";
@@ -111,14 +107,14 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $mail->Subject = 'Password Reset Verification Code';
                     $mail->Body = "
                     <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px;'>
-                        <h2 style='color: #1A237E; text-align: center;'>Victosah Solution</h2>
+                        <h2 style='color: #C2185B; text-align: center;'>Glorefy</h2>
                         <p style='font-size: 16px; line-height: 1.5;'>Hello {$admin['full_name']},</p>
                         <p style='font-size: 16px; line-height: 1.5;'>You requested to reset your password. To verify your identity, please use the following OTP code:</p>
                         <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
                             {$otp}
                         </div>
                         <p style='font-size: 16px; line-height: 1.5;'>This code is valid for 10 minutes. If you did not request this, please ignore this email.</p>
-                        <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Victosah Team</p>
+                        <p style='font-size: 16px; line-height: 1.5;'>Best regards,<br>Glorefy Team</p>
                     </div>
                     ";
                     $mail->AltBody = "Your password reset verification code is: {$otp}";
@@ -140,7 +136,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error_message = "Your email address is not recognized as an administrator.";
         }
         
-        $conn->close();
+        
     }
 }
 ?>
@@ -151,40 +147,25 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH ADMIN | Forgot Password</title>
+    <title>GLOREFY ADMIN | Forgot Password</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css" />
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
+<link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
-    <style>
-        body {
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-image: url("./assets/global/bg.svg");
-            background-position: center;
-            background-size: cover;
-        }
-    </style>
-
+<?php include 'tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
     <div class="w-[90%] lg:w-[50%] h-[fit-content] mx-auto bg-white rounded-[24px] p-5">
 
-        <div class="w-[95%] mx-auto flex items-center justify-between">
+        <div class="w-[95%] mx-auto max-w-[1440px] flex items-center justify-between">
             <a href="./index.php" class="flex items-center gap-2">
-            <img src="./assets/global/arrow-left.svg" />
+            <i class="fa-solid fa-arrow-left text-[20px]"></i>
                 <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Go back</h3>
             </a>
             <div class="flex items-center gap-1 md:gap-2">
-                <img src="<?php echo DOMAIN; ?>/assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-                <h1 class="text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                <img src="<?php echo DOMAIN; ?>/assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
             </div>
         </div>
         
@@ -214,7 +195,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <?php endif; ?>
 
-        <p class="font-['Open Sans'] text-[19px] text-[24px] font-medium text-left mt-5 text-[#1A237E]">
+        <p class="font-['Open Sans'] text-[19px] text-[24px] font-medium text-left mt-5 text-[#C2185B]">
             Forgot Password
         </p>
         <p class="font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#777777] mt-2">
@@ -237,11 +218,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                     required />
             </div>
 
-            <button type="submit" class="w-full py-[8px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center mt-4">Send Reset Code</button>
+            <button type="submit" class="w-full py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center mt-4">Send Reset Code</button>
         </form>
 
         <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#7A7A7A] py-3">
-            Remember your password? <a href="./index.php" class="text-[#1A237E] font-medium">Sign in</a>
+            Remember your password? <a href="./index.php" class="text-[#C2185B] font-medium">Sign in</a>
         </p>
     </div>
 </body>

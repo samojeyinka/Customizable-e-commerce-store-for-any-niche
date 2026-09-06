@@ -1,13 +1,7 @@
-<?php
-$host = "localhost";
-$user = "root";  
-$pass = "";
-$dbname = "victosah";
+﻿<?php
+require_once '../../config/config.php';
 
-$conn = new mysqli($host, $user, $pass, $dbname);
-if ($conn->connect_error) {
-    die(json_encode(["success" => false, "message" => "Database connection failed."]));
-}
+$conn = db();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userId = intval($_POST['user_id']);
@@ -21,9 +15,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($action === 'delete') {
         $sql = "DELETE FROM users WHERE id = ?";
     } elseif ($action === 'disable') {
-        $sql = "UPDATE users SET is_disabled = 1 WHERE id = ?";
+        $sql = "UPDATE users SET status = 'suspended' WHERE id = ?";
     } elseif ($action === 'enable') {
-        $sql = "UPDATE users SET is_disabled = 0 WHERE id = ?";
+        $sql = "UPDATE users SET status = 'active' WHERE id = ?";
     } else {
         echo json_encode(["success" => false, "message" => "Invalid action."]);
         exit;
@@ -41,5 +35,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 }
 
-$conn->close();
+
 ?>

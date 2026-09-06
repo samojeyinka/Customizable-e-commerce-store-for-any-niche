@@ -3,51 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Check recent order</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Check recent order</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../styles/modal.css">
-    <link rel="stylesheet" href="../styles/tabs.css">
-    <link rel="stylesheet" href="../styles/styles.css">
-    <link rel="stylesheet" href="../styles/faq.css" />
-
-    <style>
-    .ordermenu-content {
-            display: none;
-            position: absolute;
-            top: 70%;
-            /* Positions it directly below the opener */
-            right:-50%;
-            /* Aligns it with the left edge of the opener */
-            min-width: 160px;
-            min-height: 10rem;
-            z-index: 5;
-            background-color: white !important;
-            border: 1px solid #E1E1E1;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 8px;
-            border-radius: 4px;
-        }
-
-        .showom {
-            display: block;
-        }
-
-        @media screen and (max-width:768px){
-
-            .ordermenu-content {
-
-            top: 100%;
-            right:0%;
-        }
-
-        }
-    </style>
-
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -58,27 +22,26 @@
 
 <nav class="w-[90%] flex items-center justify-between">
 <a href="../index.php" class="flex items-center gap-1 md:gap-2">
-                    <img src="../assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-                    <h1 class="text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                    <img src="../assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
                 </a>
     <div class="hidden md:flex items-center gap-0">
         <div class="flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#B8BBD7] rounded-l-[4px] p-2">
-            <img src="../assets/global/search.svg" alt="Search" class="w-[24px]" />
+            <i class="fa-solid fa-magnifying-glass text-[24px] text-[#777777] leading-none" alt="Search"></i>
             <input type="text" placeholder="What are you shopping for?" class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
         </div>
-        <button type="submit" class="py-2 px-4 bg-[#1A237E] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
+        <button type="submit" class="py-2 px-4 bg-[#C2185B] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
     </div>
     <div class="flex items-center gap-6">
         <a href="./products/cart.php">
-            <img src="../assets/global/bag.svg" class="w-[22px] md:w-[24px]" alt="bag" />
+            <i class="fa-solid fa-bag-shopping text-[22px] md:text-[24px] text-[#262626] leading-none" alt="bag"></i>
         </a>
         <a href="../user/favourites.php">
-            <img src="../assets/global/lovely.svg" class="w-[22px] md:w-[24px]" alt="bag" />
+            <i class="fa-solid fa-heart text-[22px] md:text-[24px] text-[#262626] leading-none" alt="bag"></i>
         </a>
 
         <a onclick="openSidemenu()" class="flex items-center gap-1 cursor-pointer">
-            <img src="../assets/global/profile.svg" class="w-[22px] md:w-[24px]" alt="bag" />
-            <img src="../assets/products/down2.svg" class="w-[12px]" alt="bag" />
+            <i class="fa-solid fa-user text-[22px] md:text-[24px] text-[#262626] leading-none" alt="bag"></i>
+            <i class="fa-solid fa-chevron-down text-[12px] text-[#262626] leading-none" alt="bag"></i>
         </a>
 
     </div>
@@ -95,18 +58,18 @@
         <p class="menulink text-[16px] font-regular text-[#262626] font-['Open Sans']" id="myBtn">Create an Account</p>
 
         <a href="../user/profile.php" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#262626] font-['Open Sans']">
-            <img src="../assets/global/user.svg" class="" />
+            <i class="fa-solid fa-user text-[20px] text-[#262626] leading-none"></i>
             <span>My Profile</span>
 
         </a>
 
         <a href="../user/orders.php" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#262626] font-['Open Sans']">
-            <img src="../assets/global/invoice.svg" class="" />
+            <i class="fa-solid fa-receipt text-[20px] text-[#262626] leading-none"></i>
             <span>My Orders</span>
 
         </a>
         <a id="logooutBtn" class="menulink flex items-center gap-2 text-[16px] font-regular text-[#EE3F3F] font-['Open Sans']">
-            <img src="../assets/global/logout.svg" class="" />
+            <i class="fa-solid fa-right-from-bracket text-[20px] text-[#262626] leading-none"></i>
             <span>Log Out</span>
 
         </a>
@@ -123,7 +86,7 @@
     <!-- Modal content -->
     <div class="modal-content overflow-hidden p-4">
 
-        <img src="../assets/global/close-circle.svg" alt="close" id="closeauth" class="w-[26px] md:w-[32px] cursor-pointer absolute right-4" />
+        <i class="fa-solid fa-xmark text-[26px] md:text-[32px] text-[#262626] cursor-pointer absolute right-4 leading-none" id="closeauth" alt="close"></i>
 
         <div class="w-[fit-content] flex items-center mx-auto gap-10 tab">
             <button class="tablinks text-[16px] font-['Open Sans'] font-medium" onclick="openTab(event, 'SignUp')" id="defaultOpen">Create an account</button>
@@ -131,7 +94,7 @@
         </div>
 
         <div id="SignUp" class="tabcontent">
-            <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Welcome to Victosah Solution</h3>
+            <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Welcome to Glorefy</h3>
 
             <form class="flex flex-col gap-4 pt-4">
                 <div class="flex flex-col gap-1">
@@ -158,7 +121,7 @@
                             type="password"
                             placeholder="Enter your password"
                             class="w-full  font-['Open Sans'] bg-transparent outline-none   font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                        <img src="../assets/global/eye.svg" class="w-[24px] cursor-pointer" />
+                        <i class="fa-solid fa-eye text-[24px] text-[#262626] cursor-pointer leading-none"></i>
                     </div>
                 </div>
 
@@ -174,11 +137,11 @@
                             type="password"
                             placeholder="Confirm your password"
                             class="w-full  font-['Open Sans'] bg-transparent outline-none   font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                        <img src="../assets/global/eye-slash.svg" class="w-[24px] cursor-pointer" />
+                        <i class="fa-solid fa-eye-slash text-[24px] text-[#262626] cursor-pointer leading-none"></i>
                     </div>
                 </div>
                 <p class='text-[14px] font-["Open Sans] text-[#EE3F3F] font-regular underline cursor-pointer'>Password doesn’t match</p>
-                <span class="w-full py-[8px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center" id="rvBtn">Create an account</span>
+                <span class="w-full py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center" id="rvBtn">Create an account</span>
 
             </form>
 
@@ -187,7 +150,7 @@
             </p>
 
             <div class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-                <img src="../assets/global/google.svg" class="w-[20px]" />
+                <i class="fa-brands fa-google text-[20px] text-[#262626] leading-none"></i>
                 <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#262626] py-3">
                     Create an account with Google
                 </p>
@@ -202,7 +165,7 @@
             <section id="dangeralert" class="flex flex-col items-center w-full bg-[#FDECEC] shadow-lg mt-2 py-3 px-4 rounded relative overflow-hidden">
                 <div class="h-[100%] w-[5px] bg-[#EE3F3F] absolute left-0 top-0"></div>
                 <div class="flex items-center gap-2 mr-auto">
-                    <img src="../assets/global/canceldanger.svg" id="closedangeralert" alt="Cancel danger alert" class="w-[24px] cursor-pointer" />
+                    <i class="fa-solid fa-xmark text-[24px] text-[#EE3F3F] cursor-pointer leading-none" id="closedangeralert" alt="Cancel danger alert"></i>
                     <p class="text-[16px] md:text-[17px]  text-[#2C2C2C] w-full font-Satoshi font-medium">
                         Incorrect details
                     </p>
@@ -237,13 +200,13 @@
                             type="password"
                             placeholder="Enter your password"
                             class="w-full  font-['Open Sans'] bg-transparent outline-none   font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                        <img src="./assets/global/eye.svg" class="w-[24px] cursor-pointer" />
+                        <i class="fa-solid fa-eye text-[24px] text-[#262626] cursor-pointer leading-none"></i>
                     </div>
                 </div>
 
-                <p id="openPassordRqMail" class='text-[14px] font-["Open Sans] text-[#1A237E] font-regular  cursor-pointer'>Forgot Password?</p>
+                <p id="openPassordRqMail" class='text-[14px] font-["Open Sans] text-[#C2185B] font-regular  cursor-pointer'>Forgot Password?</p>
 
-                <a href="../user/profile.php" class="w-full py-[8px] px-3 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Sign In</a>
+                <a href="../user/profile.php" class="w-full py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Sign In</a>
 
             </form>
 
@@ -252,7 +215,7 @@
             </p>
 
             <div class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-                <img src="../assets/global/google.svg" class="w-[20px]" />
+                <i class="fa-brands fa-google text-[20px] text-[#262626] leading-none"></i>
                 <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#262626] py-3">
                     Create an account with Google
                 </p>
@@ -270,7 +233,7 @@
 
 <div id="regVerify" class="modal verify">
     <div class="modal-content overflow-hidden p-4">
-        <img src="../assets/global/back.svg" alt="back" id="backtoreg" class="w-[26px] md:w-[32px] absolute left-4 cursor-pointer" />
+        <i class="fa-solid fa-arrow-left text-[26px] md:text-[32px] text-[#262626] absolute left-4 cursor-pointer leading-none" id="backtoreg" alt="back"></i>
 
         <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
             Let us verify it’s you
@@ -307,13 +270,13 @@
             <span
 
                 id="regsuccessbtn"
-                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
+                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
                 Verify me
             </span>
         </form>
 
         <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-center">
-            Resend code in <span class="text-[#1A237E]">23sec</span>
+            Resend code in <span class="text-[#C2185B]">23sec</span>
         </p>
     </div>
 </div>
@@ -322,7 +285,7 @@
 <div id="regSuccess" class="modal regsuccess">
     <div class="modal-content overflow-hidden p-4 flex flex-col items-center">
 
-        <img src="../assets/global/success.svg" class="mx-auto w-[120px]" />
+        <i class="fa-solid fa-circle-check text-[120px] text-[#C2185B] mx-auto leading-none"></i>
 
         <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
             Account Creation Successful
@@ -334,7 +297,7 @@
 
 
 
-        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer"
+        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer"
             id="closeregsucces">
             Continue Shopping
         </span>
@@ -349,7 +312,7 @@
 
 <div id="logout" class="modal logout">
     <div class="modal-content overflow-hidden px-5 py-10">
-        <img src="../assets/global/close-circle.svg" alt="close" id="closelogout" class="w-[26px] md:w-[32px] cursor-pointer absolute top-10 right-4" />
+        <i class="fa-solid fa-xmark text-[26px] md:text-[32px] text-[#262626] cursor-pointer absolute top-10 right-4 leading-none" id="closelogout" alt="close"></i>
 
         <p class="text-[#EE3F3F] font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
             Log Out
@@ -375,7 +338,7 @@
 <!-- ========================  The Password reset moal  starts ======================== -->
 <div id="passwordRequestMail" class="modal password-request-mail">
     <div class="modal-content overflow-hidden p-4">
-        <img src="../assets/global/back.svg" id="backtologin" alt="back" class="w-[26px] md:w-[32px] absolute left-4 cursor-pointer" />
+        <i class="fa-solid fa-arrow-left text-[26px] md:text-[32px] text-[#262626] absolute left-4 cursor-pointer leading-none" id="backtologin" alt="back"></i>
 
         <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
             Forgot Password?
@@ -404,7 +367,7 @@
 
             <span
                 id="openPassordRqV"
-                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
+                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
                 Continue
             </span>
         </form>
@@ -419,7 +382,7 @@
 <!-- ========================  The Password reset moal  starts ======================== -->
 <div id="passwordRequestverify" class="modal password-request-verify">
     <div class="modal-content overflow-hidden p-4">
-        <img src="../assets/global/back.svg" id="backtomail" alt="back" class="w-[26px] md:w-[32px] absolute left-4 cursor-pointer" />
+        <i class="fa-solid fa-arrow-left text-[26px] md:text-[32px] text-[#262626] absolute left-4 cursor-pointer leading-none" id="backtomail" alt="back"></i>
 
         <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
             Let us verify it’s you
@@ -455,13 +418,13 @@
 
             <span
                 id="openPasswordRequestNP"
-                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
+                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
                 Verify me
             </span>
         </form>
 
         <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-center">
-            Didn't get code? <span class="text-[#1A237E] font-medium cursor-pointer">Resend </span>
+            Didn't get code? <span class="text-[#C2185B] font-medium cursor-pointer">Resend </span>
         </p>
     </div>
 </div>
@@ -472,7 +435,7 @@
 <!-- ========================  The Enter new pasword modal  starts ======================== -->
 <div id="passwordRequestNP" class="modal password-request-np">
     <div class="modal-content overflow-hidden p-4">
-        <img src="./assets/global/back.svg" id="backtoprverify" alt="back" class="w-[26px] md:w-[32px] absolute left-4 cursor-pointer" />
+        <i class="fa-solid fa-arrow-left text-[26px] md:text-[32px] text-[#262626] absolute left-4 cursor-pointer leading-none" id="backtoprverify" alt="back"></i>
 
         <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
             Reset Password
@@ -498,7 +461,7 @@
                         type="password"
                         placeholder="Enter your password"
                         class="w-full  font-['Open Sans'] bg-transparent outline-none   font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                    <img src="./assets/global/eye.svg" class="w-[24px] cursor-pointer" />
+                    <i class="fa-solid fa-eye text-[24px] text-[#262626] cursor-pointer leading-none"></i>
                 </div>
             </div>
 
@@ -514,14 +477,14 @@
                         type="password"
                         placeholder="Confirm your password"
                         class="w-full  font-['Open Sans'] bg-transparent outline-none   font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                    <img src="../assets/global/eye-slash.svg" class="w-[24px] cursor-pointer" />
+                    <i class="fa-solid fa-eye-slash text-[24px] text-[#262626] cursor-pointer leading-none"></i>
                 </div>
             </div>
 
 
             <span
                 id="openpasswordresetsuccess"
-                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
+                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
                 Reset Password
             </span>
         </form>
@@ -535,7 +498,7 @@
 <div id="passwordresetsuccess" class="modal passwordresetsuccess">
     <div class="modal-content overflow-hidden p-4 flex flex-col items-center">
 
-        <img src="../assets/global/success.svg" class="mx-auto w-[120px]" />
+        <i class="fa-solid fa-circle-check text-[120px] text-[#C2185B] mx-auto leading-none"></i>
 
         <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
             Password Reset Successful
@@ -547,7 +510,7 @@
 
 
 
-        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer"
+        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer"
             id="closeprsucces">
             Sign In
         </span>
@@ -564,14 +527,14 @@
 
 <!-- ========================  The options  starts ======================== -->
 <section class="w-full  py-4 border-b-[1px] border-[#E1E1E1]">
-<div class="w-[90%] mx-auto hidden  md:flex items-center justify-between">
+<div class="w-[90%] mx-auto max-w-[1440px] hidden  md:flex items-center justify-between">
     <div class="flex items-center gap-10">
 
         <div class="custom-dropdown">
 
             <div class="flex items-center gap-2 dropdown-toggle">
-                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Duvets</span>
-                <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Skincare</span>
+                <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
             </div>
             <div class="dropdown-content">
                 <div class="flex items-center gap-3">
@@ -599,8 +562,8 @@
         <div class="custom-dropdown">
 
             <div class="flex items-center gap-2 dropdown-toggle">
-                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Bedsheets</span>
-                <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Face Makeup</span>
+                <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
             </div>
             <div class="dropdown-content">
                 <div class="flex items-center gap-3">
@@ -620,30 +583,8 @@
         <div class="custom-dropdown">
 
             <div class="flex items-center gap-2 dropdown-toggle">
-                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Foams</span>
-                <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
-            </div>
-            <div class="dropdown-content">
-                <div class="flex items-center gap-3">
-                    <div>
-                        <div onclick="selectOption(this)">Option 1</div>
-                        <div onclick="selectOption(this)">Option 2</div>
-                        <div onclick="selectOption(this)">Option 3</div>
-                    </div>
-                    <div>
-                        <div onclick="selectOption(this)">Option 4</div>
-                        <div onclick="selectOption(this)">Option 5</div>
-                        <div onclick="selectOption(this)">Option 6</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="custom-dropdown">
-
-            <div class="flex items-center gap-2 dropdown-toggle">
-                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Pillows</span>
-                <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Lips & Eyes</span>
+                <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
             </div>
             <div class="dropdown-content">
                 <div class="flex items-center gap-3">
@@ -664,8 +605,30 @@
         <div class="custom-dropdown">
 
             <div class="flex items-center gap-2 dropdown-toggle">
-                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Lightings</span>
-                <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Hair Care</span>
+                <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
+            </div>
+            <div class="dropdown-content">
+                <div class="flex items-center gap-3">
+                    <div>
+                        <div onclick="selectOption(this)">Option 1</div>
+                        <div onclick="selectOption(this)">Option 2</div>
+                        <div onclick="selectOption(this)">Option 3</div>
+                    </div>
+                    <div>
+                        <div onclick="selectOption(this)">Option 4</div>
+                        <div onclick="selectOption(this)">Option 5</div>
+                        <div onclick="selectOption(this)">Option 6</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="custom-dropdown">
+
+            <div class="flex items-center gap-2 dropdown-toggle">
+                <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Fragrances</span>
+                <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
             </div>
             <div class="dropdown-content">
                 <div class="flex items-center gap-3">
@@ -687,63 +650,63 @@
 
 
     <div class="flex items-center gap-2 cursor-pointer">
-        <img src="../assets/home/truck-fast.svg" class='w-[24px] h-[24px]' />
-        <a href="../user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans] text-[#1A237E] font-medium underline'>Track your order</a>
+        <i class="fa-solid fa-truck-fast text-[24px] text-[#C2185B] leading-none"></i>
+        <a href="../user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans] text-[#C2185B] font-medium underline'>Track your order</a>
     </div>
 
 </div>
 
-<div class="w-[90%] mx-auto flex items-center gap-10  md:hidden">
-    <img src="../assets/global/menu.svg" alt="menu" class="cursor-pointer w-[24px]" onclick="openMobileMenu()" />
+<div class="w-[90%] mx-auto max-w-[1440px] flex items-center gap-10  md:hidden">
+    <i class="fa-solid fa-bars cursor-pointer text-[24px] text-[#262626]" onclick="openMobileMenu()" alt="menu"></i>
 
 
     <!-- The mobile nav starts -->
     <div id="menuNav" class="dropdown-menu border-t-[1px] border-[#E1E1E1] bg-white">
 
-        <div class="w-[92%] mx-auto">
-            <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Duvets</button>
+        <div class="w-[92%] mx-auto max-w-[1440px]">
+            <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Skincare</button>
             <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
-                <p>Duvet type</p>
-                <p>Duvet type</p>
-                <p>Duvet type</p>
-                <p>Duvet type</p>
+                <p>Skincare type</p>
+                <p>Skincare type</p>
+                <p>Skincare type</p>
+                <p>Skincare type</p>
             </div>
 
-            <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Bedsheets</button>
+            <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Face Makeup</button>
             <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
+                <p>Face makeup type</p>
+                <p>Face makeup type</p>
+                <p>Face makeup type</p>
+                <p>Face makeup type</p>
             </div>
 
-            <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Foams</button>
+            <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Lips & Eyes</button>
             <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
+                <p>Lips & eyes type</p>
+                <p>Lips & eyes type</p>
+                <p>Lips & eyes type</p>
+                <p>Lips & eyes type</p>
             </div>
 
-            <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Pillows</button>
+            <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Hair Care</button>
             <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
+                <p>Hair care type</p>
+                <p>Hair care type</p>
+                <p>Hair care type</p>
+                <p>Hair care type</p>
             </div>
 
-            <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Lightings</button>
+            <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Fragrances</button>
             <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
-                <p>Bedsheets type</p>
+                <p>Fragrance type</p>
+                <p>Fragrance type</p>
+                <p>Fragrance type</p>
+                <p>Fragrance type</p>
             </div>
 
             <div class="flex items-center gap-2 cursor-pointer pt-4">
-                <img src="../assets/home/truck-fast.svg" class='w-[24px] h-[24px]' />
-                <strong class='text-[13px] md:text-[14px] font-["Open Sans] text-[#1A237E] font-medium underline'>Track your order</strong>
+                <i class="fa-solid fa-truck-fast text-[24px] text-[#C2185B] leading-none"></i>
+                <strong class='text-[13px] md:text-[14px] font-["Open Sans] text-[#C2185B] font-medium underline'>Track your order</strong>
             </div>
 
         </div>
@@ -754,25 +717,25 @@
 
     <div class="w-[100%]  flex items-center  items-center gap-0">
         <div class="w-full flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#B8BBD7] rounded-l-[4px] p-2">
-            <img src="../assets/global/search.svg" alt="Search" class="w-[24px]" />
+            <i class="fa-solid fa-magnifying-glass text-[24px] text-[#777777] leading-none" alt="Search"></i>
             <input type="text" placeholder="What are you shopping for?" class="w-full text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
         </div>
-        <button type="submit" class="py-2 px-4 bg-[#1A237E] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
+        <button type="submit" class="py-2 px-4 bg-[#C2185B] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
     </div>
 </div>
 </section>
 <!-- ========================  The options  ends ======================== -->
 
         <section class="w-full bg-[#FFFFFFF] py-1">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Cart</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Check Out</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</span>
                 </div>
             </div>
         </section>
@@ -780,7 +743,7 @@
       
 
         <div class="w-full bg-[#FFFFFF] py-5">
-            <div class="w-[90%] mx-auto hidden md:block">
+            <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block">
 
 
                 <table cols="" class="w-full">
@@ -802,7 +765,7 @@
                                     <img src="../assets/products/img1.svg" class="w-full h-full" />
                                 </div>
                                 <div class="flex flex-col gap-[2px]">
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Name: Bounce Pillow</p>
+                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Name: Dewy Glow Serum</p>
                                     <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Color: Blue</p>
                                     <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Size: King size (6 a 4 in)</p>
                                     <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Quantity: 1</p>
@@ -822,7 +785,7 @@
                             <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Jan 12, 2025</td>
 
                             <td class="relative">
-                                <img src="../assets/user/action.svg" class="w-[24px] ml-auto cursor-pointer" onclick="openOrdermenu(this);"/>
+                                <i class="fa-solid fa-ellipsis-vertical text-[24px] ml-auto cursor-pointer leading-none" onclick="openOrdermenu(this);"></i>
                                 <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                                     <div class="flex flex-col gap-3">
                                         <a href="../products/show.php" class="text-[16px] font-medium text-[#262626]">Re-Order</a>
@@ -845,14 +808,14 @@
 
 
 
-            <div class="w-[90%] mx-auto  md:hidden">
+            <div class="w-[90%] mx-auto max-w-[1440px]  md:hidden">
                 <div class="w-full flex flex-col gap-4">
 
                     <div class="border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2">
 
                         <div class="flex items-center justify-between relative">
                             <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">January 12, 2025</p>
-                            <img src="../assets/user/action.svg" class="w-[24px] ml-auto cursor-pointer" onclick="openOrdermenu(this)"/>
+                            <i class="fa-solid fa-ellipsis-vertical text-[24px] ml-auto cursor-pointer leading-none" onclick="openOrdermenu(this)"></i>
 
                             <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                                     <div class="flex flex-col gap-3">
@@ -886,14 +849,14 @@
                                         <img src="../assets/products/img1.svg" class="w-full h-full object-cover" />
                                     </div>
                                     <div class="flex flex-col gap-[2px]">
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Bounce Pillow</p>
+                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Dewy Glow Serum</p>
                                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> Blue</p>
                                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> King size (6 a 4 in)</p>
                                     </div>
 
                                 </div>
 
-                                <p class='text-[14px] font-["Open Sans] text-[#1A237E] font-regular underline cursor-pointer'>Track your order</p>
+                                <p class='text-[14px] font-["Open Sans] text-[#C2185B] font-regular underline cursor-pointer'>Track your order</p>
                             </div>
 
                             <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
@@ -915,21 +878,20 @@
             <div class="w-[90%] flex gap-4 flex-col md:flex-row justify-between mx-auto">
                 <div class="flex flex-col gap-3">
                     <div class="flex items-center gap-1">
-                        <img src="../assets/global/logo.svg" class="w-[50px] h-[48.15px]" />
-                        <h1 class="text-[20px] text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                        <img src="../assets/global/logo.png" class="w-[50px] h-[48.15px]" />
                     </div>
                     <div class="flex flex-col gap-2">
                         <div class="flex items-center gap-1">
-                            <img src="../assets/global/location.svg" class="w-[24px] h-[24px]" />
+                            <i class="fa-solid fa-location-dot text-[24px] text-[#777777] leading-none"></i>
                             <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">Location</p>
                         </div>
                         <div class="flex items-center gap-1">
-                            <img src="../assets/global/call.svg" class="w-[24px] h-[24px]" />
+                            <i class="fa-solid fa-phone text-[24px] text-[#777777] leading-none"></i>
                             <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">09090909090</p>
                         </div>
                         <div class="flex items-center gap-1">
-                            <img src="../assets/global/mail.svg" class="w-[24px] h-[24px]" />
-                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">supportvictosah@gmail.com</p>
+                            <i class="fa-solid fa-envelope text-[24px] text-[#777777] leading-none"></i>
+                            <p class="text-[15px] text-[16px] font-['Open Sans'] font-regular">support@glorefy.com</p>
                         </div>
 
                     </div>
@@ -956,7 +918,7 @@
 
                             <input type="text" placeholder="Enter your email address" class="lg:w-[12rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
                         </div>
-                        <button type="submit" class="py-1 px-4 bg-[#1A237E] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]">Subscribe</button>
+                        <button type="submit" class="py-1 px-4 bg-[#C2185B] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]">Subscribe</button>
                     </div>
                 </div>
 
@@ -965,12 +927,12 @@
                 <div class="flex flex-col gap-2">
                     <h1 class="text-[#262626] text-[20px] md:text-[24px] font-['Montserrat'] font-medium">Connect with us on:</h1>
                     <div class="flex items-center gap-7">
-                        <a href="#"><img src="../assets/global/e1.svg" alt="Search" class="w-[13.83px]" /></a>
-                        <a href="#"><img src="../assets/global/e2.svg" alt="Search" class="w-[21.83px]" /></a>
-                        <a href="#"><img src="../assets/global/e3.svg" alt="Search" class="w-[21.83px]" /></a>
-                        <a href="#"><img src="../assets/global/e4.svg" alt="Search" class="w-[21.83px]" /></a>
-                        <a href="#"><img src="../assets/global/e5.svg" alt="Search" class="w-[17.83px]" /></a>
-                        <a href="#"><img src="../assets/global/e6.svg" alt="Search" class="w-[30.22px]" /></a>
+                        <a href="#"><i class="fa-brands fa-facebook-f text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+                        <a href="#"><i class="fa-brands fa-whatsapp text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+                        <a href="#"><i class="fa-brands fa-pinterest-p text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+                        <a href="#"><i class="fa-brands fa-youtube text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+                        <a href="#"><i class="fa-brands fa-x-twitter text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
                     </div>
                 </div>
                 <div class="flex md:items-center flex-col gap-3 md:gap-0 md:flex-row justify-between mt-10">
@@ -978,7 +940,7 @@
                         <p class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#777777]">Terms & Conditions</p>
                         <p class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#777777]">Privacy Policy</p>
                     </div>
-                    <p class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#777777]">© 2025 Victosah Solutions | All Rights Reserved</p>
+                    <p class="text-[15px] md:text-[16px] font-['Open Sans'] font-medium text-[#777777]">© 2025 Glorefy | All Rights Reserved</p>
 
                 </div>
             </div>

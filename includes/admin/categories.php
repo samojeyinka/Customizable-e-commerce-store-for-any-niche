@@ -2,7 +2,7 @@
     <!-- Modal content -->
     <div class="modal-content overflow-hidden p-4">
         <h1 class="text-[20px] text-[#262626] font-Onest font-medium text-center">All Categories</h1>
-        <img src="../assets/global/close-circle.svg" alt="close" id="closeCategoriesLists" class="w-[24px] md:w-[27px] cursor-pointer absolute top-4 right-4" />
+        <i class="fa-solid fa-xmark text-[24px] cursor-pointer absolute top-4 right-4" id="closeCategoriesLists" alt="close"></i>
 
       
         <div class="w-full overflow-x-auto mt-3">
@@ -15,7 +15,7 @@
                             </th>
                             <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Date Added</th>
                             <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">
-                                <img src="../assets/dash/column.svg" class="min-w-[24px] min-h-[24px]" />
+                                <i class="fa-solid fa-table-columns text-[20px]"></i>
                             </th>
                         </thead>
 
@@ -57,7 +57,7 @@
                                 </td>
                                 <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-nowrap">12/02/2045 09:00am</td>
                                 <td class="relative">
-                                    <img src="../assets/user/action.svg" class="w-[20px] cursor-pointer" onclick="openOrdermenu(this)" />
+                                    <i class="fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer" onclick="openOrdermenu(this)"></i>
                                     <!-- Order Menu (specific to this row) -->
                                     <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
                                         <div class="flex flex-col gap-3">

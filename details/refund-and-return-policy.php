@@ -7,17 +7,14 @@ require_once __DIR__ . "/../config/config.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Refund & Return Policy</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Refund & Return Policy</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css" />
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/inputs.css">
-    <link rel="stylesheet" href="./details.css">
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -36,13 +33,13 @@ require_once __DIR__ . "/../config/config.php";
 
 
 
-        <div class="w-[90%] mx-auto py-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] py-5">
 
             <div class="flex flex-col gap-4">
                 <div class="">
                     <h2 class="text-[#262626]  text-[25px] md:text-[30px] font-['Open Sans'] font-medium">Refund & Return Policy</h2>
                     <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
-                        At Victosah Solutions, we are committed to providing high-quality bedding and interior products. If you are not completely satisfied with your purchase, we offer a hassle-free return and refund process.
+                        At Glorefy, we are committed to providing high-quality beauty and skincare products. If you are not completely satisfied with your purchase, we offer a hassle-free return and refund process.
                     </p>
                 </div>
 
@@ -65,7 +62,7 @@ require_once __DIR__ . "/../config/config.php";
                     For hygiene and safety reasons, the following items cannot be returned or refunded:
                     </p>
                     <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
-                        • Pillows, mattress toppers, and bedding once the packaging has been opened.
+                        • Opened or used cosmetics, skincare, and beauty products, unless the product is faulty or defective.
                     </p>
                     <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
                         • Custom-made or personalized products.
@@ -79,17 +76,17 @@ require_once __DIR__ . "/../config/config.php";
                     <h2 class="text-[#262626]  text-[22px] md:text-[30px] font-['Open Sans'] font-medium">Return process</h2>
                     <div class="flex flex-col md:flex-row md:items-center gap-3 py-4">
                         <div class="flex items-start  md:flex-col gap-2">
-                        <img src="../assets/global/one.svg" class="w-[35px]"/>    
+                        <i class="fa-solid fa-1 text-[35px] text-[#C2185B] leading-none"></i>    
                         <div class="flex flex-col gap-1">
                         <h2 class="text-[#262626]  text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Initiate a Return</h2>
                         <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
-                        Contact our customer support team at <b class="text-[#1A237E]">victosahsols@gmail.com</b> or WhatsApp <b class="text-[#1A237E]">08122490008</b> to request a return.
+                        Contact our customer support team at <b class="text-[#C2185B]">support@glorefy.com</b> or WhatsApp <b class="text-[#C2185B]">+1 (212) 555-0147</b> to request a return.
                     </p>
                             </div>
                         </div>
 
                         <div class="flex items-start  md:flex-col gap-2">
-                        <img src="../assets/global/two.svg" class="w-[35px]"/>    
+                        <i class="fa-solid fa-2 text-[35px] text-[#C2185B] leading-none"></i>    
                         <div class="flex flex-col gap-1">
                         <h2 class="text-[#262626]  text-[16px] md:text-[18px] font-['Open Sans'] font-medium"> Prepare Your Return</h2>
                         <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
@@ -100,7 +97,7 @@ Securely pack the item in its original packaging and include proof of purchase.
                         </div>
 
                         <div class="flex items-start  md:flex-col gap-2">
-                        <img src="../assets/global/three.svg" class="w-[35px]"/>    
+                        <i class="fa-solid fa-3 text-[35px] text-[#C2185B] leading-none"></i>    
                         <div class="flex flex-col gap-1">
                         <h2 class="text-[#262626]  text-[16px] md:text-[18px] font-['Open Sans'] font-medium"> Ship the Item</h2>
                         <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
@@ -118,7 +115,7 @@ Securely pack the item in its original packaging and include proof of purchase.
                     <h2 class="text-[#262626]  text-[22px] md:text-[30px] font-['Open Sans'] font-medium">Refund process</h2>
                     <div class="flex flex-col md:flex-row md:items-center gap-3 py-4">
                         <div class="flex items-start  md:flex-col gap-2">
-                        <img src="../assets/global/one.svg" class="w-[35px]"/>    
+                        <i class="fa-solid fa-1 text-[35px] text-[#C2185B] leading-none"></i>    
                         <div class="flex flex-col gap-1">
                         <h2 class="text-[#262626]  text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Approval</h2>
                         <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
@@ -129,7 +126,7 @@ Once we receive and inspect the returned item, we will notify you about the appr
                         </div>
 
                         <div class="flex items-start  md:flex-col gap-2">
-                        <img src="../assets/global/two.svg" class="w-[35px]"/>    
+                        <i class="fa-solid fa-2 text-[35px] text-[#C2185B] leading-none"></i>    
                         <div class="flex flex-col gap-1">
                         <h2 class="text-[#262626]  text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Processing Time</h2>
                         <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
@@ -175,7 +172,7 @@ Approved refunds will be processed within 7-10 business days and credited back t
                 </div>
 
                 <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
-                For any further inquiries, please reach out to our support team at <b>victosahsols@gmail.com</b>. We appreciate your trust in Victosah Solutions and are dedicated to ensuring your satisfaction.
+                For any further inquiries, please reach out to our support team at <b>support@glorefy.com</b>. We appreciate your trust in Glorefy and are dedicated to ensuring your satisfaction.
                         </p>
 
 

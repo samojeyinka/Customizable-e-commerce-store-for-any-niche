@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . "/../config/config.php";
 // Include database connection
 include(__DIR__ . '/../config/connect.php');
@@ -23,11 +23,7 @@ if (!isset($conn)) {
 
 
     
-    $conn = new mysqli($servername, $username, $dbpassword, $dbname);
-    
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+    $conn = db();
 }
 
 // Initialize profile manager with the database connection BEFORE any operations
@@ -137,37 +133,15 @@ require_once "../includes/auth/google.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | My Profile</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | My Profile</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/styles.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
-    <style>
-        body {
-            overflow-x: hidden;
-        }
-        .alert {
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-    </style>
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -177,16 +151,16 @@ require_once "../includes/auth/google.php";
         ?>
     <main class="bg-[#FEFEFE]">
         <section class="w-full bg-[#FFFFFFF] py-1">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">My Profile</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">My Profile</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[95%] md:w-[90%] mx-auto flex flex-col gap-3 py-5">
+        <div class="w-[95%] md:w-[90%] mx-auto max-w-[1440px] flex flex-col gap-3 py-5">
             <?php if(!empty($successMessage)): ?>
                 <div class="alert alert-success"><?php echo $successMessage; ?></div>
             <?php endif; ?>
@@ -233,7 +207,7 @@ require_once "../includes/auth/google.php";
 
             <section class="flex flex-col items-center w-full bg-[#EEE7FF] py-3 px-4 rounded">
                 <div class="flex items-center gap-2 mr-auto">
-                    <img src="<?php echo DOMAIN; ?>/assets/user/info.svg" alt="Profile Picture" class="w-[24px]" />
+                    <i class="fa-solid fa-circle-user text-[24px] text-[#777777] leading-none" alt="Profile Picture"></i>
                     <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
                         Need for your information
                     </p>
@@ -255,7 +229,7 @@ require_once "../includes/auth/google.php";
                                     We'll use this email to send you details and updates about your order
                                 </p>
                             </div>
-                            <button type="submit" class="w-[fit-content] py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] flex items-center gap-2 cursor-pointer rounded-[4px]">
+                            <button type="submit" class="w-[fit-content] py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] flex items-center gap-2 cursor-pointer rounded-[4px]">
                                 Save Changes
                             </button>
                         </div>
@@ -279,7 +253,7 @@ require_once "../includes/auth/google.php";
                 </div>
 
                 <div class="w-full md:w-[90%] border-[1px] border-[#E1E1E1] rounded-[8px] p-4 flex flex-col gap-2">
-                    <button type="submit" class="w-[fit-content] py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] flex items-center gap-2 cursor-pointer rounded-[4px]">
+                    <button type="submit" class="w-[fit-content] py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] flex items-center gap-2 cursor-pointer rounded-[4px]">
                         Save Changes
                     </button>
 

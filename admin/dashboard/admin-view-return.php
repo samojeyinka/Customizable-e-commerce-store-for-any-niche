@@ -6,8 +6,9 @@ require_once "../../config/config.php";
 // Authentication check with admin role
 
 
+
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die(mysqli_error($conn));
 }
@@ -83,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['status'])) {
 // Status colors
 $status_colors = [
     'Processing' => 'bg-[#E8B006]',
-    'Received' => 'bg-[#1A237E]',
+    'Received' => 'bg-[#C2185B]',
     'Accepted' => 'bg-[#39D959]',
     'Rejected' => 'bg-red-500',
     'Completed' => 'bg-[#39D959]'
@@ -105,12 +106,13 @@ function formatDate($date) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH Admin | Return Request Details</title>
+    <title>GLOREFY Admin | Return Request Details</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/admin/styles/admin.css">
+    <?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body class="bg-gray-100">
@@ -215,7 +217,7 @@ function formatDate($date) {
                                 <div class="flex-1">
                                     <h3 class="font-medium text-lg"><?php echo $return['product_name']; ?></h3>
                                     <p class="text-gray-600">Size: <?php echo $return['size']; ?> • Color: <?php echo $return['colors']; ?></p>
-                                    <p class="text-gray-600">Price: ₦<?php echo number_format($return['price']); ?></p>
+                                    <p class="text-gray-600">Price: ₦<?php echo number_format((float)$return['price']); ?></p>
                                     <p class="text-gray-600">Return Quantity: <?php echo $return['return_quantity']; ?></p>
                                     <p class="font-medium text-lg mt-2">Total Refund: ₦<?php echo number_format($return['price'] * $return['return_quantity']); ?></p>
                                 </div>

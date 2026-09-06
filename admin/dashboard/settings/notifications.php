@@ -167,14 +167,10 @@ if ($result->num_rows > 0) {
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../style.css" />
-    <link rel="stylesheet" href="../../styles/styles.css" />
-    <link rel="stylesheet" href="../../styles/overlay.css">
-    <link rel="stylesheet" href="../../styles/dropdown.css" />
-    <link rel="stylesheet" href=".././../styles/graph.css" />
-    <link rel="stylesheet" href="../../styles/dash.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-    <title>Notification Settings | VICTOSAH ADMIN</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <title>Notification Settings | GLOREFY ADMIN</title>
+    <?php include '../../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body class="relative">
@@ -219,7 +215,7 @@ if ($result->num_rows > 0) {
                     <span class="text-gray-700">New Orders</span>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" name="dashboard_new_orders" class="sr-only peer" <?php echo $settings['dashboard_new_orders'] ? 'checked' : ''; ?>>
-                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                     </label>
                 </div>
 
@@ -227,7 +223,7 @@ if ($result->num_rows > 0) {
                     <span class="text-gray-700">Transactions</span>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" name="dashboard_transactions" class="sr-only peer" <?php echo $settings['dashboard_transactions'] ? 'checked' : ''; ?>>
-                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                     </label>
                 </div>
 
@@ -235,7 +231,7 @@ if ($result->num_rows > 0) {
                     <span class="text-gray-700">Cancellation & Refund Alerts</span>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" name="dashboard_cancellation_refunds" class="sr-only peer" <?php echo $settings['dashboard_cancellation_refunds'] ? 'checked' : ''; ?>>
-                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                     </label>
                 </div>
 
@@ -243,7 +239,7 @@ if ($result->num_rows > 0) {
                     <span class="text-gray-700">Security Alerts</span>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" name="dashboard_security_alerts" class="sr-only peer" <?php echo $settings['dashboard_security_alerts'] ? 'checked' : ''; ?>>
-                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                     </label>
                 </div>
 
@@ -251,7 +247,7 @@ if ($result->num_rows > 0) {
                     <span class="text-gray-700">Stock & Quantity Alert</span>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" name="dashboard_stock_alerts" class="sr-only peer" <?php echo $settings['dashboard_stock_alerts'] ? 'checked' : ''; ?>>
-                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                     </label>
                 </div>
 
@@ -259,7 +255,7 @@ if ($result->num_rows > 0) {
                     <span class="text-gray-700">Chat</span>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" name="dashboard_chat" class="sr-only peer" <?php echo $settings['dashboard_chat'] ? 'checked' : ''; ?>>
-                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                     </label>
                 </div>
             </div>
@@ -273,7 +269,7 @@ if ($result->num_rows > 0) {
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" name="email_notifications_enabled" id="email_toggle" class="sr-only peer" <?php echo $settings['email_notifications_enabled'] ? 'checked' : ''; ?>>
-                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                     </label>
                 </div>
 
@@ -282,7 +278,7 @@ if ($result->num_rows > 0) {
                         <span class="text-gray-700">New Orders</span>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" name="email_new_orders" class="sr-only peer email-setting" <?php echo $settings['email_new_orders'] ? 'checked' : ''; ?> <?php echo $settings['email_notifications_enabled'] ? '' : 'disabled'; ?>>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                         </label>
                     </div>
 
@@ -290,7 +286,7 @@ if ($result->num_rows > 0) {
                         <span class="text-gray-700">Transactions</span>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" name="email_transactions" class="sr-only peer email-setting" <?php echo $settings['email_transactions'] ? 'checked' : ''; ?> <?php echo $settings['email_notifications_enabled'] ? '' : 'disabled'; ?>>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                         </label>
                     </div>
 
@@ -298,7 +294,7 @@ if ($result->num_rows > 0) {
                         <span class="text-gray-700">Cancellation & Refund Alerts</span>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" name="email_cancellation_refunds" class="sr-only peer email-setting" <?php echo $settings['email_cancellation_refunds'] ? 'checked' : ''; ?> <?php echo $settings['email_notifications_enabled'] ? '' : 'disabled'; ?>>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                         </label>
                     </div>
 
@@ -306,7 +302,7 @@ if ($result->num_rows > 0) {
                         <span class="text-gray-700">Security Alerts</span>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" name="email_security_alerts" class="sr-only peer email-setting" <?php echo $settings['email_security_alerts'] ? 'checked' : ''; ?> <?php echo $settings['email_notifications_enabled'] ? '' : 'disabled'; ?>>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                         </label>
                     </div>
 
@@ -314,7 +310,7 @@ if ($result->num_rows > 0) {
                         <span class="text-gray-700">Stock & Quantity Alert</span>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" name="email_stock_alerts" class="sr-only peer email-setting" <?php echo $settings['email_stock_alerts'] ? 'checked' : ''; ?> <?php echo $settings['email_notifications_enabled'] ? '' : 'disabled'; ?>>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                         </label>
                     </div>
 
@@ -322,7 +318,7 @@ if ($result->num_rows > 0) {
                         <span class="text-gray-700">Chat</span>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" name="email_chat" class="sr-only peer email-setting" <?php echo $settings['email_chat'] ? 'checked' : ''; ?> <?php echo $settings['email_notifications_enabled'] ? '' : 'disabled'; ?>>
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1A237E]"></div>
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C2185B]"></div>
                         </label>
                     </div>
                 </div>
@@ -330,7 +326,7 @@ if ($result->num_rows > 0) {
             
             <!-- Save Button -->
             <div class="mt-6">
-                <button type="submit" class="w-full py-[12px] px-3 bg-[#1A237E] text-white text-[16px] font-medium cursor-pointer rounded-[8px] hover:bg-[#0e1442] transition-colors">
+                <button type="submit" class="w-full py-[12px] px-3 bg-[#C2185B] text-white text-[16px] font-medium cursor-pointer rounded-[8px] hover:bg-[#0e1442] transition-colors">
                     Save Settings
                 </button>
             </div>

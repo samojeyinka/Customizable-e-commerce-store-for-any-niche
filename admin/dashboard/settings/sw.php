@@ -5,33 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Two-Factor Authentication</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
-    }
-    
-    .modal-content {
-      background-color: #fefefe;
-      margin: 10% auto;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 500px;
-      animation: modalFadeIn 0.3s;
-    }
-    
-    @keyframes modalFadeIn {
-      from {opacity: 0; transform: translateY(-20px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-  </style>
+
+  <?php include '../../tailwind-components.php'; ?>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body class="bg-gray-100 p-4">
   <div class="max-w-md mx-auto bg-white rounded-lg shadow-sm">
@@ -57,7 +33,7 @@
     <!-- Modal content -->
     <div class="modal-content overflow-hidden p-4">
       <div class="w-full">
-        <div class="w-[95%] mx-auto flex items-center justify-between cursor-pointer close-modal">
+        <div class="w-[95%] mx-auto max-w-[1440px] flex items-center justify-between cursor-pointer close-modal">
           <span class="flex items-center gap-2">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="arrow-left">
               <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#262626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -66,7 +42,7 @@
           </span>
         </div>
         
-        <p class="pl-[2.5%] font-['Open Sans'] text-[18px] md:text-[22px] font-medium text-left pt-5 text-[#1A237E]">
+        <p class="pl-[2.5%] font-['Open Sans'] text-[18px] md:text-[22px] font-medium text-left pt-5 text-[#C2185B]">
           Enable Two Factor Authentication (2FA)
         </p>
         
@@ -107,14 +83,14 @@
           </div>
           
           <span
-            class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer verify-btn"
+            class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer verify-btn"
           >
             Verify
           </span>
         </form>
         
         <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-left">
-          Resend code in <span class="text-[#1A237E] countdown">23sec</span>
+          Resend code in <span class="text-[#C2185B] countdown">23sec</span>
         </p>
       </div>
     </div>
@@ -125,7 +101,7 @@
     <!-- Modal content -->
     <div class="modal-content overflow-hidden p-4">
       <div class="w-full">
-        <div class="w-[95%] mx-auto flex items-center justify-between cursor-pointer close-modal">
+        <div class="w-[95%] mx-auto max-w-[1440px] flex items-center justify-between cursor-pointer close-modal">
           <span class="flex items-center gap-2">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="arrow-left">
               <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#262626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -134,7 +110,7 @@
           </span>
         </div>
         
-        <p class="pl-[2.5%] font-['Open Sans'] text-[18px] md:text-[22px] font-medium text-left pt-5 text-[#1A237E]">
+        <p class="pl-[2.5%] font-['Open Sans'] text-[18px] md:text-[22px] font-medium text-left pt-5 text-[#C2185B]">
           Disable Two Factor Authentication (2FA)
         </p>
         
@@ -175,14 +151,14 @@
           </div>
           
           <span
-            class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer verify-btn"
+            class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer verify-btn"
           >
             Verify
           </span>
         </form>
         
         <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-left">
-          Resend code in <span class="text-[#1A237E] countdown">23sec</span>
+          Resend code in <span class="text-[#C2185B] countdown">23sec</span>
         </p>
       </div>
     </div>
@@ -300,7 +276,7 @@
         if (seconds <= 0) {
           clearInterval(timer);
           element.textContent = 'Resend';
-          element.parentElement.innerHTML = 'Code expired. <span class="text-[#1A237E] cursor-pointer">Resend code</span>';
+          element.parentElement.innerHTML = 'Code expired. <span class="text-[#C2185B] cursor-pointer">Resend code</span>';
         }
       }, 1000);
     }

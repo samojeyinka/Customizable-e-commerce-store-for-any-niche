@@ -4,61 +4,67 @@ require_once __DIR__ . "/../config/config.php";
 include(__DIR__ . '/../config/connect.php');
 require_once __DIR__ . '/../includes/auth/auth.php';
 
-// Require authentication to access cart
-requireAuth();
+// Authentication is optional: signed-in users load from DB,
+// guests load from localStorage via functions/cart.js.
+$cart_total = 0;
+$cart_items = [];
+$guest_cart = !isAuthenticated();
 
-// Get current user
-$user = getCurrentUser();
-$user_id = $user['id'];
+if (!$guest_cart) {
+    $user = getCurrentUser();
+    $user_id = $user['id'];
 
-// Process cart updates (quantity changes or removals)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        // Handle item removal
-        if ($_POST['action'] === 'remove' && isset($_POST['cart_id'])) {
-            $cart_id = intval($_POST['cart_id']);
-            
-            $remove_query = "DELETE FROM cart WHERE cart_id = ? AND user_id = ?";
-            $stmt = mysqli_prepare($con, $remove_query);
-            mysqli_stmt_bind_param($stmt, "ii", $cart_id, $user_id);
-            
-            if (mysqli_stmt_execute($stmt)) {
-                // Item removed successfully
-                header("Location: cart.php?removed=1");
-                exit();
+    // Process cart updates (quantity changes or removals)
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST['action'])) {
+            // Handle item removal
+            if ($_POST['action'] === 'remove' && isset($_POST['cart_id'])) {
+                $cart_id = intval($_POST['cart_id']);
+
+                $remove_query = "DELETE FROM cart WHERE cart_id = ? AND user_id = ?";
+                $stmt = mysqli_prepare($con, $remove_query);
+                mysqli_stmt_bind_param($stmt, "ii", $cart_id, $user_id);
+
+                if (mysqli_stmt_execute($stmt)) {
+                    // Item removed successfully
+                    header("Location: cart.php?removed=1");
+                    exit();
+                }
             }
-        }
-        
-        // Handle quantity update
-        if ($_POST['action'] === 'update' && isset($_POST['cart_id']) && isset($_POST['quantity'])) {
-            $cart_id = intval($_POST['cart_id']);
-            $quantity = intval($_POST['quantity']);
-            
-            // Ensure quantity is at least 1
-            if ($quantity < 1) {
-                $quantity = 1;
-            }
-            
-            $update_query = "UPDATE cart SET quantity = ?, updated_at = NOW() WHERE cart_id = ? AND user_id = ?";
-            $stmt = mysqli_prepare($con, $update_query);
-            mysqli_stmt_bind_param($stmt, "iii", $quantity, $cart_id, $user_id);
-            
-            if (mysqli_stmt_execute($stmt)) {
-                // Quantity updated successfully
-                header("Location: cart.php?updated=1");
-                exit();
+
+            // Handle quantity update
+            if ($_POST['action'] === 'update' && isset($_POST['cart_id']) && isset($_POST['quantity'])) {
+                $cart_id = intval($_POST['cart_id']);
+                $quantity = intval($_POST['quantity']);
+
+                // Ensure quantity is at least 1
+                if ($quantity < 1) {
+                    $quantity = 1;
+                }
+
+                $update_query = "UPDATE cart SET quantity = ?, updated_at = NOW() WHERE cart_id = ? AND user_id = ?";
+                $stmt = mysqli_prepare($con, $update_query);
+                mysqli_stmt_bind_param($stmt, "iii", $quantity, $cart_id, $user_id);
+
+                if (mysqli_stmt_execute($stmt)) {
+                    // Quantity updated successfully
+                    header("Location: cart.php?updated=1");
+                    exit();
+                }
             }
         }
     }
 }
 
+if (!$guest_cart) {
 // Ultra-simplified query - should work with almost any database structure
 $cart_query = "
     SELECT 
         c.cart_id,
         c.quantity,
-        p.product_id,
+p.product_id,
         p.product_name,
+        p.product_slug,
         i.image_path AS main_image,
         v.variant_id,
         v.size,
@@ -129,6 +135,8 @@ if ($result && mysqli_num_rows($result) > 0) {
     }
 }
 
+}
+
 // Get total number of items in cart
 $total_items = count($cart_items);
 
@@ -140,17 +148,15 @@ require_once "../includes/auth/google.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Cart</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Cart</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/styles.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -161,11 +167,11 @@ require_once "../includes/auth/google.php";
     include(__DIR__ . '/../includes/options.php');
         ?>
         <section class="w-full bg-[#FFFFFFF] py-4">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">Cart</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Cart</span>
                 </div>
             </div>
         </section>
@@ -183,17 +189,17 @@ require_once "../includes/auth/google.php";
             </div>
         <?php endif; ?>
         
-        <?php if (empty($cart_items)): ?>
+        <?php if (empty($cart_items) && !$guest_cart): ?>
             <div class='py-4 text-center text-[#262626] font-medium font-[Open Sans]'>
                             <div>
-                            <img class='mx-auto' src='../assets/global/empty.svg'/>
+                            <i class="fa-regular fa-heart text-[80px] text-[#D8C4CE] mx-auto leading-none"></i>
                            You have not added any items to cart yet.
                             </div>
                             </div>
         <?php else: ?>
 <!-- <h2 class="text-lg font-medium text-gray-900">Cart Items (<?php echo $total_items; ?>)</h2> -->
         <div class="w-full bg-[#FFFFFF] py-5">
-            <div class="w-[90%] mx-auto hidden md:block">
+            <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block">
 
 
                 <table cols="" class="w-full">
@@ -205,7 +211,8 @@ require_once "../includes/auth/google.php";
                         <th>Action</th>
                     </thead>
 
-                    <tbody class="">
+                    <tbody id="cart-guest-table-body" class="">
+                    <?php if (!$guest_cart): ?>
                     <?php foreach ($cart_items as $item): ?>
                         <tr>
                             <td class="py-3 flex gap-2">
@@ -216,7 +223,7 @@ require_once "../includes/auth/google.php";
                                                 class="h-full w-full object-cover object-center">
                                 </div>
                                 <div class="flex flex-col gap-[2px]">
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">    <a href="show.php?id=<?php echo $item['product_id']; ?>" class="hover:text-[#1A237E]">
+                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">    <a href="<?php echo product_url($item); ?>" class="hover:text-[#C2185B]">
                                                             <?php echo htmlspecialchars($item['product_name']); ?>
                                                         </a></p>
                                                         <?php if (!empty($item['variant_id'])): ?>
@@ -235,7 +242,7 @@ require_once "../includes/auth/google.php";
                                 </div>
 
                             </td>
-                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦<?php echo number_format($item['item_total']); ?></td></td>
+                            <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦<?php echo number_format((float)$item['item_total']); ?></td></td>
                             <td>
                             <form method="POST" action="cart.php" class="flex items-center mb-2">
                                                         <input type="hidden" name="action" value="update">
@@ -248,7 +255,7 @@ require_once "../includes/auth/google.php";
                                                             <button type="button" class="quantity-btn px-2 py-1 text-gray-600 hover:text-gray-900" data-action="increase">+</button>
                                                         </div>
                                                         
-                                                        <button type="submit" class="ml-2 text-sm text-[#1A237E] hover:text-[#1A237E]/80">
+                                                        <button type="submit" class="ml-2 text-sm text-[#C2185B] hover:text-[#C2185B]/80">
                                                             Update
                                                         </button>
                                                     </form>
@@ -285,19 +292,26 @@ require_once "../includes/auth/google.php";
 
                         </tr>
                         <?php endforeach; ?>
-                     
+                    <?php endif; ?>
                     </tbody>
                 </table>
 
-                <a href="./checkout.php" class="flex items-center justify-center gap-2 mt-2 max-w-[377px] py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+                <?php if ($guest_cart): ?>
+                <a href="#" onclick="openAuthModal('SignIn'); return false;" class="flex items-center justify-center gap-2 mt-2 max-w-[377px] py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+                    <span>Sign in to Checkout</span>
+                </a>
+                <?php else: ?>
+                <a href="./checkout.php" class="flex items-center justify-center gap-2 mt-2 max-w-[377px] py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
                     <span>Continue to Checkout</span>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/to.svg" class="w-[16px] mt-1" />
+                    <i class="fa-solid fa-arrow-right text-[16px] text-[#262626] leading-none mt-[2px]"></i>
 </a>
+                <?php endif; ?>
 
             </div>
 
-            <div class="w-[90%] mx-auto  md:hidden">
-                <div class="w-full flex flex-col gap-4">
+            <div class="w-[90%] mx-auto max-w-[1440px]  md:hidden">
+                <div id="cart-guest-mobile" class="w-full flex flex-col gap-4">
+                <?php if (!$guest_cart): ?>
                 <?php foreach ($cart_items as $item): ?>
                     <div class="border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex justify-between">
                     <div class="flex flex-col gap-2">
@@ -322,7 +336,7 @@ require_once "../includes/auth/google.php";
                                                 class="h-full w-full object-cover object-center">
                             </div>
                             <div class="flex flex-col gap-[2px]">
-                                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">  <a href="show.php?id=<?php echo $item['product_id']; ?>" class="hover:text-[#1A237E]">
+                                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">  <a href="<?php echo product_url($item); ?>" class="hover:text-[#C2185B]">
                                                             <?php echo htmlspecialchars($item['product_name']); ?>
                                                         </a></p>
 
@@ -365,7 +379,7 @@ require_once "../includes/auth/google.php";
                                                             <button type="button" class="quantity-btn px-2 py-1 text-gray-600 hover:text-gray-900" data-action="increase">+</button>
                                                         </div>
                                                         
-                                                        <button type="submit" class="ml-2 text-sm text-[#1A237E] hover:text-[#1A237E]/80">
+                                                        <button type="submit" class="ml-2 text-sm text-[#C2185B] hover:text-[#C2185B]/80">
                                                             Update
                                                         </button>
                                                     </form>
@@ -376,12 +390,18 @@ require_once "../includes/auth/google.php";
                     
                     </div>
                     <?php endforeach; ?>
-               
+                    <?php endif; ?>
 
-                    <a href="./checkout.php" class="flex items-center justify-center gap-2 mt-2 w-full py-2 px-4 bg-[#1A237E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+                    <?php if ($guest_cart): ?>
+                    <a href="#" onclick="openAuthModal('SignIn'); return false;" class="flex items-center justify-center gap-2 mt-2 w-full py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+                        <span>Sign in to Checkout</span>
+                    </a>
+                    <?php else: ?>
+                    <a href="./checkout.php" class="flex items-center justify-center gap-2 mt-2 w-full py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
                     <span>Continue to Checkout</span>
-                    <img src="<?php echo DOMAIN; ?>/assets/products/to.svg" class="w-[16px] mt-1" />
+                    <i class="fa-solid fa-arrow-right text-[16px] text-[#262626] leading-none mt-[2px]"></i>
                 </a>
+                    <?php endif; ?>
 
                 </div>
             </div>
@@ -425,34 +445,6 @@ require_once "../includes/auth/google.php";
             });
         });
 
-    
-
-   if (proceedtoCart()) {
-    proceedtoCart.addEventListener('click', function() {
-            if (!validateSelection()) return;
-            
-            // First add to cart
-            const productId = <?php echo $product_id; ?>;
-            const variantId = document.getElementById('variantid').value;
-            const quantity = document.getElementById('quantity').value;
-            
-            const formData = new FormData();
-            formData.append('product_id', productId);
-            formData.append('variant_id', variantId);
-            formData.append('quantity', quantity);
-
-        window.location.href = './checkout.php';
-
-        }
-
-        )
-
-        
-   
-        }
-    
-
-        
     </script>
 
 

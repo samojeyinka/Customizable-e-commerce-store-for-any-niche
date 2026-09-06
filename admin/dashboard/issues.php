@@ -10,10 +10,10 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Check if admin
+
 
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die(mysqli_error($conn));
 }
@@ -161,7 +161,7 @@ function getOrderStatusBadgeClass($status) {
         case 'Processing':
             return 'bg-[#E8B006] text-white';
         case 'Shipped':
-            return 'bg-[#1A237E] text-white';
+            return 'bg-[#C2185B] text-white';
         case 'Delivered':
             return 'bg-[#39D959] text-white';
         case 'Cancelled':
@@ -189,64 +189,10 @@ function formatDate($dateString) {
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-    <link rel="stylesheet" href="../styles/overlay.css">
-    <link rel="stylesheet" href="../styles/dropdown.css" />
-    <link rel="stylesheet" href="../styles/graph.css" />
-    <link rel="stylesheet" href="../styles/dash.css" />
-    <title>Manage Customer Issues - Admin Dashboard</title>
+<title>Manage Customer Issues - Admin Dashboard</title>
 
-    <style>
-        .pagination a.active {
-            background-color: #1A237E;
-            color: white;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 700px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-        }
-        
-        .issue-excerpt {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    </style>
+<?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body class="relative">
@@ -297,7 +243,7 @@ include "./sidebar.php"
                 </div>
                 
                 <div class="flex items-end">
-                    <button type="submit" class="px-4 py-2 bg-[#1A237E] text-white rounded-md">Filter</button>
+                    <button type="submit" class="px-4 py-2 bg-[#C2185B] text-white rounded-md">Filter</button>
                 </div>
             </form>
         </div>
@@ -412,7 +358,7 @@ include "./sidebar.php"
                 
                 for ($i = $start_page; $i <= $end_page; $i++):
                 ?>
-                <a href="?page=<?php echo $i; ?>&status=<?php echo $status_filter; ?>&search=<?php echo urlencode($search_query); ?>&sort=<?php echo $sort_by; ?>" class="px-3 py-1 rounded-md <?php echo ($i == $page) ? 'active bg-[#1A237E] text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'; ?>"><?php echo $i; ?></a>
+                <a href="?page=<?php echo $i; ?>&status=<?php echo $status_filter; ?>&search=<?php echo urlencode($search_query); ?>&sort=<?php echo $sort_by; ?>" class="px-3 py-1 rounded-md <?php echo ($i == $page) ? 'active bg-[#C2185B] text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'; ?>"><?php echo $i; ?></a>
                 <?php endfor; ?>
                 
                 <?php if ($page < $total_pages): ?>
@@ -466,7 +412,7 @@ include "./sidebar.php"
             
             <div class="flex justify-end">
                 <button type="button" onclick="closeIssueModal()" class="mr-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-md">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-[#1A237E] text-white rounded-md">Update Issue</button>
+                <button type="submit" class="px-4 py-2 bg-[#C2185B] text-white rounded-md">Update Issue</button>
             </div>
         </form>
     </div>

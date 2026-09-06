@@ -308,7 +308,7 @@ try {
     mysqli_commit($con);
 
     // Create notifications after successful order
-    $order_total = number_format($total, 2);
+    $order_total = number_format((float)$total, 2);
     $customer_name = trim(($profile['first_name'] ?? '') . ' ' . ($profile['last_name'] ?? ''));
     if (empty($customer_name)) {
         $customer_name = "Customer #" . $user_id;

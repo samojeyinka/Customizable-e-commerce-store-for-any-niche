@@ -7,8 +7,10 @@ ini_set('display_errors', 1);
 require_once '../../includes/auth/auth.php';
 require_once "../../config/config.php";
 
+
+
 // Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
+$conn = db();
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
@@ -88,9 +90,9 @@ function generateStarRating($rating) {
     $html = '<div class="flex items-center gap-1">';
     for ($i = 1; $i <= 5; $i++) {
         if ($i <= $rating) {
-            $html .= '<img src="../assets/products/star.svg" class="w-[16px]" />';
+            $html .= '<i class="fa-solid fa-star text-[#FFC107] text-[16px] leading-none"></i>';
         } else {
-            $html .= '<img src="../assets/products/lstar.svg" class="w-[16px]" />';
+            $html .= '<i class="fa-solid fa-star text-[#E0E0E0] text-[16px] leading-none"></i>';
         }
     }
     $html .= '</div>';
@@ -121,13 +123,9 @@ function getStatusColorClass($status) {
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-    <link rel="stylesheet" href="../styles/modal.css">
-    <link rel="stylesheet" href="../styles/dropdown.css" />
-    <link rel="stylesheet" href="../styles/graph.css" />
-    <link rel="stylesheet" href="../styles/dash.css" />
-    <title>Product Reviews</title>
+<title>Product Reviews</title>
+    <?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body class="relative">
@@ -148,7 +146,7 @@ include "./sidebar.php"
                             Reviews for: <?php echo htmlspecialchars($product['product_name']); ?>
                         </h1>
                         <div class="flex items-center gap-2 mt-1">
-                            <a href="./products.php" class="text-[#1A237E] text-[14px] hover:underline">Back to Products</a>
+                            <a href="./products.php" class="text-[#C2185B] text-[14px] hover:underline">Back to Products</a>
                         </div>
                     <?php else: ?>
                         <h1 class="text-[18px] md:text-[22px] font-Onest font-semibold text-[#262626]">
@@ -164,7 +162,7 @@ include "./sidebar.php"
                         <?php endif; ?>
                         
                         <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[24px] p-2">
-                            <img src="../assets/dash/search-normal (1).svg" alt="Search" class="w-[18px]" />
+                            <i class="fa-solid fa-magnifying-glass text-[18px]" alt="Search"></i>
                             <input type="text" name="search" placeholder="Search reviews..." value="<?php echo htmlspecialchars($search_query); ?>" class="w-full md:w-[200px] text-[14px] border-none outline-none placeholder:text-[#D9D9D9]" />
                         </div>
                         
@@ -175,7 +173,7 @@ include "./sidebar.php"
                             <option value="rejected" <?php echo $filter_status === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
                         </select>
                         
-                        <button type="submit" class="bg-[#1A237E] text-white py-1 px-3 rounded-md text-[14px]">Filter</button>
+                        <button type="submit" class="bg-[#C2185B] text-white py-1 px-3 rounded-md text-[14px]">Filter</button>
                         
                         <a href="?<?php echo $product_id > 0 ? 'product_id='.$product_id : ''; ?>" class="text-[#777777] text-[14px] hover:underline">Clear</a>
                     </form>
@@ -218,7 +216,7 @@ include "./sidebar.php"
                                             </td>
                                             <?php if (!$product_id): ?>
                                                 <td class="p-3 text-[13px] md:text-[14px] font-['Open Sans']">
-                                                    <a href="?product_id=<?php echo $review['product_id']; ?>" class="text-[#1A237E] hover:underline">
+                                                    <a href="?product_id=<?php echo $review['product_id']; ?>" class="text-[#C2185B] hover:underline">
                                                         <?php echo htmlspecialchars($review['product_name']); ?>
                                                     </a>
                                                 </td>

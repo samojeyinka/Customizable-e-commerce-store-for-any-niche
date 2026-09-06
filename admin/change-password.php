@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once "../config/config.php";
 
@@ -37,11 +37,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         require_once "../config/servername.php";
         
-        $conn = new mysqli($servername, $username, $dbpassword, $dbname);
-        
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
+        $conn = db();
         
         // Hash the new password
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
@@ -64,7 +60,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error_message = "Error updating password. Please try again.";
         }
         
-        $conn->close();
+        
     }
 }
 ?>
@@ -75,41 +71,26 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH ADMIN | Change Password</title>
+    <title>GLOREFY ADMIN | Change Password</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css" />
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
+<link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
-    <style>
-        body {
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-image: url("./assets/global/bg.svg");
-            background-position: center;
-            background-size: cover;
-        }
-    </style>
-
+<?php include 'tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
     <div class="w-[90%] lg:w-[50%] h-[fit-content] mx-auto bg-white rounded-[24px] p-5">
 
-        <div class="w-[95%] mx-auto flex items-center justify-between">
+        <div class="w-[95%] mx-auto max-w-[1440px] flex items-center justify-between">
             <a href="./forgotten-password-verify.php" class="flex items-center gap-2">
-                <img src="./assets/global/arrow-left.svg" alt="Back" />
+                <i class="fa-solid fa-arrow-left text-[20px]" alt="Back"></i>
                 <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Go back</h3>
             </a>
 
             <div class="flex items-center gap-1 md:gap-2">
-                <img src="<?php echo DOMAIN; ?>/assets/global/logo.svg" alt="VICTOSAH" class="w-[31.35px] md:w-[41.35px]" />
-                <h1 class="text-[20px] md:text-[24px] font-Onest font-semibold">VICTOSAH</h1>
+                <img src="<?php echo DOMAIN; ?>/assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
             </div>
         </div>
         <h3 class="text-[#262626] text-center text-[18px] md:text-[22px] font-['Open Sans'] font-medium pt-5">ADMIN PANEL</h3>
@@ -126,7 +107,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <?php endif; ?>
 
-        <p class="text-[#1A237E] font-['Open Sans'] text-[18px] text-[22px] font-medium text-left pl-[2.5%] pt-5">
+        <p class="text-[#C2185B] font-['Open Sans'] text-[18px] text-[22px] font-medium text-left pl-[2.5%] pt-5">
             Reset Password
         </p>
         <p class="text-left text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2 pl-[2.5%]">
@@ -180,7 +161,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <button
                 type="submit"
-                class="text-center mx-auto w-[95%] text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#1A237E] text-white rounded-[8px] mt-10 cursor-pointer">
+                class="text-center mx-auto w-[95%] text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
                 Reset Password
             </button>
         </form>

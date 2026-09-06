@@ -1,10 +1,5 @@
 <?php
 
-$con = mysqli_connect('localhost', 'root', '', 'victosah');
-if (!$con) {
-  die(mysqli_error($con));
-}
+require_once __DIR__ . '/config.php';
 
-?>
-
-
+$con = db();

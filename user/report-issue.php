@@ -10,11 +10,7 @@ requireAuth();
 $user = getCurrentUser();
 $user_id = $user['id'];
 
-// Database connection
-$conn = mysqli_connect('localhost', 'root', '', 'victosah');
-if (!$conn) {
-    die(mysqli_error($conn));
-}
+$conn = db();
 
 
 
@@ -32,7 +28,9 @@ if (!$order_id) {
     // Get order details to verify it belongs to the user
     $order_sql = "SELECT o.*, 
                     DATE_FORMAT(o.created_at, '%M %d, %Y') as order_date,
-                    DATE_FORMAT(o.delivered_at, '%M %d, %Y') as delivery_date,
+                    (SELECT DATE_FORMAT(changed_at, '%M %d, %Y') FROM order_status_history 
+                     WHERE order_id = o.id AND new_status = 'Delivered' 
+                     ORDER BY changed_at DESC LIMIT 1) as delivery_date,
                     p.first_name, p.last_name, p.phone, p.address, p.city, p.state
                 FROM orders o
                 LEFT JOIN profiles p ON o.user_id = p.user_id
@@ -83,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_issue'])) {
     } else if (strlen($issue_description) < 20) {
         $error_message = "Please provide more details about your issue (at least 20 characters).";
     } else {
-        // Insert the issue
+// Insert the issue
         $insert_sql = "INSERT INTO order_issues (order_id, user_id, issue_type, issue_description) 
                        VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($insert_sql);
@@ -111,13 +109,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_issue'])) {
                         if (move_uploaded_file($tmp_name, $filepath)) {
                             // Save image info to database
                             $image_sql = "INSERT INTO order_issue_images (issue_id, image_path) VALUES (?, ?)";
-                            $stmt = $conn->prepare($image_sql);
+                            $istmt = $conn->prepare($image_sql);
                             $relative_path = 'issues/' . $filename;
-                            $stmt->bind_param("is", $issue_id, $relative_path);
+                            $istmt->bind_param("is", $issue_id, $relative_path);
                             
-                            if (!$stmt->execute()) {
+                            if (!$istmt->execute()) {
                                 $upload_success = false;
                             }
+                            $istmt->close();
                         } else {
                             $upload_success = false;
                         }
@@ -125,50 +124,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_issue'])) {
                 }
             }
             
-            $success_message = "Your issue has been submitted successfully. We'll get back to you soon.";
+            // Include notifications functions
+            require_once '../includes/notifications.php';
             
-            // Optionally, send email notification to admin and/or customer
-            // sendIssueNotification($order_id, $issue_id, $user_id, $issue_type);
-
-            // Add this after the successful issue submission (after the issue_id is created)
-if ($stmt->execute()) {
-    $issue_id = $stmt->insert_id;
-    
-    // Handle image uploads if enabled
-    $upload_success = true;
-    // ... [existing image upload code] ...
-    
-    // Include notifications functions
-    require_once '../includes/notifications.php';
-    
-    // Create notification for admin
-    add_notification(
-        $conn,
-        'issue',
-        "New Order Issue Reported",
-        "A new issue has been reported for Order #$order_id. Issue type: $issue_type",
-        $issue_id,
-        'issue',
-        null, // null for_user_id means it's for all admins
-        1     // 1 means it's for admin
-    );
-    
-    // Create notification for the user too
-    add_notification(
-        $conn,
-        'issue_confirmation',
-        'Issue Report Received',
-        "Your issue report for Order #$order_id has been received. We'll get back to you soon.",
-        $issue_id,
-        'issue',
-        $user_id, // specific user
-        0         // 0 means it's not for admin
-    );
-    
-    $success_message = "Your issue has been submitted successfully. We'll get back to you soon.";
-    
-    // ... [rest of existing code]
-}
+            // Create notification for admin
+            add_notification(
+                $conn,
+                'issue',
+                "New Order Issue Reported",
+                "A new issue has been reported for Order #$order_id. Issue type: $issue_type",
+                $issue_id,
+                'issue',
+                null,
+                1
+            );
+            
+            // Create notification for the user too
+            add_notification(
+                $conn,
+                'issue_confirmation',
+                'Issue Report Received',
+                "Your issue report for Order #$order_id has been received. We'll get back to you soon.",
+                $issue_id,
+                'issue',
+                $user_id,
+                0
+            );
+            
+            $success_message = "Your issue has been submitted successfully. We'll get back to you soon.";
             
         } else {
             $error_message = "Error submitting your issue. Please try again.";
@@ -182,7 +165,7 @@ function getStatusBadgeClass($status) {
         case 'Processing':
             return 'bg-[#E8B006]';
         case 'Shipped':
-            return 'bg-[#1A237E]';
+            return 'bg-[#C2185B]';
         case 'Delivered':
             return 'bg-[#39D959]';
         case 'Cancelled':
@@ -202,17 +185,15 @@ require_once "../includes/auth/google.php";
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTOSAH | Report an Issue</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
+    <title>GLOREFY | Report an Issue</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/style.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/modal.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/tabs.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/styles.css">
-    <link rel="stylesheet" href="<?php echo DOMAIN; ?>/styles/faq.css" />
+<?php include '../includes/tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -223,18 +204,18 @@ require_once "../includes/auth/google.php";
         ?>
 
         <section class="w-full bg-[#FFFFFFF] py-1">
-            <div class="w-[90%] mx-auto">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./orders.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</a>
-                    <img src="../assets/products/right.svg" class="w-[7px]" />
-                    <span class="text-[#18237E] text-[13px] md:text-[14px] font-Onest font-medium">Report an Issue</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
+                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Report an Issue</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto bg-[#FFFFFF] py-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] bg-[#FFFFFF] py-5">
             <div class="w-full md:w-[80%] lg:w-[70%] mx-auto">
                 <h1 class="text-[24px] md:text-[28px] font-['Open Sans'] font-bold mb-6">Report an Issue</h1>
                 
@@ -243,14 +224,14 @@ require_once "../includes/auth/google.php";
                     <?php echo $error_message; ?>
                 </div>
                 <div class="flex justify-center mt-6">
-                    <a href="./orders.php" class="py-2 px-4 bg-[#1A237E] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
+                    <a href="./orders.php" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
                 </div>
                 <?php elseif (!empty($success_message)): ?>
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                     <?php echo $success_message; ?>
                 </div>
                 <div class="flex justify-center mt-6 space-x-4">
-                    <a href="./orders.php" class="py-2 px-4 bg-[#1A237E] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
+                    <a href="./orders.php" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
                     <a href="./track-order.php?id=<?php echo $order_id; ?>" class="py-2 px-4 bg-[#E8B006] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Track Order</a>
                 </div>
                 <?php elseif (!empty($order)): ?>
@@ -273,7 +254,7 @@ require_once "../includes/auth/google.php";
                             <?php if (!empty($order['delivery_date'])): ?>
                             <p class="text-[14px] text-gray-600">Delivery Date: <span class="font-medium"><?php echo $order['delivery_date']; ?></span></p>
                             <?php endif; ?>
-                            <p class="text-[14px] text-gray-600">Total Amount: <span class="font-medium">₦<?php echo number_format($order['order_total'], 2); ?></span></p>
+                            <p class="text-[14px] text-gray-600">Total Amount: <span class="font-medium">₦<?php echo number_format((float)$order['order_total'], 2); ?></span></p>
                         </div>
                     </div>
                     
@@ -290,7 +271,7 @@ require_once "../includes/auth/google.php";
                             <div class="flex-1">
                                 <p class="text-[14px] font-medium"><?php echo $item['product_name']; ?></p>
                                 <p class="text-[13px] text-gray-600">Size: <?php echo $item['size']; ?> <?php echo !empty($item['texture']) ? "• Texture: {$item['texture']}" : ''; ?></p>
-                                <p class="text-[13px] text-gray-600">Qty: <?php echo $item['quantity']; ?> • ₦<?php echo number_format($item['price'], 2); ?></p>
+                                <p class="text-[13px] text-gray-600">Qty: <?php echo $item['quantity']; ?> • ₦<?php echo number_format((float)$item['price'], 2); ?></p>
                             </div>
                         </div>
                         <?php endforeach; ?>
@@ -313,7 +294,7 @@ require_once "../includes/auth/google.php";
                     <form method="POST" enctype="multipart/form-data" class="space-y-4">
                         <div>
                             <label for="issue_type" class="block text-[14px] font-medium mb-2">Issue Type*</label>
-                            <select id="issue_type" name="issue_type" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1A237E]" required>
+                            <select id="issue_type" name="issue_type" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2185B]" required>
                                 <option value="">Select an issue type</option>
                                 <option value="Wrong Item Received">Wrong Item Received</option>
                                 <option value="Damaged Item">Damaged Item</option>
@@ -332,7 +313,7 @@ require_once "../includes/auth/google.php";
                                 name="issue_description" 
                                 rows="5" 
                                 placeholder="Please provide details about your issue..."
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1A237E]"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2185B]"
                                 required
                                 minlength="20"
                             ></textarea>
@@ -346,7 +327,7 @@ require_once "../includes/auth/google.php";
                                 id="issue_images" 
                                 name="issue_images[]" 
                                 accept="image/*" 
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1A237E]"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2185B]"
                                 multiple
                             />
                             <p class="text-xs text-gray-500 mt-1">You can upload up to 3 images to help us understand your issue (JPEG, PNG, max 5MB each)</p>
@@ -354,7 +335,7 @@ require_once "../includes/auth/google.php";
                         
                         <div class="flex justify-end space-x-3 mt-6">
                             <a href="./orders.php" class="py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[16px] font-['Open Sans'] rounded-[4px]">Cancel</a>
-                            <button type="submit" name="submit_issue" class="py-2 px-4 bg-[#1A237E] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Submit Report</button>
+                            <button type="submit" name="submit_issue" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Submit Report</button>
                         </div>
                     </form>
                 </div>

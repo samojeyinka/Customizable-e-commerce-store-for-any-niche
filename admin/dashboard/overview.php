@@ -126,31 +126,11 @@ $locationBreakdown = getNonLagosBreakdown($conn);
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-    <link rel="stylesheet" href="../styles/modal.css">
-    <link rel="stylesheet" href="../styles/overlay.css">
-    <link rel="stylesheet" href="../styles/dropdown.css" />
-    <link rel="stylesheet" href="../styles/graph.css" />
-    <link rel="stylesheet" href="../styles/dash.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-    <title>Document</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Document</title>
 
-    <style>
-        .modal.logout {
-            padding-top: 10%;
-        }
-
-        .ordermenu-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            z-index: 10;
-            min-width: 160px;
-
-        }
-    </style>
-
+<?php include '../tailwind-components.php'; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -172,7 +152,7 @@ include("./sidebar.php");
                 <div class="custom-dropdown">
                     <div class="md:min-w-[65px] lg:min-w-[70px] rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-1 px-2 dropdown-toggle">
                         <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular"><?php echo $selected_year; ?></span>
-                        <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                        <i class="fa-solid fa-chevron-down arrow-down"></i>
                     </div>
                     <div class="dropdown-content">
                         <div class="flex items-center gap-3">
@@ -198,7 +178,7 @@ include("./sidebar.php");
                             echo $period_text;
                             ?>
                         </span>
-                        <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                        <i class="fa-solid fa-chevron-down arrow-down"></i>
                     </div>
                     <div class="dropdown-content">
                         <div class="flex items-center gap-3">
@@ -225,12 +205,12 @@ include("./sidebar.php");
 
                 <div class="flex flex-col gap-[1px]">
                     <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Users Registered</span>
-                    <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">
-                        <?php echo number_format($user_stats['total_users']); ?>
+                    <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']">
+                        <?php echo number_format((float)$user_stats['total_users']); ?>
                     </h2>
 
                     <div class="flex items-center gap-1">
-                        <img src="../assets/dash/<?php echo $user_percentage >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <i class="fa-solid <?php echo $user_percentage >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                         <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                             <span class="text-<?php echo $user_percentage >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                 <?php echo $user_percentage >= 0 ? '+' . abs($user_percentage) : '-' . abs($user_percentage); ?>%
@@ -248,12 +228,12 @@ include("./sidebar.php");
 
                 <div class="flex flex-col gap-[1px]">
                     <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Sales</span>
-                    <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">
+                    <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']">
                         ₦<?php echo number_format($sales_stats['total_revenue'] ?? 0); ?>
                     </h2>
 
                     <div class="flex items-center gap-1">
-                        <img src="../assets/dash/<?php echo $sales_percentage >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <i class="fa-solid <?php echo $sales_percentage >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                         <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                             <span class="text-<?php echo $sales_percentage >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                 <?php echo $sales_percentage >= 0 ? '+' . abs($sales_percentage) : '-' . abs($sales_percentage); ?>%
@@ -271,13 +251,12 @@ include("./sidebar.php");
 
                 <div class="flex flex-col gap-[1px]">
                     <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Total Orders</span>
-                    <h2 class="text-[#1A237E] text-[18px] text-[22px] font-medium font-['Open Sans']">
-                        <?php echo number_format($order_stats['total_orders']); ?>
+                    <h2 class="text-[#C2185B] text-[18px] text-[22px] font-medium font-['Open Sans']">
+                        <?php echo number_format((float)$order_stats['total_orders']); ?>
                     </h2>
 
                     <div class="flex items-center gap-1">
-                        <img src="../assets/dash/<?php echo $order_percentage >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
-                        <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
+<i class="fa-solid <?php echo $order_percentage >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                             <span class="text-<?php echo $order_percentage >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                 <?php echo $order_percentage >= 0 ? '+' . abs($order_percentage) : '-' . abs($order_percentage); ?>%
                             </span> from last 28 days
@@ -295,7 +274,7 @@ include("./sidebar.php");
                 <div class="flex flex-col-reverse gap-2 md:flex-row md:items-center justify-between">
 
                     <div class="flex md:hidden items-center gap-1">
-                        <img src="../assets/dash/<?php echo $sales_percentage >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                        <i class="fa-solid <?php echo $sales_percentage >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                         <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                             <span class="text-<?php echo $sales_percentage >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                 <?php echo $sales_percentage >= 0 ? '+' . abs($sales_percentage) : '-' . abs($sales_percentage); ?>%
@@ -304,14 +283,14 @@ include("./sidebar.php");
                     </div>
                     <div class="flex items-center gap-[3px]">
                         <span class="text-[#262626] text-[14px] font-medium font-['Open Sans']">Revenue:</span>
-                        <h2 class="text-[#1A237E] text-[16px] text-[20px] font-medium font-['Open Sans']">
+                        <h2 class="text-[#C2185B] text-[16px] text-[20px] font-medium font-['Open Sans']">
                             ₦<?php echo number_format($sales_stats['total_revenue'] ?? 0); ?>
                         </h2>
 
           
 
                         <div class="hidden md:flex items-center gap-1">
-                            <img src="../assets/dash/<?php echo $sales_percentage >= 0 ? 'increase' : 'decrease'; ?>.svg" class="w-[20px] h-[20px]" />
+                            <i class="fa-solid <?php echo $sales_percentage >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'; ?> text-[20px]"></i>
                             <p class="text-[#262626] text-[11px] text-[12px] font-regular font-['Open Sans']">
                                 <span class="text-<?php echo $sales_percentage >= 0 ? '[#39D959]' : '[#D93939]'; ?>">
                                     <?php echo $sales_percentage >= 0 ? '+' . abs($sales_percentage) : '-' . abs($sales_percentage); ?>%
@@ -329,7 +308,7 @@ include("./sidebar.php");
                                 <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">
                                     <?php echo $period_text; ?>
                                 </span>
-                                <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                                <i class="fa-solid fa-chevron-down arrow-down"></i>
                             </div>
                             <div class="dropdown-content">
                                 <div class="flex items-center gap-3">
@@ -362,7 +341,7 @@ include("./sidebar.php");
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular">
                                 <?php echo $period_text; ?>
                             </span>
-                            <img src="../assets/products/down.svg" class="arrow-down w-[12px] h-[6px]" />
+                            <i class="fa-solid fa-chevron-down arrow-down"></i>
                         </div>
                         <div class="dropdown-content">
                             <div class="flex items-center gap-3">
@@ -398,7 +377,7 @@ include("./sidebar.php");
                     </svg>
                     <div class="content">
                         <img src="../assets/dash/bag-happy.svg" class="bucket-icon" />
-                        <span class="value"><?php echo number_format($delivery_stats['total_delivery_orders']); ?></span>
+                        <span class="value"><?php echo number_format((float)$delivery_stats['total_delivery_orders']); ?></span>
                     </div>
                 </div>
 
@@ -408,7 +387,7 @@ include("./sidebar.php");
                         <div class="flex flex-col gap-1">
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium text-left">Express Delivery</span>
                             <span class="text-[#9A9A9A] text-[13px] md:text-[14px] font-Onest font-regular text-left">
-                                <?php echo number_format($delivery_stats['express_delivery']); ?>
+                                <?php echo number_format((float)$delivery_stats['express_delivery']); ?>
                             </span>
                         </div>
                     </div>
@@ -418,7 +397,7 @@ include("./sidebar.php");
                         <div class="flex flex-col gap-1">
                             <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium text-left">Pick Up</span>
                             <span class="text-[#9A9A9A] text-[13px] md:text-[14px] font-Onest font-regular text-left">
-                                <?php echo number_format($delivery_stats['pickup_delivery']); ?>
+                                <?php echo number_format((float)$delivery_stats['pickup_delivery']); ?>
                             </span>
                         </div>
                     </div>
@@ -466,11 +445,11 @@ include("./sidebar.php");
 <div class="flex items-start justify-between gap-2">
     <div class="flex flex-col gap-[3px]">
         <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Lagos</p>
-        <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']"><?php echo number_format($lagosSales); ?> sales</p>
+        <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']"><?php echo number_format((float)$lagosSales); ?> sales</p>
     </div>
 
     <div class="flex items-center gap-[5px]">
-        <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦<?php echo number_format($lagos_revenue); ?></p>
+        <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦<?php echo number_format((float)$lagos_revenue); ?></p>
         <button class="w-[fit-content] bg-[<?php echo $lagos_color; ?>] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium"><?php echo ($lagos_growth >= 0 ? '+' : '') . round($lagos_growth); ?>%</button>
     </div>
 </div>
@@ -479,11 +458,11 @@ include("./sidebar.php");
 <div class="flex items-start justify-between gap-2">
     <div class="flex flex-col gap-[3px]">
         <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']">Outside Lagos</p>
-        <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']"><?php echo number_format($nonLagosSales); ?> sales</p>
+        <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']"><?php echo number_format((float)$nonLagosSales); ?> sales</p>
     </div>
 
     <div class="flex items-center gap-[5px]">
-        <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦<?php echo number_format($non_lagos_revenue); ?></p>
+        <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦<?php echo number_format((float)$non_lagos_revenue); ?></p>
         <button class="w-[fit-content] bg-[<?php echo $non_lagos_color; ?>] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium"><?php echo ($non_lagos_growth >= 0 ? '+' : '') . round($non_lagos_growth); ?>%</button>
     </div>
 </div>
@@ -497,11 +476,11 @@ include("./sidebar.php");
         <div class="flex items-start justify-between gap-2 mb-2">
             <div class="flex flex-col gap-[3px]">
                 <p class="text-[#2c2c2c] text-[14px] text-[15px] font-medium font-['Open Sans']"><?php echo htmlspecialchars($location["location"]); ?></p>
-                <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']"><?php echo number_format($location["sales"]); ?> sales</p>
+                <p class="text-[#2c2c2c] text-[13px] text-[14px] font-regular font-['Open Sans']"><?php echo number_format((float)$location["sales"]); ?> sales</p>
             </div>
 
             <div class="flex items-center gap-[5px]">
-                <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦<?php echo number_format($location["revenue"]); ?></p>
+                <p class="text-[#4B4B4B] text-[13px] text-[14px] font-regular font-['Open Sans']">₦<?php echo number_format((float)$location["revenue"]); ?></p>
                 <button class="w-[fit-content] bg-[<?php echo $location["growth_color"]; ?>] py-1 px-3 rounded-[16px] text-[14px] text-white font-medium"><?php echo ($location["growth"] >= 0 ? '+' : '') . $location["growth"]; ?>%</button>
             </div>
         </div>
@@ -517,12 +496,13 @@ include("./sidebar.php");
 <div class="w-full p-3 border-[1px] border-[#E7E7E7] rounded-[8px]">
     <div class="flex items-center justify-between py-3">
         <span class="text-[#262626] text-[15px] md:text-[17px] font-medium font-['Open Sans']">Latest Orders</span>
-        <a href="./orders.php" class="text-[#1A237E] text-[14px] md:text-[15px] font-medium font-['Open Sans'] cursor-pointer">See All</a>
+        <a href="./orders.php" class="text-[#C2185B] text-[14px] md:text-[15px] font-medium font-['Open Sans'] cursor-pointer">See All</a>
     </div>
+
 
     <?php
     // Create a new connection
-    $orders_conn = mysqli_connect('localhost', 'root', '', 'victosah');
+    $orders_conn = db();
     if (!$orders_conn) {
         die("Connection failed: " . mysqli_connect_error());
     }
@@ -549,7 +529,7 @@ include("./sidebar.php");
     $orders_status_classes = [
         'Confirmed' => 'bg-[#1A7E79]',
         'Processing' => 'bg-[#E8B006]',
-        'Shipped' => 'bg-[#1A237E]',
+        'Shipped' => 'bg-[#C2185B]',
         'Delivered' => 'bg-[#39D959]',
         'Cancelled' => 'bg-red-500',
         'Returned' => 'bg-[#9C27B0]'
@@ -568,21 +548,23 @@ include("./sidebar.php");
                 <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Status</th>
                 <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Date</th>
                 <th class="">
-                    <img src="../assets/dash/column.svg" class="min-w-[24px] min-h-[24px]" />
+                    <i class="fa-solid fa-table-columns text-[20px]"></i>
                 </th>
             </thead>
 
             <tbody>
                 <?php
                 // Query to get the 5 most recent orders
-                $latest_orders_sql = "SELECT 
+$latest_orders_sql = "SELECT 
                     orders.id AS order_id,
                     orders.order_total AS amount,
                     orders.order_status,
                     orders.$orders_date_column AS order_date,
+                    users.email AS customer_email,
                     profiles.first_name,
                     profiles.last_name
                 FROM orders
+                LEFT JOIN users ON orders.user_id = users.id
                 LEFT JOIN profiles ON orders.user_id = profiles.user_id
                 ORDER BY orders.$orders_date_column DESC
                 LIMIT 5";
@@ -608,10 +590,10 @@ include("./sidebar.php");
                         $status = $order['order_status'] ?? 'Processing';
                         $status_class = $orders_status_classes[$status] ?? 'bg-[#E8B006]';
                         
-                        // Get customer name
+// Get customer name
                         $customer_name = trim(($order['first_name'] ?? '') . ' ' . ($order['last_name'] ?? ''));
                         if (empty($customer_name)) {
-                            $customer_name = 'Unknown Customer';
+                            $customer_name = !empty($order['customer_email']) ? $order['customer_email'] : 'Guest';
                         }
                 ?>
                 <tr>
@@ -626,7 +608,7 @@ include("./sidebar.php");
                     </td>
                     <td class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-nowrap"><?php echo $formatted_date . ' ' . $formatted_time; ?></td>
                     <td class="relative">
-                        <img src="../assets/user/action.svg" class="w-[20px] cursor-pointer" onclick="openOrdermenu(this)" />
+                        <i class="fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer" onclick="openOrdermenu(this)"></i>
                         
                         <!-- Order Menu (specific to this row) -->
                         <div class="ordermenu-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
