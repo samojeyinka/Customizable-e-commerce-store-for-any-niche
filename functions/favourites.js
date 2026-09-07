@@ -20,10 +20,10 @@ function postJSON(url,body){return fetch(url,{method:'POST',headers:{'Content-Ty
 function paintHeart(el,on){
   if(!el)return;
   if(on){
-    el.classList.add('favorite-active','fa-solid','text-[#C2185B]');
+    el.classList.add('favorite-active','fa-solid','glor-text');
     el.classList.remove('fa-regular','text-white');
   }else{
-    el.classList.remove('favorite-active','fa-solid','text-[#C2185B]');
+    el.classList.remove('favorite-active','fa-solid','glor-text');
     el.classList.add('fa-regular','text-white');
   }
 }
@@ -31,11 +31,11 @@ function paintHeart(el,on){
 function stroke(el,on){
   if(!el)return;
   if(on){
-    el.classList.add('favorite-active','text-[#C2185B]');
+    el.classList.add('favorite-active','glor-text');
     el.classList.remove('text-[#262626]','fa-regular');
     el.classList.add('fa-solid');
   }else{
-    el.classList.remove('favorite-active','text-[#C2185B]');
+    el.classList.remove('favorite-active','glor-text');
     el.classList.add('text-[#262626]','fa-regular');
     el.classList.remove('fa-solid');
   }

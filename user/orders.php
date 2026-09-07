@@ -16,6 +16,7 @@ $conn = db();
 $all_orders_sql = "
     SELECT o.id, o.order_total, o.delivery_method, o.pickup_location,
            o.payment_reference, o.order_status, o.created_at as order_date,
+           o.delivery_confirmed_at,
            oi.id as item_id, oi.product_id, oi.variant_id, oi.quantity, oi.price,
            p.product_name, p.product_slug, p.colors,
            pv.size, pv.texture,
@@ -47,6 +48,7 @@ foreach ($all_rows as $row) {
             'payment_reference' => $row['payment_reference'],
             'order_status' => $row['order_status'],
             'order_date' => $row['order_date'],
+            'delivery_confirmed_at' => $row['delivery_confirmed_at'],
         ];
         $order_items_map[$oid] = [];
     }
@@ -91,7 +93,7 @@ require_once "../includes/auth/google.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
 
     <?php
     include(__DIR__ . '/../includes/header.php');
@@ -99,24 +101,24 @@ require_once "../includes/auth/google.php";
         ?>
 
 
-        <section class="w-full bg-[#FFFFFFF] py-1">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
             <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] gap-3 mx-auto bg-[#FFFFFF] py-5 flex items-center flex-col-reverse md:flex-row justify-between">
+        <div class="w-[90%] gap-3 mx-auto bg-[<?php echo store_color('color_bg'); ?>] py-5 flex items-center flex-col-reverse md:flex-row justify-between">
             <div class="w-full flex items-center gap-4 overflow-x-auto">
-                <a href="?status=all" class="py-1 px-4 bg-[<?php echo $status_filter == 'all' ? '#C2185B' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'all' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">All</a>
-                <a href="?status=Processing" class="py-1 px-4 bg-[<?php echo $status_filter == 'Processing' ? '#C2185B' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Processing' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Processing</a>
-                <a href="?status=Shipped" class="py-1 px-4 bg-[<?php echo $status_filter == 'Shipped' ? '#C2185B' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Shipped' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Shipped</a>
-                <a href="?status=Delivered" class="py-1 px-4 bg-[<?php echo $status_filter == 'Delivered' ? '#C2185B' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Delivered' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Delivered</a>
-                <a href="?status=Returned" class="py-1 px-4 bg-[<?php echo $status_filter == 'Returned' ? '#C2185B' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Returned' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Returned</a>
-                <a href="?status=Cancelled" class="py-1 px-4 bg-[<?php echo $status_filter == 'Cancelled' ? '#C2185B' : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Cancelled' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Cancelled</a>
+                <a href="?status=all" class="py-1 px-4 bg-[<?php echo $status_filter == 'all' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'all' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">All</a>
+                <a href="?status=Processing" class="py-1 px-4 bg-[<?php echo $status_filter == 'Processing' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Processing' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Processing</a>
+                <a href="?status=Shipped" class="py-1 px-4 bg-[<?php echo $status_filter == 'Shipped' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Shipped' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Shipped</a>
+                <a href="?status=Delivered" class="py-1 px-4 bg-[<?php echo $status_filter == 'Delivered' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Delivered' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Delivered</a>
+                <a href="?status=Returned" class="py-1 px-4 bg-[<?php echo $status_filter == 'Returned' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Returned' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Returned</a>
+                <a href="?status=Cancelled" class="py-1 px-4 bg-[<?php echo $status_filter == 'Cancelled' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Cancelled' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Cancelled</a>
             </div>
 
             <div class="w-full md:w-[80%] lg:w-[70%] flex items-center justify-between">
@@ -129,7 +131,7 @@ require_once "../includes/auth/google.php";
             </div>
         </div>
 
-        <div class="w-full bg-[#FFFFFF] py-5">
+        <div class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <!-- Desktop View -->
             <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block">
                 <table cols="" class="w-full">
@@ -163,7 +165,7 @@ require_once "../includes/auth/google.php";
                         if (empty($filtered_orders)) {
                             echo "<tr><td colspan='7' class='py-4 text-center text-[#262626] font-medium font-[Open Sans]'>
                             <div>
-                            <i class='fa-regular fa-heart text-[80px] text-[#D8C4CE] mx-auto leading-none'></i>
+                            <i class='fa-regular fa-heart text-[80px] text-[<?php echo store_color('color_tint'); ?>] mx-auto leading-none'></i>
                            You have not made any orders yet
                             </div>
                             </td></tr>";
@@ -182,7 +184,7 @@ require_once "../includes/auth/google.php";
                                     if ($status_text == 'Processing') {
                                         $status_color = 'bg-[#E8B006]';
                                     } elseif ($status_text == 'Shipped') {
-                                        $status_color = 'bg-[#C2185B]';
+                                        $status_color = 'bg-[' . store_color('color_primary') . ']';
                                     } elseif ($status_text == 'Delivered') {
                                         $status_color = 'bg-[#39D959]';
                                     } elseif ($status_text == 'Returned') {
@@ -227,7 +229,14 @@ require_once "../includes/auth/google.php";
                 <a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Track Order</a>";
                 
 if ($status_text == 'Delivered') {
-    echo "<a href='./write-review.php?order_id={$order['id']}&product_id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>";
+    $delivery_confirmed = !empty($order['delivery_confirmed_at']);
+    if ($delivery_confirmed) {
+        echo "<a href='./write-review.php?order_id={$order['id']}&product_id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>";
+    } else {
+        echo "<span class='text-[16px] font-medium text-gray-400 cursor-not-allowed' title='Confirm you received this order to unlock reviews'>Leave a review</span>";
+        echo "<a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#2FA05A]'>Confirm delivery received</a>";
+    }
+    echo "<a href='./return-request.php?item_id={$item['id']}&order_id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Return Item</a>";
 } else {
     echo "<span class='text-[16px] font-medium text-gray-400 cursor-not-allowed' title='You can review this product after delivery'>Leave a review</span>";
 }
@@ -272,7 +281,7 @@ echo "
                         echo "
                         <div class='py-4 text-center text-[#262626] font-medium font-[Open Sans]'>
                             <div>
-                            <i class='fa-regular fa-heart text-[80px] text-[#D8C4CE] mx-auto leading-none'></i>
+                            <i class='fa-regular fa-heart text-[80px] text-[<?php echo store_color('color_tint'); ?>] mx-auto leading-none'></i>
                            You have not made any orders yet
                             </div>
                             </div>
@@ -293,7 +302,7 @@ echo "
                                 if ($status_text == 'Processing') {
                                     $status_color = 'bg-[#E8B006]';
                                 } elseif($status_text == 'Shipped'){
-                                    $status_color = 'bg-[#C2185B]';
+                                    $status_color = 'bg-[' . store_color('color_primary') . ']';
                                 }
                                 
                                 elseif ($status_text == 'Delivered') {
@@ -326,7 +335,14 @@ echo "
                 <a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Track Order</a>";
                 
 if ($status_text == 'Delivered') {
-    echo "<a href='./write-review.php?order_id={$order['id']}&product_id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>";
+    $delivery_confirmed = !empty($order['delivery_confirmed_at']);
+    if ($delivery_confirmed) {
+        echo "<a href='./write-review.php?order_id={$order['id']}&product_id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>";
+    } else {
+        echo "<span class='text-[16px] font-medium text-gray-400 cursor-not-allowed' title='Confirm you received this order to unlock reviews'>Leave a review</span>";
+        echo "<a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#2FA05A]'>Confirm delivery received</a>";
+    }
+    echo "<a href='./return-request.php?item_id={$item['id']}&order_id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Return Item</a>";
 } else {
     echo "<span class='text-[16px] font-medium text-gray-400 cursor-not-allowed' title='You can review this product after delivery'>Leave a review</span>";
 }
@@ -365,7 +381,7 @@ echo "
                                                     <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Size:</b> {$variant['size']}</p>
                                                 </div>
                                             </div>
-                                            <a href='./track-order.php?id={$order['id']}' class='text-[14px] font-[\"Open Sans\"] text-[#C2185B] font-regular underline cursor-pointer'>Track your order</a>
+                                            <a href='./track-order.php?id={$order['id']}' class='text-[14px] font-[\"Open Sans\"] text-[" . store_color('color_primary') . "] font-regular underline cursor-pointer'>Track your order</a>
                                         </div>
                                         <p class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>₦" . number_format((float)$item['price']) . "</p>
                                     </div>
@@ -440,8 +456,8 @@ echo "
                         
                         <!-- Processing Status -->
                         <div class="status-item relative flex mb-8">
-                            <div id="processing-icon" class="status-icon w-[40px] h-[40px] rounded-full bg-[#C2185B] flex items-center justify-center z-10">
-                                <i class="fa-solid fa-clipboard-check text-[20px] text-[#C2185B] leading-none" alt="Processing"></i>
+                            <div id="processing-icon" class="status-icon w-[40px] h-[40px] rounded-full bg-[<?php echo store_color('color_primary'); ?>] flex items-center justify-center z-10">
+                                <i class="fa-solid fa-clipboard-check text-[20px] text-[<?php echo store_color('color_primary'); ?>] leading-none" alt="Processing"></i>
                             </div>
                             <div class="status-content ml-4">
                                 <h4 class="text-[16px] font-['Open Sans'] font-semibold">Order Processing</h4>
@@ -452,7 +468,7 @@ echo "
                         <!-- Shipped Status -->
                         <div class="status-item relative flex mb-8">
                             <div id="shipped-icon" class="status-icon w-[40px] h-[40px] rounded-full bg-[#E1E1E1] flex items-center justify-center z-10">
-                                <i class="fa-solid fa-truck-fast text-[20px] text-[#C2185B] leading-none" alt="Shipped"></i>
+                                <i class="fa-solid fa-truck-fast text-[20px] text-[<?php echo store_color('color_primary'); ?>] leading-none" alt="Shipped"></i>
                             </div>
                             <div class="status-content ml-4">
                                 <h4 class="text-[16px] font-['Open Sans'] font-semibold">Order Dispatched</h4>
@@ -464,7 +480,7 @@ echo "
                         <!-- Delivered Status -->
                         <div class="status-item relative flex">
                             <div id="delivered-icon" class="status-icon w-[40px] h-[40px] rounded-full bg-[#E1E1E1] flex items-center justify-center z-10">
-                                <i class="fa-solid fa-box text-[20px] text-[#C2185B] leading-none" alt="Delivered"></i>
+                                <i class="fa-solid fa-box text-[20px] text-[<?php echo store_color('color_primary'); ?>] leading-none" alt="Delivered"></i>
                             </div>
                             <div class="status-content ml-4">
                                 <h4 class="text-[16px] font-['Open Sans'] font-semibold">Order Delivered</h4>

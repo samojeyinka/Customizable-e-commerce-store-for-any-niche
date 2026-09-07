@@ -55,7 +55,7 @@ function getOrderStatusBadgeClass($status) {
         case 'Processing':
             return 'bg-[#E8B006] text-white';
         case 'Shipped':
-            return 'bg-[#C2185B] text-white';
+            return 'bg-[' . store_color('color_primary') . '] text-white';
         case 'Delivered':
             return 'bg-[#39D959] text-white';
         case 'Cancelled':
@@ -100,7 +100,7 @@ require_once "../includes/auth/google.php";
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./orders.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">My Reported Issues</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">My Reported Issues</span>
                 </div>
             </div>
         </section>
@@ -109,13 +109,13 @@ require_once "../includes/auth/google.php";
             <div class="w-full md:w-[80%] lg:w-[70%] mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h1 class="text-[24px] md:text-[28px] font-['Open Sans'] font-bold">My Reported Issues</h1>
-                    <a href="./orders.php" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
+                    <a href="./orders.php" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
                 </div>
                 
                 <?php if (empty($issues)): ?>
                 <div class="text-center py-10 border-[1px] border-[#E1E1E1] rounded-[8px]">
                     <p class="text-[16px] text-gray-600 mb-4">You haven't reported any issues yet.</p>
-                    <a href="./orders.php" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">View My Orders</a>
+                    <a href="./orders.php" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">View My Orders</a>
                 </div>
                 <?php else: ?>
                 <div class="space-y-6">
@@ -149,6 +149,15 @@ require_once "../includes/auth/google.php";
                                 <p class="text-[14px] text-gray-800 whitespace-pre-line"><?php echo htmlspecialchars($issue['issue_description']); ?></p>
                             </div>
                         </div>
+                        
+                        <?php if (!empty($issue['admin_notes'])): ?>
+                        <div class="mb-4">
+                            <h3 class="text-[16px] font-medium mb-2">Support Note</h3>
+                            <div class="p-3 bg-blue-50 rounded-md">
+                                <p class="text-[14px] text-gray-800 whitespace-pre-line"><?php echo htmlspecialchars($issue['admin_notes']); ?></p>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                         
                         <?php if (!empty($issue['resolution'])): ?>
                         <div class="mb-4">

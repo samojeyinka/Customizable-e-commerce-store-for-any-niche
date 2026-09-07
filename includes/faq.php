@@ -1,57 +1,27 @@
-   <!-- ========================  The faq section end ======================== -->
+<?php
+$faq = store('faq');
+$items = isset($faq['items']) && is_array($faq['items']) ? array_values($faq['items']) : [];
+$faqTitle = !empty($faq['title']) ? $faq['title'] : 'Frequently Asked Questions';
+$columns = array_chunk($items, (int) ceil(count($items) / 2));
+?>
+   <!-- ========================  The FAQ section starts ======================== -->
    <section class="w-[90%] mx-auto max-w-[1440px] pb-10">
-            <h2 class="mx-auto text-center text-[30px] md:text-[40px] text-[#C85A7C]  font-['League Gothic'] font-medium">
-                Frequently Asked Questions
+            <h2 class="mx-auto text-center text-[30px] md:text-[40px] text-[<?php echo store_color('color_primary'); ?>] font-['League Gothic'] font-medium">
+                <?php echo store_escape($faqTitle); ?>
             </h2>
 
             <div class="flex flex-col md:flex-row items-start md:gap-5">
-                <div class="">
-                    <button class="accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">What payment methods do you accept?</button>
+                <?php foreach ($columns as $col): ?>
+                <div class="w-full">
+                    <?php foreach ($col as $item): ?>
+                    <button class="accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626] font-['Open Sans'] font-medium"><?php echo store_escape($item['q'] ?? ''); ?></button>
                     <div class="faqext text-[16px] font-regular text-[#777777]">
-                        <p>We accept all major credit/debit cards, bank transfers, and Paystack payments. All transactions are secure and encrypted.</p>
+                        <p><?php echo store_escape($item['a'] ?? ''); ?></p>
                     </div>
-
-                    <button class="accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">How long does delivery take?</button>
-                    <div class="faqext text-[16px] font-regular text-[#777777]">
-                        <p>Express delivery takes 1-3 business days within Lagos and 3-7 business days nationwide. Pick-up orders are ready within 24 hours.</p>
-                    </div>
-
-                    <button class="accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Do you have a returns policy?</button>
-                    <div class="faqext text-[16px] font-regular text-[#777777]">
-                        <p>Yes! We offer hassle-free returns within 14 days of purchase for unopened products. If you have any issues with your order, our support team is here to help.</p>
-                    </div>
-
-                    <button class="accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Are your products authentic?</button>
-                    <div class="faqext text-[16px] font-regular text-[#777777]">
-                        <p>Absolutely. Every product on Glorefy is sourced directly from authorized distributors and verified brands. We guarantee 100% authenticity.</p>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-                <div class="">
-                    <button class="accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Do you deliver nationwide?</button>
-                    <div class="faqext text-[16px] font-regular text-[#777777]">
-                        <p>Yes, we deliver to all 36 states in Nigeria. Express delivery is available for most locations, and we also offer pick-up from our Lagos store.</p>
-                    </div>
-
-                    <button class="accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">How do I track my order?</button>
-                    <div class="faqext text-[16px] font-regular text-[#777777]">
-                        <p>You can track your order from your account dashboard. Once your order is shipped, you'll receive a notification with real-time tracking details.</p>
-                    </div>
-
-                    <button class="accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">How can I contact customer support?</button>
-                    <div class="faqext text-[16px] font-regular text-[#777777]">
-                        <p>You can reach us via WhatsApp, email at support@glorefy.com, or through the contact form on our website. We respond within 24 hours.</p>
-                    </div>
-
-                    <button class="accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626]  font-['Open Sans'] font-medium">Can I get beauty advice?</button>
-                    <div class="faqext text-[16px] font-regular text-[#777777]">
-                        <p>Yes! Our team of beauty experts can help you build a personalized skincare routine. Contact us or visit our store for a free consultation.</p>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
 
-
-
-
-
         </section>
-        <!-- ========================  The faq section end ======================== -->
+        <!-- ========================  The FAQ section ends ======================== -->

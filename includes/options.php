@@ -64,7 +64,7 @@ $topCategoriesJson = json_encode($topCategories);
             <?php foreach ($topCategories as $category): ?>
             <div class="custom-dropdown shrink-0">
                 <div class="flex items-center gap-2 dropdown-toggle">
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium pointer-events-none hover:text-[#C2185B] transition-colors">
+                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium pointer-events-none hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors">
                         <?php echo htmlspecialchars($category['category_title']); ?>
                     </span>
                     <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none transition-transform duration-200 pointer-events-none"></i>
@@ -88,8 +88,8 @@ $topCategoriesJson = json_encode($topCategories);
 
         <?php if (isAuthenticated()): ?>
             <div class="flex items-center gap-2 cursor-pointer pt-4">
-                <i class="fa-solid fa-truck-fast text-[24px] text-[#C2185B] leading-none"></i>
-                <a href="<?php echo DOMAIN; ?>/user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans"] text-[#C2185B] font-medium underline'>Track your order</a>
+                <i class="fa-solid fa-truck-fast text-[24px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>
+                <a href="<?php echo DOMAIN; ?>/user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans"] text-[<?php echo store_color('color_primary'); ?>] font-medium underline'>Track your order</a>
             </div>
         <?php endif; ?>
     </div>
@@ -117,8 +117,8 @@ $topCategoriesJson = json_encode($topCategories);
 
                 <?php if (isAuthenticated()): ?>
                     <div class="flex items-center gap-2 cursor-pointer pt-4">
-                        <i class="fa-solid fa-truck-fast text-[24px] text-[#C2185B] leading-none"></i>
-                        <a href="<?php echo DOMAIN; ?>/user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans"] text-[#C2185B] font-medium underline'>Track your order</a>
+                        <i class="fa-solid fa-truck-fast text-[24px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>
+                        <a href="<?php echo DOMAIN; ?>/user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans"] text-[<?php echo store_color('color_primary'); ?>] font-medium underline'>Track your order</a>
                     </div>
                 <?php endif; ?>
             </div>
@@ -127,18 +127,18 @@ $topCategoriesJson = json_encode($topCategories);
 
 <!-- Mobile live search (driven by functions/search.js) -->
 <div class="mobile-search-container flex items-center gap-0 relative w-full" data-glor-search data-glor-domain="<?php echo DOMAIN; ?>">
-    <div class="flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#D8C4CE] rounded-l-[4px] p-2 w-full bg-white">
+    <div class="flex items-center gap-2 border-y-[1px] border-l-[1px] border-[<?php echo store_color('color_tint'); ?>] rounded-l-[4px] p-2 w-full bg-white">
         <i class="fa-solid fa-magnifying-glass text-[24px] text-[#777777] leading-none" alt="Search"></i>
         <input 
             type="text" 
             id="mobileOnlySearchInput" 
             data-glor-q
-            placeholder="Search skincare, makeup, beauty..." 
+            placeholder="<?php echo store_escape(store('search_placeholder')); ?>" 
             class="w-full text-[14px] border-none outline-none placeholder:text-[#B8BBD7] bg-transparent" 
             autocomplete="off"
         />
     </div>
-    <button type="submit" id="mobileOnlySearchButton" data-glor-btn class="py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
+    <button type="submit" id="mobileOnlySearchButton" data-glor-btn class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
     
     <!-- Search Results Dropdown - content rendered by search.js -->
     <div id="mobileOnlySearchResults" data-glor-panel class="absolute top-full left-0 w-full bg-white shadow-md rounded-b-md z-[100] mt-1 hidden"></div>

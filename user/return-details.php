@@ -58,10 +58,10 @@ $image_path = isset($return['image_path']) ? "../assets/products/" . $return['im
 // Updated status colors including 'Received'
 $status_colors = [
     'Processing' => 'bg-[#E8B006]',
-    'Received' => 'bg-[#C2185B]',    // Added Received status with navy blue color
+    'Received' => 'bg-[' . store_color('color_primary') . ']',    // Added Received status with navy blue color
     'Accepted' => 'bg-[#39D959]',
     'Rejected' => 'bg-red-500',
-    'Completed' => 'bg-[#C2185B]'
+    'Completed' => 'bg-[' . store_color('color_primary') . ']'
 ];
 
 // Get the color for the current status
@@ -93,25 +93,25 @@ require_once "../includes/auth/google.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
     <?php
     include(__DIR__ . '/../includes/header.php');
     include(__DIR__ . '/../includes/options.php');
     ?>
 
-        <section class="w-full bg-[#FFFFFF] py-1">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
             <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./returns.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Returns</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Return Details</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">Return Details</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto max-w-[1440px] bg-[#FFFFFF] py-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <div class="w-full md:w-[80%] lg:w-[60%] mx-auto">
                 <h1 class="text-[24px] md:text-[28px] text-[#2C2C2C] font-['Open Sans'] font-medium mb-6 text-center">Return Request Details</h1>
                 
@@ -143,7 +143,7 @@ require_once "../includes/auth/google.php";
                     
                     <?php if (!empty($return['admin_message'])): ?>
                     <div class="mt-4 bg-blue-50 border-l-4 border-blue-700 p-3 rounded-lg">
-                        <p class="text-[14px] text-[#C2185B] font-['Open Sans'] font-semibold">Message from Admin:</p>
+                        <p class="text-[14px] text-[<?php echo store_color('color_primary'); ?>] font-['Open Sans'] font-semibold">Message from Admin:</p>
                         <p class="text-[14px] text-[#262626] font-['Open Sans'] mt-1"><?php echo $return['admin_message']; ?></p>
                     </div>
                     <?php endif; ?>
@@ -197,7 +197,7 @@ require_once "../includes/auth/google.php";
                 
                 <!-- Actions -->
                 <div class="actions mt-6 flex justify-end">
-                    <a href="./returns.php" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Returns</a>
+                    <a href="./returns.php" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Returns</a>
                 </div>
             </div>
         </div>

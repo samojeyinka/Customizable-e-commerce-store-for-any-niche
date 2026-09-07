@@ -250,32 +250,61 @@ include "./sidebar.php"
 
         
         <!-- Issues Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">            
-            <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                <h3 class="text-yellow-800 font-semibold">Pending</h3>
-                <p class="text-2xl font-bold"><?php echo $pending_count; ?></p>
-                <a href="?status=pending" class="text-blue-700 text-sm hover:underline">View all</a>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="group flex items-start gap-4 px-5 py-4 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[10px] transition-colors hover:border-[#E2E2E2] hover:bg-white cursor-pointer" onclick="window.location='?status=pending'">
+                <div class="w-[42px] h-[42px] rounded-[10px] bg-[#FFF4E6] flex items-center justify-center shrink-0">
+                    <i class="fa-regular fa-clock text-[#C77E23] text-[18px]"></i>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-[#8A8A8A] text-[12px] font-medium font-['Open Sans'] tracking-wide">Pending</span>
+                    <div class="flex items-end gap-1.5">
+                        <h2 class="text-[#262626] text-[24px] leading-none font-semibold font-['Open Sans']"><?php echo $pending_count; ?></h2>
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#D9903A] mb-1.5"></span>
+                    </div>
+                    <a href="?status=pending" class="text-[#262626] text-[12px] font-['Open Sans'] opacity-0 group-hover:opacity-100 transition-opacity">View all →</a>
+                </div>
             </div>
 
-
-            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h3 class="text-blue-800 font-semibold">In Progress</h3>
-                <p class="text-2xl font-bold"><?php echo $inprogress_count; ?></p>
-                <a href="?status=in_progress" class="text-blue-700 text-sm hover:underline">View all</a>
+            <div class="group flex items-start gap-4 px-5 py-4 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[10px] transition-colors hover:border-[#E2E2E2] hover:bg-white cursor-pointer" onclick="window.location='?status=in_progress'">
+                <div class="w-[42px] h-[42px] rounded-[10px] bg-[#EAF1FE] flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-spinner text-[#3B6FD6] text-[18px]"></i>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-[#8A8A8A] text-[12px] font-medium font-['Open Sans'] tracking-wide">In Progress</span>
+                    <div class="flex items-end gap-1.5">
+                        <h2 class="text-[#262626] text-[24px] leading-none font-semibold font-['Open Sans']"><?php echo $inprogress_count; ?></h2>
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#3B6FD6] mb-1.5"></span>
+                    </div>
+                    <a href="?status=in_progress" class="text-[#262626] text-[12px] font-['Open Sans'] opacity-0 group-hover:opacity-100 transition-opacity">View all →</a>
+                </div>
             </div>
 
-         
-            
-            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
-                <h3 class="text-green-800 font-semibold">Resolved</h3>
-                <p class="text-2xl font-bold"><?php echo $resolved_count; ?></p>
-                <a href="?status=resolved" class="text-green-700 text-sm hover:underline">View all</a>
+            <div class="group flex items-start gap-4 px-5 py-4 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[10px] transition-colors hover:border-[#E2E2E2] hover:bg-white cursor-pointer" onclick="window.location='?status=resolved'">
+                <div class="w-[42px] h-[42px] rounded-[10px] bg-[#E7F7EE] flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-circle-check text-[#2FA05A] text-[18px]"></i>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-[#8A8A8A] text-[12px] font-medium font-['Open Sans'] tracking-wide">Resolved</span>
+                    <div class="flex items-end gap-1.5">
+                        <h2 class="text-[#262626] text-[24px] leading-none font-semibold font-['Open Sans']"><?php echo $resolved_count; ?></h2>
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#2FA05A] mb-1.5"></span>
+                    </div>
+                    <a href="?status=resolved" class="text-[#262626] text-[12px] font-['Open Sans'] opacity-0 group-hover:opacity-100 transition-opacity">View all →</a>
+                </div>
             </div>
-            
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h3 class="text-gray-800 font-semibold">Closed</h3>
-                <p class="text-2xl font-bold"><?php echo $closed_count; ?></p>
-                <a href="?status=closed" class="text-gray-700 text-sm hover:underline">View all</a>
+
+            <div class="group flex items-start gap-4 px-5 py-4 bg-[#FBFBFB] border-[1px] border-[#EEEEEE] rounded-[10px] transition-colors hover:border-[#E2E2E2] hover:bg-white cursor-pointer" onclick="window.location='?status=closed'">
+                <div class="w-[42px] h-[42px] rounded-[10px] bg-[#F1F0F3] flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-lock text-[#6B6B78] text-[18px]"></i>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-[#8A8A8A] text-[12px] font-medium font-['Open Sans'] tracking-wide">Closed</span>
+                    <div class="flex items-end gap-1.5">
+                        <h2 class="text-[#262626] text-[24px] leading-none font-semibold font-['Open Sans']"><?php echo $closed_count; ?></h2>
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#6B6B78] mb-1.5"></span>
+                    </div>
+                    <a href="?status=closed" class="text-[#262626] text-[12px] font-['Open Sans'] opacity-0 group-hover:opacity-100 transition-opacity">View all →</a>
+                </div>
             </div>
         </div>
 
@@ -330,7 +359,7 @@ include "./sidebar.php"
                         <td class="py-3 px-4 text-sm"><?php echo formatDate($issue['created_at']); ?></td>
                         <td class="py-3 px-4">
                             <button 
-                                onclick="openIssueModal(<?php echo $issue['issue_id']; ?>, '<?php echo htmlspecialchars(addslashes($issue['issue_type'])); ?>', '<?php echo htmlspecialchars(addslashes($issue['issue_description'])); ?>', '<?php echo $issue['status']; ?>', '<?php echo htmlspecialchars(addslashes($issue['admin_notes'] ?? '')); ?>', '<?php echo htmlspecialchars(addslashes($issue['resolution'] ?? '')); ?>')" 
+                                onclick="openIssueModal(<?php echo $issue['issue_id']; ?>, '<?php echo htmlspecialchars(addslashes($issue['issue_type'])); ?>', '<?php echo htmlspecialchars(addslashes($issue['issue_description'])); ?>', '<?php echo $issue['status']; ?>', '<?php echo htmlspecialchars(addslashes($issue['admin_notes'] ?? '')); ?>', '<?php echo htmlspecialchars(addslashes($issue['resolution'] ?? '')); ?>', <?php echo (int)$issue['order_id']; ?>, '<?php echo htmlspecialchars(addslashes($issue['customer_name'] ?? '')); ?>', '<?php echo htmlspecialchars(addslashes($issue['customer_email'] ?? '')); ?>', '<?php echo htmlspecialchars(addslashes($issue['order_status'] ?? '')); ?>', '<?php echo htmlspecialchars(addslashes(formatDate($issue['created_at']))); ?>')" 
                                 class="text-blue-600 hover:text-blue-800"
                             >
                                 View/Update
@@ -371,48 +400,92 @@ include "./sidebar.php"
 </div>
 
 <!-- Issue Detail Modal -->
-<div id="issueModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeIssueModal()">&times;</span>
-        <h2 class="text-xl font-semibold mb-4">Issue Details</h2>
-        
-        <form id="updateIssueForm" method="POST" action="">
+<div id="issueModal" class="modal" style="display: none;">
+    <div class="modal-content max-w-xl">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+                <div class="w-[36px] h-[36px] rounded-[10px] bg-[#FCE7F0] flex items-center justify-center">
+                    <i class="fa-solid fa-circle-exclamation text-[#C2185B] text-[16px]"></i>
+                </div>
+                <div>
+                    <h2 class="text-[16px] font-Onest font-semibold text-[#111827]">Issue Details</h2>
+                    <p class="text-[12px] text-gray-400 font-['Open Sans']" id="modalSubtitle">ID #0000</p>
+                </div>
+            </div>
+            <span class="close text-gray-400 text-[24px] leading-none cursor-pointer hover:text-gray-700" onclick="closeIssueModal()">&times;</span>
+        </div>
+
+        <form id="updateIssueForm" method="POST" action="" class="px-6 py-5 flex flex-col gap-5">
             <input type="hidden" id="issue_id" name="issue_id" value="">
             <input type="hidden" name="action" value="update_status">
-            
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Issue Type</label>
-                <div id="issueType" class="p-2 bg-gray-50 rounded-md text-gray-800"></div>
+
+            <!-- Status banner -->
+            <div id="modalStatusBanner" class="flex items-center gap-2.5 rounded-[10px] px-4 py-3 bg-gray-50 border border-gray-100">
+                <span id="modalStatusDot" class="w-2 h-2 rounded-full bg-gray-400"></span>
+                <span class="text-[13px] font-medium text-gray-700">Current status:</span>
+                <span id="modalStatusLabel" class="text-[13px] font-semibold text-gray-900 rounded-full px-2.5 py-0.5 bg-white border border-gray-200">Pending</span>
             </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Issue Description</label>
-                <div id="issueDescription" class="p-2 bg-gray-50 rounded-md text-gray-800 whitespace-pre-line"></div>
+
+            <!-- Issue context -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1 bg-[#FBFBFB] rounded-[10px] border border-[#EEEEEE] px-3.5 py-3">
+                    <span class="text-[11px] text-gray-400 font-medium uppercase tracking-wide">Order ID</span>
+                    <span id="modalOrderId" class="text-[14px] font-semibold text-[#262626]">—</span>
+                </div>
+                <div class="flex flex-col gap-1 bg-[#FBFBFB] rounded-[10px] border border-[#EEEEEE] px-3.5 py-3">
+                    <span class="text-[11px] text-gray-400 font-medium uppercase tracking-wide">Order Status</span>
+                    <span id="modalOrderStatus" class="text-[14px] font-medium text-[#262626]">—</span>
+                </div>
+                <div class="flex flex-col gap-1 bg-[#FBFBFB] rounded-[10px] border border-[#EEEEEE] px-3.5 py-3">
+                    <span class="text-[11px] text-gray-400 font-medium uppercase tracking-wide">Customer</span>
+                    <span id="modalCustomer" class="text-[14px] font-medium text-[#262626]">—</span>
+                </div>
+                <div class="flex flex-col gap-1 bg-[#FBFBFB] rounded-[10px] border border-[#EEEEEE] px-3.5 py-3">
+                    <span class="text-[11px] text-gray-400 font-medium uppercase tracking-wide">Reported On</span>
+                    <span id="modalIssueDate" class="text-[14px] font-medium text-[#262626]">—</span>
+                </div>
             </div>
-            
-            <div class="mb-4">
-                <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select id="modal_status" name="status" class="w-full p-2 border border-gray-300 rounded-md">
-                    <option value="pending">Pending</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                    <option value="closed">Closed</option>
-                </select>
+
+            <!-- Issue details -->
+            <div class="flex flex-col gap-2">
+                <span class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide">Issue</span>
+                <div class="flex flex-col gap-3 rounded-[10px] border border-gray-100 px-4 py-3.5 bg-white">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-regular fa-tag text-[13px] text-gray-400"></i>
+                        <span id="issueType" class="inline-flex items-center text-[13px] font-medium text-[#C2185B] bg-[#FCE7F0] rounded-full px-3 py-1"></span>
+                    </div>
+                    <p id="issueDescription" class="text-[13px] leading-relaxed text-gray-600 whitespace-pre-line"></p>
+                </div>
             </div>
-            
-            <div class="mb-4">
-                <label for="admin_notes" class="block text-sm font-medium text-gray-700 mb-1">Admin Notes</label>
-                <textarea id="admin_notes" name="admin_notes" rows="3" class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+
+            <!-- Update section -->
+            <div class="flex flex-col gap-3 border-t border-gray-100 pt-4">
+                <span class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide">Update Issue</span>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="status" class="text-[13px] font-medium text-gray-600">Status</label>
+                    <select id="modal_status" name="status" class="admin-select">
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="admin_notes" class="text-[13px] font-medium text-gray-600">Admin Notes</label>
+                    <textarea id="admin_notes" name="admin_notes" rows="2" class="admin-input"></textarea>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="resolution" class="text-[13px] font-medium text-gray-600">Resolution</label>
+                    <textarea id="resolution" name="resolution" rows="2" class="admin-input" placeholder="Enter details about how the issue was resolved"></textarea>
+                </div>
             </div>
-            
-            <div class="mb-4">
-                <label for="resolution" class="block text-sm font-medium text-gray-700 mb-1">Resolution</label>
-                <textarea id="resolution" name="resolution" rows="3" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter details about how the issue was resolved"></textarea>
-            </div>
-            
-            <div class="flex justify-end">
-                <button type="button" onclick="closeIssueModal()" class="mr-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-md">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-[#C2185B] text-white rounded-md">Update Issue</button>
+
+            <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+                <button type="button" onclick="closeIssueModal()" class="admin-btn-outline"><i class="fa-solid fa-xmark"></i> Cancel</button>
+                <button type="submit" class="admin-btn-primary"><i class="fa-solid fa-floppy-disk"></i> Update Issue</button>
             </div>
         </form>
     </div>
@@ -428,14 +501,38 @@ include "./sidebar.php"
     
 <script>
     // Issue Modal Functions
-    function openIssueModal(issueId, issueType, issueDescription, status, adminNotes, resolution) {
+    function openIssueModal(issueId, issueType, issueDescription, status, adminNotes, resolution, orderId, customer, orderStatus, issueDate) {
         document.getElementById('issue_id').value = issueId;
         document.getElementById('issueType').textContent = issueType;
         document.getElementById('issueDescription').textContent = issueDescription;
         document.getElementById('modal_status').value = status;
         document.getElementById('admin_notes').value = adminNotes || '';
         document.getElementById('resolution').value = resolution || '';
-        
+
+        document.getElementById('modalSubtitle').textContent = '#' + (issueId || 0).toString().padStart(4, '0');
+        document.getElementById('modalOrderId').textContent = '#' + (orderId || '—');
+        document.getElementById('modalCustomer').textContent = customer || '—';
+        document.getElementById('modalOrderStatus').textContent = orderStatus ? orderStatus.replace(/_/g, ' ') : '—';
+        document.getElementById('modalIssueDate').textContent = issueDate || '—';
+
+        const statusMap = {
+            pending:     { label: 'Pending',     color: '#C77E23', bg: '#FFF6EB' },
+            in_progress: { label: 'In Progress', color: '#3B6FD6', bg: '#EDF3FF' },
+            resolved:    { label: 'Resolved',    color: '#2FA05A', bg: '#E6F7EE' },
+            closed:      { label: 'Closed',      color: '#6B6B78', bg: '#F1F0F3' }
+        };
+        const meta = statusMap[status] || statusMap.pending;
+        const banner = document.getElementById('modalStatusBanner');
+        const dot = document.getElementById('modalStatusDot');
+        const label = document.getElementById('modalStatusLabel');
+        banner.style.backgroundColor = meta.bg;
+        banner.style.borderColor = meta.bg;
+        dot.style.backgroundColor = meta.color;
+        label.textContent = meta.label;
+        label.style.color = meta.color;
+        label.style.borderColor = meta.color;
+        label.style.backgroundColor = '#ffffff';
+
         document.getElementById('issueModal').style.display = 'block';
     }
     

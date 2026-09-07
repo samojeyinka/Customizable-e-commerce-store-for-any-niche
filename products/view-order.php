@@ -1,3 +1,6 @@
+<?php
+require_once __DIR__ . "/../config/config.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,7 +18,7 @@
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
        <!-- ========================  The header  starts ======================== -->
        <header class="w-full bg-[#E8E9F2] flex items-center justify-center p-3">
 
@@ -29,7 +32,7 @@
             <i class="fa-solid fa-magnifying-glass text-[24px] text-[#777777] leading-none" alt="Search"></i>
             <input type="text" placeholder="What are you shopping for?" class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
         </div>
-        <button type="submit" class="py-2 px-4 bg-[#C2185B] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
+        <button type="submit" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
     </div>
     <div class="flex items-center gap-6">
         <a href="./products/cart.php">
@@ -141,7 +144,7 @@
                     </div>
                 </div>
                 <p class='text-[14px] font-["Open Sans] text-[#EE3F3F] font-regular underline cursor-pointer'>Password doesn’t match</p>
-                <span class="w-full py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center" id="rvBtn">Create an account</span>
+                <span class="w-full py-[8px] px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center" id="rvBtn">Create an account</span>
 
             </form>
 
@@ -204,9 +207,9 @@
                     </div>
                 </div>
 
-                <p id="openPassordRqMail" class='text-[14px] font-["Open Sans] text-[#C2185B] font-regular  cursor-pointer'>Forgot Password?</p>
+                <p id="openPassordRqMail" class='text-[14px] font-["Open Sans] text-[<?php echo store_color('color_primary'); ?>] font-regular  cursor-pointer'>Forgot Password?</p>
 
-                <a href="../user/profile.php" class="w-full py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Sign In</a>
+                <a href="../user/profile.php" class="w-full py-[8px] px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Sign In</a>
 
             </form>
 
@@ -270,13 +273,13 @@
             <span
 
                 id="regsuccessbtn"
-                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
+                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] mt-10 cursor-pointer">
                 Verify me
             </span>
         </form>
 
         <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-center">
-            Resend code in <span class="text-[#C2185B]">23sec</span>
+            Resend code in <span class="text-[<?php echo store_color('color_primary'); ?>]">23sec</span>
         </p>
     </div>
 </div>
@@ -285,7 +288,7 @@
 <div id="regSuccess" class="modal regsuccess">
     <div class="modal-content overflow-hidden p-4 flex flex-col items-center">
 
-        <i class="fa-solid fa-circle-check text-[120px] text-[#C2185B] mx-auto leading-none"></i>
+        <i class="fa-solid fa-circle-check text-[120px] text-[<?php echo store_color('color_primary'); ?>] mx-auto leading-none"></i>
 
         <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
             Account Creation Successful
@@ -297,7 +300,7 @@
 
 
 
-        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer"
+        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] mt-10 cursor-pointer"
             id="closeregsucces">
             Continue Shopping
         </span>
@@ -367,7 +370,7 @@
 
             <span
                 id="openPassordRqV"
-                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
+                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] mt-10 cursor-pointer">
                 Continue
             </span>
         </form>
@@ -418,13 +421,13 @@
 
             <span
                 id="openPasswordRequestNP"
-                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
+                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] mt-10 cursor-pointer">
                 Verify me
             </span>
         </form>
 
         <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-center">
-            Didn't get code? <span class="text-[#C2185B] font-medium cursor-pointer">Resend </span>
+            Didn't get code? <span class="text-[<?php echo store_color('color_primary'); ?>] font-medium cursor-pointer">Resend </span>
         </p>
     </div>
 </div>
@@ -484,7 +487,7 @@
 
             <span
                 id="openpasswordresetsuccess"
-                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
+                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] mt-10 cursor-pointer">
                 Reset Password
             </span>
         </form>
@@ -498,7 +501,7 @@
 <div id="passwordresetsuccess" class="modal passwordresetsuccess">
     <div class="modal-content overflow-hidden p-4 flex flex-col items-center">
 
-        <i class="fa-solid fa-circle-check text-[120px] text-[#C2185B] mx-auto leading-none"></i>
+        <i class="fa-solid fa-circle-check text-[120px] text-[<?php echo store_color('color_primary'); ?>] mx-auto leading-none"></i>
 
         <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
             Password Reset Successful
@@ -510,7 +513,7 @@
 
 
 
-        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer"
+        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] mt-10 cursor-pointer"
             id="closeprsucces">
             Sign In
         </span>
@@ -650,8 +653,8 @@
 
 
     <div class="flex items-center gap-2 cursor-pointer">
-        <i class="fa-solid fa-truck-fast text-[24px] text-[#C2185B] leading-none"></i>
-        <a href="../user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans] text-[#C2185B] font-medium underline'>Track your order</a>
+        <i class="fa-solid fa-truck-fast text-[24px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>
+        <a href="../user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans] text-[<?php echo store_color('color_primary'); ?>] font-medium underline'>Track your order</a>
     </div>
 
 </div>
@@ -705,8 +708,8 @@
             </div>
 
             <div class="flex items-center gap-2 cursor-pointer pt-4">
-                <i class="fa-solid fa-truck-fast text-[24px] text-[#C2185B] leading-none"></i>
-                <strong class='text-[13px] md:text-[14px] font-["Open Sans] text-[#C2185B] font-medium underline'>Track your order</strong>
+                <i class="fa-solid fa-truck-fast text-[24px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>
+                <strong class='text-[13px] md:text-[14px] font-["Open Sans] text-[<?php echo store_color('color_primary'); ?>] font-medium underline'>Track your order</strong>
             </div>
 
         </div>
@@ -720,13 +723,13 @@
             <i class="fa-solid fa-magnifying-glass text-[24px] text-[#777777] leading-none" alt="Search"></i>
             <input type="text" placeholder="What are you shopping for?" class="w-full text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
         </div>
-        <button type="submit" class="py-2 px-4 bg-[#C2185B] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
+        <button type="submit" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
     </div>
 </div>
 </section>
 <!-- ========================  The options  ends ======================== -->
 
-        <section class="w-full bg-[#FFFFFFF] py-1">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
             <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
@@ -735,14 +738,14 @@
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Check Out</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</span>
                 </div>
             </div>
         </section>
 
       
 
-        <div class="w-full bg-[#FFFFFF] py-5">
+        <div class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block">
 
 
@@ -856,7 +859,7 @@
 
                                 </div>
 
-                                <p class='text-[14px] font-["Open Sans] text-[#C2185B] font-regular underline cursor-pointer'>Track your order</p>
+                                <p class='text-[14px] font-["Open Sans] text-[<?php echo store_color('color_primary'); ?>] font-regular underline cursor-pointer'>Track your order</p>
                             </div>
 
                             <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
@@ -918,7 +921,7 @@
 
                             <input type="text" placeholder="Enter your email address" class="lg:w-[12rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7]" />
                         </div>
-                        <button type="submit" class="py-1 px-4 bg-[#C2185B] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]">Subscribe</button>
+                        <button type="submit" class="py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]">Subscribe</button>
                     </div>
                 </div>
 
@@ -927,12 +930,12 @@
                 <div class="flex flex-col gap-2">
                     <h1 class="text-[#262626] text-[20px] md:text-[24px] font-['Montserrat'] font-medium">Connect with us on:</h1>
                     <div class="flex items-center gap-7">
-                        <a href="#"><i class="fa-brands fa-facebook-f text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
-                        <a href="#"><i class="fa-brands fa-instagram text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
-                        <a href="#"><i class="fa-brands fa-whatsapp text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
-                        <a href="#"><i class="fa-brands fa-pinterest-p text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
-                        <a href="#"><i class="fa-brands fa-youtube text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
-                        <a href="#"><i class="fa-brands fa-x-twitter text-[20px] text-[#777777] hover:text-[#C2185B] transition-colors"></i></a>
+                        <a href="#"><i class="fa-brands fa-facebook-f text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a>
+                        <a href="#"><i class="fa-brands fa-whatsapp text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a>
+                        <a href="#"><i class="fa-brands fa-pinterest-p text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a>
+                        <a href="#"><i class="fa-brands fa-youtube text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a>
+                        <a href="#"><i class="fa-brands fa-x-twitter text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a>
                     </div>
                 </div>
                 <div class="flex md:items-center flex-col gap-3 md:gap-0 md:flex-row justify-between mt-10">

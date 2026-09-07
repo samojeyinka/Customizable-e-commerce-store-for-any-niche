@@ -309,19 +309,19 @@ require_once "../includes/auth/google.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE] relative">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>] relative">
     <?php
      include('../includes/header.php');
     include('../includes/options.php');
     ?>
-        <section class="w-full bg-[#FFFFFFF] py-1">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
             <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="../products/cart.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Cart</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Check Out</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">Check Out</span>
                 </div>
             </div>
         </section>
@@ -702,7 +702,7 @@ require_once "../includes/auth/google.php";
     <button 
         type="button" 
         id="update-profile-btn"
-        class="py-2 px-4 bg-gray-100 hover:bg-gray-200 text-[#C2185B] text-[14px] font-['Open Sans'] flex items-center gap-1 cursor-pointer rounded-[4px] border border-[#E1E1E1]">
+        class="py-2 px-4 bg-gray-100 hover:bg-gray-200 text-[<?php echo store_color('color_primary'); ?>] text-[14px] font-['Open Sans'] flex items-center gap-1 cursor-pointer rounded-[4px] border border-[#E1E1E1]">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
         </svg>
@@ -758,14 +758,14 @@ require_once "../includes/auth/google.php";
     <!-- <button 
     type="button" 
     id="pay-button-desktop"
-    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex">
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex">
     Pay Now ₦<?php echo number_format((float)$total); ?>
 </button> -->
 
 <button 
     type="button" 
     id="pay-button-desktop"
-    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex <?php echo !$profileComplete ? 'opacity-50 cursor-not-allowed' : ''; ?>"
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] hidden md:flex <?php echo !$profileComplete ? 'opacity-50 cursor-not-allowed' : ''; ?>"
     <?php echo !$profileComplete ? 'disabled' : ''; ?>
 >
     <?php echo $profileComplete ? 'Pay Now ₦' . number_format((float)$total) : 'Complete Profile to Checkout'; ?>
@@ -790,20 +790,20 @@ require_once "../includes/auth/google.php";
 
         <div class="flex items-center justify-between">
             <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Total</p>
-            <p class="text-[#C2185B] text-[18px] md:text-[22px] font-['Open Sans'] font-bold">₦<span id="mobile-total"><?php echo number_format((float)$total); ?></span></p>
+            <p class="text-[<?php echo store_color('color_primary'); ?>] text-[18px] md:text-[22px] font-['Open Sans'] font-bold">₦<span id="mobile-total"><?php echo number_format((float)$total); ?></span></p>
         </div>
     </div>
     <!-- <button 
     type="button" 
     id="pay-button-mobile"
-    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
     Pay Now ₦<?php echo number_format((float)$total); ?>
 </button> -->
 
 <button 
     type="button" 
     id="pay-button-mobile"
-    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] <?php echo !$profileComplete ? 'opacity-50 cursor-not-allowed' : ''; ?>"
+    class="w-full md:max-w-[377px] flex items-center justify-center gap-2 mt-4 py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] <?php echo !$profileComplete ? 'opacity-50 cursor-not-allowed' : ''; ?>"
     <?php echo !$profileComplete ? 'disabled' : ''; ?>
 >
     <?php echo $profileComplete ? 'Pay Now ₦' . number_format((float)$total) : 'Complete Profile to Checkout'; ?>
@@ -823,7 +823,7 @@ require_once "../includes/auth/google.php";
     <?php if (empty($cart_items)): ?>
         <div class="p-3 text-center">
             <p class="text-[#6b7280] text-[14px] md:text-[16px] font-['Open Sans']">Your cart is empty</p>
-            <a href="../products/index.php" class="text-[#C2185B] text-[14px] font-['Open Sans'] underline">Continue Shopping</a>
+            <a href="../products/index.php" class="text-[<?php echo store_color('color_primary'); ?>] text-[14px] font-['Open Sans'] underline">Continue Shopping</a>
         </div>
     <?php else: ?>
         <?php foreach ($cart_items as $item): ?>
@@ -883,7 +883,7 @@ require_once "../includes/auth/google.php";
 
                     <div class="flex items-center justify-between">
                         <p class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">Total</p>
-                        <p class="text-[#C2185B] text-[18px] md:text-[22px] font-['Open Sans'] font-bold">₦<span id="desktop-total"><?php echo number_format((float)$total); ?></span></p>
+                        <p class="text-[<?php echo store_color('color_primary'); ?>] text-[18px] md:text-[22px] font-['Open Sans'] font-bold">₦<span id="desktop-total"><?php echo number_format((float)$total); ?></span></p>
                     </div>
                 </div>
 
@@ -900,14 +900,14 @@ require_once "../includes/auth/google.php";
     <div id="paysuccess" class="payment ps" style="display: none;">
         <div class="payment-content pss overflow-hidden py-[4rem] flex flex-col gap-4 items-center">
             <div class="overflow-hidden flex flex-col items-center p-4">
-                <i class="fa-solid fa-circle-check text-[120px] md:text-[150px] text-[#C2185B] mx-auto leading-none"></i>
+                <i class="fa-solid fa-circle-check text-[120px] md:text-[150px] text-[<?php echo store_color('color_primary'); ?>] mx-auto leading-none"></i>
                 <p class="font-['Open Sans'] text-[19px] text-[24px] font-medium text-center">
                     Order Confirmed
                 </p>
                 <p class="w-[95%] md:w-[67%] mx-auto text-[15px] text-center md:text-[16px] font-['Open Sans'] font-regular text-[#777777] mt-2">
                     Your order has been placed successfully. A confirmation email has been sent to you. Thank you for shopping with us
                 </p>
-                <a href="<?php echo DOMAIN; ?>/user/orders.php" class="w-[80%] text-center text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer" id="closepssucces">
+                <a href="<?php echo DOMAIN; ?>/user/orders.php" class="w-[80%] text-center text-[16px] font-regular font-Satoshi py-2 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] mt-10 cursor-pointer" id="closepssucces">
                     View Order
                 </a>
             </div>

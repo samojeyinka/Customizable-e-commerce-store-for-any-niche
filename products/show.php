@@ -184,7 +184,7 @@ require_once "../includes/auth/google.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
     <?php
      include('../includes/header.php');
     include('../includes/options.php');
@@ -195,7 +195,7 @@ require_once "../includes/auth/google.php";
     Item added to your cart!
 </div>
 
-        <section class="w-full bg-[#FFFFFFF] py-4">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-4">
             <div class="w-[90%] mx-auto max-w-[1440px]">
 
 <div class="hidden md:flex items-center gap-1 cursor-pointer">
@@ -209,7 +209,7 @@ require_once "../includes/auth/google.php";
     echo (strlen($product_name) > 20) ? substr($product_name, 0, 30) . '...' : $product_name; 
 ?></a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
                 </div>
 
                 <div class="flex items-center gap-1 cursor-pointer md:hidden">
@@ -231,7 +231,7 @@ require_once "../includes/auth/google.php";
     echo (strlen($product_name) > 9) ? substr($product_name, 0, 10) . '...' : $product_name; 
 ?></a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
                 </div>
             </div>
         </section>
@@ -270,7 +270,7 @@ require_once "../includes/auth/google.php";
             <div class="text-center py-4">
                 <p class="text-[#5B5B5B] text-[14px] font-['Montserrat']">No reviews yet for this product.</p>
                 <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[#C2185B] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
+                <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[<?php echo store_color('color_primary'); ?>] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
                 <?php endif; ?>
             </div>
         <?php else: ?>
@@ -297,7 +297,7 @@ require_once "../includes/auth/google.php";
             
             <?php if ($total_reviews > count($reviews)): ?>
                 <div class="text-center mt-2">
-                    <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[#C2185B] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
+                    <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[<?php echo store_color('color_primary'); ?>] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
                 </div>
             <?php endif; ?>
         <?php endif; ?>
@@ -312,7 +312,7 @@ require_once "../includes/auth/google.php";
                 <div class="flex flex-col gap-1">
                     <div class="flex items-start gap-2"> <span class="text-[#262626] text-[24px] md:text-[28px] font-['Montserrat'] font-medium"><?php echo $product['product_name']; ?></span>
                     <?php if ($product['is_featured']): ?>
-                            <button class="w-[fit-content] h-[fit-content] bg-[#D51E5E]  rounded-[28px] text-white text-[12px] md:text-[13px] font-Onest font-regular py-[1.5px] px-2 text-nowrap">Featured</button>
+                            <button class="w-[fit-content] h-[fit-content] bg-[<?php echo store_color('color_primary'); ?>]  rounded-[28px] text-white text-[12px] md:text-[13px] font-Onest font-regular py-[1.5px] px-2 text-nowrap">Featured</button>
                             <?php endif; ?>
  </div>
                     <span class="text-[#262626] text-[18px] md:text-[20px] font-['Montserrat'] font-medium">₦<?php echo number_format((float)$lowest_price, 2); ?></span>
@@ -435,7 +435,7 @@ require_once "../includes/auth/google.php";
                     <!-- <div class="flex items-center gap-4">
                         <a href="./products/cart.php" class="w-[180px] bg-[#E8E9F2] border-[1px] border-[#969AC4] rounded-[8px] text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2 text-center">Add to cart</a>
 
-                        <a href="./checkout.php" class="text-center w-[180px] bg-[#C2185B] rounded-[8px] text-white text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2">Buy now</a>
+                        <a href="./checkout.php" class="text-center w-[180px] bg-[<?php echo store_color('color_primary'); ?>] rounded-[8px] text-white text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2">Buy now</a>
                         <img src="../assets/products/fav.svg" class="w-[24px] cursor-pointer" />
                     </div> -->
 
@@ -449,11 +449,11 @@ require_once "../includes/auth/google.php";
 
     <button 
         id="buy-now-btn"
-        class="w-[180px] bg-[#C2185B] rounded-[8px] text-white text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2 text-center"
+        class="w-[180px] bg-[<?php echo store_color('color_primary'); ?>] rounded-[8px] text-white text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2 text-center"
     >
         Buy now
     </button>
-    <?php $show_fav = isset($favorites[$product_id]) ? 'fa-solid text-[#C2185B] favorite-active' : 'fa-regular text-[#262626]'; ?>
+    <?php $show_fav = isset($favorites[$product_id]) ? 'fa-solid text-[' . store_color('color_primary') . '] favorite-active' : 'fa-regular text-[#262626]'; ?>
 <i id="product-fav-heart" data-product-id="<?php echo (int)$product_id; ?>" class="<?php echo $show_fav; ?> fa-heart text-[24px] cursor-pointer leading-none"></i>
 </div>
                 </div>
@@ -550,7 +550,7 @@ require_once "../includes/auth/google.php";
             <div class="text-center py-4">
                 <p class="text-[#5B5B5B] text-[14px] font-['Montserrat']">No reviews yet for this product.</p>
                 <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[#C2185B] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
+                <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[<?php echo store_color('color_primary'); ?>] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
                 <?php endif; ?>
             </div>
         <?php else: ?>
@@ -576,7 +576,7 @@ require_once "../includes/auth/google.php";
             
             <?php if ($total_reviews > count($reviews)): ?>
                 <div class="text-center mt-2">
-                    <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[#C2185B] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
+                    <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[<?php echo store_color('color_primary'); ?>] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
                 </div>
             <?php endif; ?>
         <?php endif; ?>

@@ -259,7 +259,7 @@ if(!isset($_SESSION['email'])) {
                 
                 <button
                     type="submit"
-                    class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
+                    class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] mt-10 cursor-pointer">
                     Verify me
                 </button>
             </form>
@@ -269,8 +269,8 @@ if(!isset($_SESSION['email'])) {
             </form>
             
             <p class="text-[#777777] text-[15px] font-['Open Sans'] font-[400] mt-3 text-center">
-                <span id="countdown-text">Resend code in <span class="text-[#C2185B]" id="countdown">60</span>sec</span>
-                <a href="#" id="resendLink" class="text-[#C2185B] hidden" onclick="document.getElementById('resendForm').submit(); return false;">Resend code</a>
+                <span id="countdown-text">Resend code in <span class="text-[<?php echo store_color('color_primary'); ?>]" id="countdown">60</span>sec</span>
+                <a href="#" id="resendLink" class="text-[<?php echo store_color('color_primary'); ?>] hidden" onclick="document.getElementById('resendForm').submit(); return false;">Resend code</a>
             </p>
         </div>
     </div>

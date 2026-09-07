@@ -184,11 +184,11 @@ require_once "../../../config/servername.php";
             
             <input type="hidden" name="send" value="1">
             
-            <button type="submit" class="w-full py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Send Reset Code</button>
+            <button type="submit" class="w-full py-[8px] px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Send Reset Code</button>
         </form>
 
         <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#7A7A7A] py-3">
-            Remember your password? <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-[#C2185B] font-medium">Sign in</a>
+            Remember your password? <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-[<?php echo store_color('color_primary'); ?>] font-medium">Sign in</a>
         </p>
     </div>
 </div>

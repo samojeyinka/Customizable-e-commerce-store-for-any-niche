@@ -34,7 +34,7 @@ if (!$order_id || !$product_id) {
     $error_message = "You can only leave a review for a product you bought.";
 } else {
     // Get order details to verify it belongs to the user and is delivered
-    $order_sql = "SELECT o.id, o.order_status, 
+    $order_sql = "SELECT o.id, o.order_status, o.delivery_confirmed_at, 
                      (SELECT MAX(changed_at) FROM order_status_history WHERE order_id = o.id AND new_status = 'Delivered') as delivered_at,
                      p.product_id, p.product_name, p.colors,
                      (SELECT image_path FROM product_images WHERE product_id = p.product_id AND is_main = 1 LIMIT 1) as image_path
@@ -56,6 +56,9 @@ if (!$order_id || !$product_id) {
         // Check if order is delivered
         if ($product['order_status'] != 'Delivered') {
             $error_message = "You can only review products from delivered orders.";
+        } else if (empty($product['delivery_confirmed_at'])) {
+            // Buyer must confirm receipt before reviewing
+            $error_message = "Please confirm you've received this order before leaving a review.";
         } else {
             // Check if user has already reviewed this product for this order
             $check_sql = "SELECT * FROM reviews WHERE user_id = ? AND product_id = ? AND order_id = ?";
@@ -172,25 +175,25 @@ require_once "../includes/auth/google.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
         <?php
         include(__DIR__ . '/../includes/header.php');
         include(__DIR__ . '/../includes/options.php');
         ?>
 
-        <section class="w-full bg-[#FFFFFFF] py-1">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
             <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./orders.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Write a Review</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">Write a Review</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto max-w-[1440px] bg-[#FFFFFF] py-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <div class="w-full md:w-[80%] lg:w-[60%] mx-auto">
                 <h1 class="text-[24px] md:text-[28px] font-['Open Sans'] font-bold mb-6">Write a Review</h1>
                 
@@ -199,7 +202,7 @@ require_once "../includes/auth/google.php";
                     <?php echo $error_message; ?>
                 </div>
                 <div class="flex justify-center mt-6">
-                    <a href="./orders.php" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
+                    <a href="./orders.php" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
                 </div>
                 <?php elseif (!empty($success_message)): ?>
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
@@ -258,14 +261,14 @@ require_once "../includes/auth/google.php";
                                 id="review_text" 
                                 name="review_text" 
                                 rows="6" 
-                                class="w-full p-3 border border-[#E1E1E1] rounded-[4px] focus:outline-none focus:ring-2 focus:ring-[#C2185B]"
+                                class="w-full p-3 border border-[#E1E1E1] rounded-[4px] focus:outline-none focus:ring-2 focus:ring-[<?php echo store_color('color_primary'); ?>]"
                                 placeholder="Share your experience with this product..."
                             ><?php echo $existing_review ? htmlspecialchars($existing_review['review_text']) : ''; ?></textarea>
                         </div>
                         
                         <div class="flex justify-end space-x-3">
                             <a href="./orders.php" class="py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[16px] font-['Open Sans'] rounded-[4px]">Cancel</a>
-                            <button type="submit" name="submit_review" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">
+                            <button type="submit" name="submit_review" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">
                                 <?php echo $existing_review ? 'Update Review' : 'Submit Review'; ?>
                             </button>
                         </div>

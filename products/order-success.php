@@ -8,6 +8,7 @@ session_start();
 include('../config/connect.php');
 // Include authentication utility
 require_once '../includes/auth/auth.php';
+require_once __DIR__ . "/../config/config.php";
 
 // Require authentication
 requireAuth();
@@ -81,8 +82,8 @@ while ($item = mysqli_fetch_assoc($items_result)) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-    <main class="bg-[#FEFEFE] relative min-h-screen flex flex-col">
-        <section class="w-full bg-[#FFFFFFF] py-1">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>] relative min-h-screen flex flex-col">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
             <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
@@ -91,7 +92,7 @@ while ($item = mysqli_fetch_assoc($items_result)) {
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="checkout.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Check Out</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Order Confirmed</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">Order Confirmed</span>
                 </div>
             </div>
         </section>
@@ -100,11 +101,11 @@ while ($item = mysqli_fetch_assoc($items_result)) {
             <!-- Success Message -->
             <div class="w-full rounded-lg border border-green-200 bg-green-50 p-6 text-center">
                 <div class="flex justify-center">
-                    <i class="fa-solid fa-circle-check text-[80px] text-[#C2185B] mb-4" alt="Success"></i>
+                    <i class="fa-solid fa-circle-check text-[80px] text-[<?php echo store_color('color_primary'); ?>] mb-4" alt="Success"></i>
                 </div>
                 <h1 class="text-2xl md:text-3xl font-medium text-gray-800 mb-2">Order Confirmed</h1>
                 <p class="text-gray-600 mb-4">Your order has been placed successfully. A confirmation email has been sent to you.</p>
-                <p class="font-medium text-gray-800">Order ID: <span class="text-[#C2185B]"><?php echo htmlspecialchars($order_id); ?></span></p>
+                <p class="font-medium text-gray-800">Order ID: <span class="text-[<?php echo store_color('color_primary'); ?>]"><?php echo htmlspecialchars($order_id); ?></span></p>
             </div>
             
             <!-- Order Summary -->
@@ -169,7 +170,7 @@ while ($item = mysqli_fetch_assoc($items_result)) {
                             </div>
                             <div class="flex justify-between pt-2 border-t border-gray-200">
                                 <span class="text-gray-800 font-medium">Total</span>
-                                <span class="font-medium text-lg text-[#C2185B]">₦<?php echo number_format((float)$order['order_total']); ?></span>
+                                <span class="font-medium text-lg text-[<?php echo store_color('color_primary'); ?>]">₦<?php echo number_format((float)$order['order_total']); ?></span>
                             </div>
                         </div>
                     </div>
@@ -181,7 +182,7 @@ while ($item = mysqli_fetch_assoc($items_result)) {
                 <a href="../products/index.php" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg text-center font-medium hover:bg-gray-300 transition">
                     Continue Shopping
                 </a>
-                <a href="../account/orders.php" class="px-6 py-3 bg-[#C2185B] text-white rounded-lg text-center font-medium hover:bg-[#0c1450] transition">
+                <a href="../account/orders.php" class="px-6 py-3 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-lg text-center font-medium hover:bg-[<?php echo store_color('color_primary_dark'); ?>] transition">
                     View Your Orders
                 </a>
             </div>

@@ -50,15 +50,15 @@ function syncCardButtons(){
   document.querySelectorAll('.cart-toggle-icon').forEach(function(ic){
     var p=ic.getAttribute('data-product-id');
     var y=has(p);
-    if(y){ic.classList.add('in-cart','fa-circle-check','text-[#C2185B]');ic.classList.remove('fa-cart-plus','text-white');}
-    else{ic.classList.remove('in-cart','fa-circle-check','text-[#C2185B]');ic.classList.add('fa-cart-plus','text-white');}
+    if(y){ic.classList.add('in-cart','fa-circle-check','glor-text');ic.classList.remove('fa-cart-plus','text-white');}
+    else{ic.classList.remove('in-cart','fa-circle-check','glor-text');ic.classList.add('fa-cart-plus','text-white');}
   });
   document.querySelectorAll('.cart-toggle-button').forEach(function(btn){
     var p=btn.getAttribute('data-product-id');
     var y=has(p);
     btn.textContent=y?'Added to Cart':'Add to Cart';
     btn.setAttribute('data-in-cart',y?'true':'false');
-    if(y){btn.classList.add('bg-[#C2185B]','text-white');}else{btn.classList.remove('bg-[#C2185B]','text-white');}
+    if(y){btn.classList.add('glor-bg','text-white');}else{btn.classList.remove('glor-bg','text-white');}
   });
 }
 
@@ -111,7 +111,7 @@ function renderDrawer(){
   if(subEl)subEl.textContent=fmt(state.subtotal);
   if(state.items.length===0){
     if(footer)footer.classList.add('hidden');
-    if(body)body.innerHTML='<div id="cart-empty" class="flex-1 flex flex-col items-center justify-center p-6 text-center"><i class="fa-solid fa-cart-shopping text-[48px] text-[#D8C4CE] mb-3"></i><p class="text-[15px] text-[#262626] font-medium mb-1">Your cart is empty</p><p class="text-[13px] text-[#777777]">Add items to get started</p></div>';
+    if(body)body.innerHTML='<div id="cart-empty" class="flex-1 flex flex-col items-center justify-center p-6 text-center"><i class="fa-solid fa-cart-shopping text-[48px] glor-text opacity-30 mb-3"></i><p class="text-[15px] text-[#262626] font-medium mb-1">Your cart is empty</p><p class="text-[13px] text-[#777777]">Add items to get started</p></div>';
     return;
   }
   if(footer)footer.classList.remove('hidden');
@@ -128,7 +128,7 @@ function renderDrawer(){
     html+='<div class="flex gap-3 p-3 border-b border-[#E1E1E1]" data-cart-row="'+k+'">';
     html+='<img src="'+esc(img)+'" class="w-16 h-16 object-cover rounded-[4px] shrink-0" alt="">';
     html+='<div class="flex-1 min-w-0">';
-    html+='<a href="'+esc(url)+'" class="block truncate text-[13px] font-medium text-[#262626] hover:text-[#C2185B]">'+esc(it.product_name)+'</a>';
+    html+='<a href="'+esc(url)+'" class="block truncate text-[13px] font-medium text-[#262626] hover:glor-text">'+esc(it.product_name)+'</a>';
     if(meta.length)html+='<div class="text-[12px] text-[#8A8A8A] mt-0.5">'+esc(meta.join(' \u00B7 '))+'</div>';
     html+='<div class="flex items-center justify-between mt-2">';
     html+='<div class="flex items-center border border-[#E1E1E1] rounded-md">';
@@ -138,7 +138,7 @@ function renderDrawer(){
     html+='</div>';
     html+='<div class="flex items-center gap-3">';
     html+='<span class="text-[13px] text-[#262626] font-medium">'+fmt(it.line_total)+'</span>';
-    html+='<button type="button" class="cart-item-remove text-[#C2185B] text-[12px] font-medium" data-pid="'+it.product_id+'" data-vid="'+(it.variant_id||'')+'">Remove</button>';
+    html+='<button type="button" class="cart-item-remove glor-text text-[12px] font-medium" data-pid="'+it.product_id+'" data-vid="'+(it.variant_id||'')+'">Remove</button>';
     html+='</div></div></div></div>';
   }
   body.innerHTML=html;
@@ -334,13 +334,13 @@ function guestCartRenderer(){
         var metaHtml=meta.map(function(m){return '<p class="text-[#262626] text-[13px] md:text-[14px] font-[\'Open Sans\']">'+m+'</p>';}).join('');
         if(tb){
           var tr=document.createElement('tr');
-          tr.innerHTML='<td class="py-3 flex gap-2"><div class="w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden"><img src="'+esc(img)+'" class="h-full w-full object-cover"></div><div class="flex flex-col gap-[2px]"><a href="'+esc(url)+'" class="text-[#262626] text-[13px] md:text-[14px] font-[\'Open Sans\'] hover:text-[#C2185B]">'+esc(it.product_name)+'</a>'+metaHtml+'</div></td><td class="text-[#262626] text-[15px] md:text-[16px] font-[\'Open Sans\']">'+fmt(it.line_total)+'</td><td></td><td><span class="py-2 px-4 bg-gray-200 text-gray-600 text-[16px] font-[\'Open Sans\'] rounded-[28px]">N/A</span></td><td><button class="text-sm text-red-600 hover:text-red-800 guest-remove" data-pid="'+it.product_id+'" data-vid="'+(it.variant_id||'')+'">Remove</button></td>';
+          tr.innerHTML='<td class="py-3 flex gap-2"><div class="w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden"><img src="'+esc(img)+'" class="h-full w-full object-cover"></div><div class="flex flex-col gap-[2px]"><a href="'+esc(url)+'" class="text-[#262626] text-[13px] md:text-[14px] font-[\'Open Sans\'] hover:glor-text">'+esc(it.product_name)+'</a>'+metaHtml+'</div></td><td class="text-[#262626] text-[15px] md:text-[16px] font-[\'Open Sans\']">'+fmt(it.line_total)+'</td><td></td><td><span class="py-2 px-4 bg-gray-200 text-gray-600 text-[16px] font-[\'Open Sans\'] rounded-[28px]">N/A</span></td><td><button class="text-sm text-red-600 hover:text-red-800 guest-remove" data-pid="'+it.product_id+'" data-vid="'+(it.variant_id||'')+'">Remove</button></td>';
           tb.appendChild(tr);
         }
         if(mb){
           var d=document.createElement('div');
           d.className='border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex justify-between';
-          d.innerHTML='<div class="flex gap-2"><div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden"><img src="'+esc(img)+'" class="h-full w-full object-cover"></div><div class="flex flex-col gap-[2px]"><a href="'+esc(url)+'" class="text-[#262626] text-[13px] md:text-[14px] font-[\'Open Sans\'] hover:text-[#C2185B]">'+esc(it.product_name)+'</a>'+metaHtml+'<button class="text-sm text-red-600 hover:text-red-800 guest-remove" data-pid="'+it.product_id+'" data-vid="'+(it.variant_id||'')+'">Remove</button></div></div><div><p class="text-[#262626] text-[15px] md:text-[16px] font-[\'Open Sans\']">'+fmt(it.line_total)+'</p></div>';
+          d.innerHTML='<div class="flex gap-2"><div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden"><img src="'+esc(img)+'" class="h-full w-full object-cover"></div><div class="flex flex-col gap-[2px]"><a href="'+esc(url)+'" class="text-[#262626] text-[13px] md:text-[14px] font-[\'Open Sans\'] hover:glor-text">'+esc(it.product_name)+'</a>'+metaHtml+'<button class="text-sm text-red-600 hover:text-red-800 guest-remove" data-pid="'+it.product_id+'" data-vid="'+(it.variant_id||'')+'">Remove</button></div></div><div><p class="text-[#262626] text-[15px] md:text-[16px] font-[\'Open Sans\']">'+fmt(it.line_total)+'</p></div>';
           mb.appendChild(d);
         }
       });

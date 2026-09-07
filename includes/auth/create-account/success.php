@@ -1,3 +1,6 @@
+<?php
+require_once __DIR__ . "/../../config/config.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +20,7 @@
 <div id="regSuccess" class="modal regsuccess">
     <div class="modal-content overflow-hidden p-4 flex flex-col items-center">
 
-        <i class="fa-solid fa-circle-check text-[120px] text-[#C2185B] mx-auto leading-none"></i>
+        <i class="fa-solid fa-circle-check text-[120px] text-[<?php echo store_color('color_primary'); ?>] mx-auto leading-none"></i>
 
         <p class="font-['Open Sans']  text-[19px] text-[24px] font-medium text-center">
             Account Creation Successful
@@ -29,7 +32,7 @@
 
 
 
-        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer"
+        <span class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] mt-10 cursor-pointer"
             id="closeregsucces">
             Continue Shopping
         </span>

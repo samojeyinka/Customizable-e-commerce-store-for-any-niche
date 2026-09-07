@@ -170,14 +170,14 @@ require_once "../includes/auth/google.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
 
     <?php
     include(__DIR__ . '/../includes/header.php');
     include(__DIR__ . '/../includes/options.php');
     ?>
 
-        <section class="w-full bg-[#FFFFFF] py-1">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
             <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
@@ -186,12 +186,12 @@ require_once "../includes/auth/google.php";
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./track-order.php?id=<?php echo $order_id; ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Track Order</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Request Return</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">Request Return</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto max-w-[1440px] bg-[#FFFFFF] py-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <div class="w-full md:w-[80%] lg:w-[60%] mx-auto">
                 <h1 class="text-[24px] md:text-[28px] text-[#2C2C2C] font-['Open Sans'] font-medium mb-6 text-center">Request Product Return</h1>
                 
@@ -288,7 +288,7 @@ require_once "../includes/auth/google.php";
                     
                     <div class="flex justify-end mt-6">
                         <a href="./track-order.php?id=<?php echo $order_id; ?>" class="mr-3 py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[16px] font-['Open Sans'] rounded-[4px]">Cancel</a>
-                        <button type="submit" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Submit Return Request</button>
+                        <button type="submit" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Submit Return Request</button>
                     </div>
                 </form>
             </div>

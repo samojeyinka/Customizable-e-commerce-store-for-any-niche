@@ -155,7 +155,7 @@ require_once "../includes/auth/google.php";
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">My Profile</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">My Profile</span>
                 </div>
             </div>
         </section>
@@ -229,7 +229,7 @@ require_once "../includes/auth/google.php";
                                     We'll use this email to send you details and updates about your order
                                 </p>
                             </div>
-                            <button type="submit" class="w-[fit-content] py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] flex items-center gap-2 cursor-pointer rounded-[4px]">
+                            <button type="submit" class="w-[fit-content] py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] flex items-center gap-2 cursor-pointer rounded-[4px]">
                                 Save Changes
                             </button>
                         </div>
@@ -253,7 +253,7 @@ require_once "../includes/auth/google.php";
                 </div>
 
                 <div class="w-full md:w-[90%] border-[1px] border-[#E1E1E1] rounded-[8px] p-4 flex flex-col gap-2">
-                    <button type="submit" class="w-[fit-content] py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] flex items-center gap-2 cursor-pointer rounded-[4px]">
+                    <button type="submit" class="w-[fit-content] py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] flex items-center gap-2 cursor-pointer rounded-[4px]">
                         Save Changes
                     </button>
 

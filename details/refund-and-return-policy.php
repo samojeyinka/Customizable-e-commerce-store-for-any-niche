@@ -18,7 +18,7 @@ require_once __DIR__ . "/../config/config.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
     <?php
       include('../includes/header.php');
       include('../includes/options.php');
@@ -76,17 +76,17 @@ require_once __DIR__ . "/../config/config.php";
                     <h2 class="text-[#262626]  text-[22px] md:text-[30px] font-['Open Sans'] font-medium">Return process</h2>
                     <div class="flex flex-col md:flex-row md:items-center gap-3 py-4">
                         <div class="flex items-start  md:flex-col gap-2">
-                        <i class="fa-solid fa-1 text-[35px] text-[#C2185B] leading-none"></i>    
+                        <i class="fa-solid fa-1 text-[35px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>    
                         <div class="flex flex-col gap-1">
                         <h2 class="text-[#262626]  text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Initiate a Return</h2>
                         <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
-                        Contact our customer support team at <b class="text-[#C2185B]">support@glorefy.com</b> or WhatsApp <b class="text-[#C2185B]">+1 (212) 555-0147</b> to request a return.
+                        Contact our customer support team at <b class="text-[<?php echo store_color('color_primary'); ?>]">support@glorefy.com</b> or WhatsApp <b class="text-[<?php echo store_color('color_primary'); ?>]">+1 (212) 555-0147</b> to request a return.
                     </p>
                             </div>
                         </div>
 
                         <div class="flex items-start  md:flex-col gap-2">
-                        <i class="fa-solid fa-2 text-[35px] text-[#C2185B] leading-none"></i>    
+                        <i class="fa-solid fa-2 text-[35px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>    
                         <div class="flex flex-col gap-1">
                         <h2 class="text-[#262626]  text-[16px] md:text-[18px] font-['Open Sans'] font-medium"> Prepare Your Return</h2>
                         <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
@@ -97,7 +97,7 @@ Securely pack the item in its original packaging and include proof of purchase.
                         </div>
 
                         <div class="flex items-start  md:flex-col gap-2">
-                        <i class="fa-solid fa-3 text-[35px] text-[#C2185B] leading-none"></i>    
+                        <i class="fa-solid fa-3 text-[35px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>    
                         <div class="flex flex-col gap-1">
                         <h2 class="text-[#262626]  text-[16px] md:text-[18px] font-['Open Sans'] font-medium"> Ship the Item</h2>
                         <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
@@ -115,7 +115,7 @@ Securely pack the item in its original packaging and include proof of purchase.
                     <h2 class="text-[#262626]  text-[22px] md:text-[30px] font-['Open Sans'] font-medium">Refund process</h2>
                     <div class="flex flex-col md:flex-row md:items-center gap-3 py-4">
                         <div class="flex items-start  md:flex-col gap-2">
-                        <i class="fa-solid fa-1 text-[35px] text-[#C2185B] leading-none"></i>    
+                        <i class="fa-solid fa-1 text-[35px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>    
                         <div class="flex flex-col gap-1">
                         <h2 class="text-[#262626]  text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Approval</h2>
                         <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
@@ -126,7 +126,7 @@ Once we receive and inspect the returned item, we will notify you about the appr
                         </div>
 
                         <div class="flex items-start  md:flex-col gap-2">
-                        <i class="fa-solid fa-2 text-[35px] text-[#C2185B] leading-none"></i>    
+                        <i class="fa-solid fa-2 text-[35px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>    
                         <div class="flex flex-col gap-1">
                         <h2 class="text-[#262626]  text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Processing Time</h2>
                         <p class="text-[#5B5B5B]  text-[15px] md:text-[16px] font-['Open Sans'] font-regular">

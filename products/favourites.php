@@ -105,7 +105,7 @@ require_once "../includes/auth/google.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
       
     <?php
      include(__DIR__ . '/../includes/header.php');
@@ -122,18 +122,18 @@ require_once "../includes/auth/google.php";
         </div>
 
 
-        <section class="w-full bg-[#FFFFFFF] py-1">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
             <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">My Favourites</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">My Favourites</span>
                 </div>
             </div>
         </section>
 
         <?php if (mysqli_num_rows($result) > 0): ?>
-        <div class="w-full bg-[#FFFFFF] py-5">
+        <div class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block">
 
 
@@ -212,7 +212,7 @@ require_once "../includes/auth/google.php";
 
                                 <?php if (array_key_exists($product['product_id'], $cart_items)): ?>
                                         <button 
-                                            class="cart-toggle-button py-1 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]"
+                                            class="cart-toggle-button py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]"
                                             data-product-id="<?php echo $product['product_id']; ?>"
                                             data-cart-id="<?php echo $cart_items[$product['product_id']]; ?>"
                                             data-in-cart="true">
@@ -220,7 +220,7 @@ require_once "../includes/auth/google.php";
                                         </button>
                                     <?php else: ?>
                                         <button 
-                                                                                       class="cart-toggle-button py-1 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]"
+                                                                                       class="cart-toggle-button py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]"
                                             data-product-id="<?php echo $product['product_id']; ?>"
                                             data-in-cart="false">
                                             Add to Cart
@@ -282,7 +282,7 @@ require_once "../includes/auth/google.php";
 
                                 </div>
 
-                                <button type="submit" class="w-[fit-content] rounded-[4px] py-1 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointerprounded-[8px]">Add to Cart</button>
+                                <button type="submit" class="w-[fit-content] rounded-[4px] py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointerprounded-[8px]">Add to Cart</button>
                             </div>
 
                             <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
@@ -319,7 +319,7 @@ require_once "../includes/auth/google.php";
 
                                 </div>
 
-                                <button type="submit" class="w-[fit-content] rounded-[4px] py-1 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointerprounded-[8px]">Add to Cart</button>
+                                <button type="submit" class="w-[fit-content] rounded-[4px] py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointerprounded-[8px]">Add to Cart</button>
                             </div>
 
                             <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
@@ -334,7 +334,7 @@ require_once "../includes/auth/google.php";
         </div>
         <?php else: ?> 
                 <div class="text-center py-16">
-                    <i class="fa-regular fa-heart text-[80px] text-[#D8C4CE] mx-auto leading-none" alt="No favorite"></i>
+                    <i class="fa-regular fa-heart text-[80px] text-[<?php echo store_color('color_tint'); ?>] mx-auto leading-none" alt="No favorite"></i>
                     <h3 class="mt-2 md:text-[20px]  font-medium text-gray-900 font-[Open Sans]">You have not add any item to favorite</h3>
            
                    

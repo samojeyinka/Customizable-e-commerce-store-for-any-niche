@@ -75,7 +75,7 @@ require_once "../google.php"
 
             <p id="passwordError" class='text-[14px] font-["Open Sans"] text-[#EE3F3F] font-regular underline cursor-pointer' style="display: none;"></p>
             
-            <button type="submit" class="w-full py-[10px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center hover:bg-[#C2185B]/90 transition-colors duration-300">
+            <button type="submit" class="w-full py-[10px] px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center hover:bg-[<?php echo store_color('color_primary'); ?>]/90 transition-colors duration-300">
                 Create an account
             </button>
         </form>
@@ -99,7 +99,7 @@ require_once "../google.php"
         <div class="text-center mt-6">
             <p class="text-[#7A7A7A] text-[14px]">
                 Already have an account? 
-                <a href="../login/signin.php" class="text-[#C2185B] font-medium hover:underline">Log in</a>
+                <a href="../login/signin.php" class="text-[<?php echo store_color('color_primary'); ?>] font-medium hover:underline">Log in</a>
             </p>
         </div>
     </div>

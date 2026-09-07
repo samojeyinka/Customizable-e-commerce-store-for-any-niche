@@ -21,6 +21,20 @@ $error_message = '';
 $order = null;
 $order_items = [];
 
+// Conversational categories with icons + guided prompt text
+$issue_categories = [
+    'Wrong Item Received'  => ['icon' => 'fa-box-open',    'prompt' => 'What did you receive instead of what you ordered? Mention the product name and how it differs from what you expected.'],
+    'Damaged Item'         => ['icon' => 'fa-cube',        'prompt' => 'How is the item damaged? Describe where and what the damage looks like (broken, torn, leaking, etc.) — a photo helps a lot.'],
+    'Missing Item'         => ['icon' => 'fa-box',         'prompt' => 'Which item(s) are missing from your order? Tell us what you expected to receive.'],
+    'Quality Issue'        => ['icon' => 'fa-circle-exclamation', 'prompt' => 'What\'s wrong with the quality? Describe the issue with the product\'s texture, scent, effectiveness, or packaging.'],
+    'Item Not As Described'=> ['icon' => 'fa-tags',        'prompt' => 'How does the item differ from the description? Mention any differences in size, color, shade, scent, or what\'s in the box.'],
+    'Delivery Problem'     => ['icon' => 'fa-truck',       'prompt' => 'What happened with delivery? Tell us about delays, wrong address, or anything that went wrong while your order was on the way.'],
+    'Other'                => ['icon' => 'fa-comment-dots','prompt' => 'Tell us what happened. Any details you can share help us resolve it faster.'],
+];
+
+// Default to the full set; filtered down below based on the order's delivery status.
+$available_categories = $issue_categories;
+
 // Validate parameters
 if (!$order_id) {
     $error_message = "Missing order ID.";
@@ -45,6 +59,15 @@ if (!$order_id) {
         $error_message = "Order not found or doesn't belong to you.";
     } else {
         $order = $result->fetch_assoc();
+
+        // Smart: only offer issue types relevant to the order's delivery status.
+        // Item-based issues (wrong/damaged/missing/quality/not-as-described) only make
+        // sense once the order has been delivered. Before that, delivery-type issues apply.
+        if ($order['order_status'] === 'Processing' || $order['order_status'] === 'Confirmed' || $order['order_status'] === 'Shipped') {
+            $available_categories = array_intersect_key($issue_categories, array_flip(['Delivery Problem', 'Other']));
+        } else {
+            $available_categories = $issue_categories;
+        }
         
         // Get order items
         $items_sql = "SELECT oi.*, 
@@ -165,7 +188,7 @@ function getStatusBadgeClass($status) {
         case 'Processing':
             return 'bg-[#E8B006]';
         case 'Shipped':
-            return 'bg-[#C2185B]';
+            return 'bg-[' . store_color('color_primary') . ']';
         case 'Delivered':
             return 'bg-[#39D959]';
         case 'Cancelled':
@@ -210,7 +233,7 @@ require_once "../includes/auth/google.php";
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./orders.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Report an Issue</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">Report an Issue</span>
                 </div>
             </div>
         </section>
@@ -224,14 +247,14 @@ require_once "../includes/auth/google.php";
                     <?php echo $error_message; ?>
                 </div>
                 <div class="flex justify-center mt-6">
-                    <a href="./orders.php" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
+                    <a href="./orders.php" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
                 </div>
                 <?php elseif (!empty($success_message)): ?>
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                     <?php echo $success_message; ?>
                 </div>
                 <div class="flex justify-center mt-6 space-x-4">
-                    <a href="./orders.php" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
+                    <a href="./orders.php" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
                     <a href="./track-order.php?id=<?php echo $order_id; ?>" class="py-2 px-4 bg-[#E8B006] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Track Order</a>
                 </div>
                 <?php elseif (!empty($order)): ?>
@@ -287,55 +310,113 @@ require_once "../includes/auth/google.php";
                     </div>
                 </div>
                 
-                <!-- Report Issue Form -->
+                <!-- Report Issue Form (conversational wizard) -->
                 <div class="border-[1px] border-[#E1E1E1] rounded-[8px] p-4 md:p-6">
-                    <h2 class="text-[18px] font-['Open Sans'] font-semibold mb-4">What issue are you experiencing?</h2>
-                    
-                    <form method="POST" enctype="multipart/form-data" class="space-y-4">
-                        <div>
-                            <label for="issue_type" class="block text-[14px] font-medium mb-2">Issue Type*</label>
-                            <select id="issue_type" name="issue_type" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2185B]" required>
-                                <option value="">Select an issue type</option>
-                                <option value="Wrong Item Received">Wrong Item Received</option>
-                                <option value="Damaged Item">Damaged Item</option>
-                                <option value="Missing Item">Missing Item</option>
-                                <option value="Quality Issue">Quality Issue</option>
-                                <option value="Item Not As Described">Item Not As Described</option>
-                                <option value="Delivery Problem">Delivery Problem</option>
-                                <option value="Other">Other</option>
-                            </select>
+                    <h2 class="text-[18px] font-['Open Sans'] font-semibold mb-1">Let's sort this out</h2>
+                    <p class="text-[13px] text-gray-500 mb-4">A few quick questions — this helps our team resolve your issue faster.</p>
+
+                    <!-- Stepper -->
+                    <div class="flex items-center gap-1 mb-6" id="wizardStepper">
+                        <?php
+                        $steps = [1 => 'What happened', 2 => 'Details', 3 => 'Photos', 4 => 'Confirm'];
+                        $i = 0;
+                        foreach ($steps as $num => $label): $i++; ?>
+                            <?php if ($num > 1): ?><div class="flex-1 h-[2px] bg-gray-200 rounded-full wizard-line" data-line="<?php echo $num; ?>"></div><?php endif; ?>
+                            <div class="flex flex-col items-center gap-1">
+                                <span class="w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-semibold transition-colors wizard-dot" data-step="<?php echo $num; ?>"><?php echo $num; ?></span>
+                                <span class="text-[11px] text-gray-400 font-['Open Sans'] hidden sm:inline wizard-label" data-step="<?php echo $num; ?>"><?php echo $label; ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data" id="issueWizardForm">
+                        <!-- Step 1: What happened -->
+                        <div class="wizard-step" data-step="1">
+                            <p class="text-[15px] font-['Open Sans'] font-medium text-gray-700 mb-3">What's the issue with this order?</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                <?php foreach ($available_categories as $cat => $meta): ?>
+                                <label class="issue-cat relative flex items-center gap-3 p-3 border-[1px] border-[#E1E1E1] rounded-[8px] cursor-pointer transition-colors hover:border-[<?php echo store_color('color_primary'); ?>]">
+                                    <input type="radio" name="issue_type" value="<?php echo htmlspecialchars($cat); ?>" class="hidden issue-cat-input" <?php echo $cat === 'Other' ? '' : ''; ?> required>
+                                    <span class="w-9 h-9 rounded-[8px] bg-[<?php echo store_color('color_tint'); ?>] flex items-center justify-center shrink-0"><i class="fa-solid <?php echo $meta['icon']; ?> text-[<?php echo store_color('color_primary'); ?>]"></i></span>
+                                    <span class="text-[14px] font-['Open Sans'] font-medium text-[#262626]"><?php echo htmlspecialchars($cat); ?></span>
+                                </label>
+                                <?php endforeach; ?>
+                            </div>
+                            <div class="flex items-center justify-between mt-5">
+                                <a href="./orders.php" class="py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[14px] font-['Open Sans'] rounded-[4px]">Cancel</a>
+                                <button type="button" class="wizard-next py-2 px-5 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[4px] font-['Open Sans'] text-[14px]">Continue</button>
+                            </div>
                         </div>
-                        
-                        <div>
-                            <label for="issue_description" class="block text-[14px] font-medium mb-2">Describe Your Issue*</label>
-                            <textarea 
-                                id="issue_description" 
-                                name="issue_description" 
-                                rows="5" 
-                                placeholder="Please provide details about your issue..."
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2185B]"
+
+                        <!-- Step 2: Details -->
+                        <div class="wizard-step hidden" data-step="2">
+                            <label for="issue_description" class="block text-[15px] font-['Open Sans'] font-medium text-gray-700 mb-2">Can you give us a bit more detail?</label>
+                            <div id="issuePrompt" class="mb-2 p-3 rounded-[8px] bg-[<?php echo store_color('color_tint'); ?>] border-l-4 border-[<?php echo store_color('color_primary'); ?>] text-[14px] text-gray-700"></div>
+                            <textarea
+                                id="issue_description"
+                                name="issue_description"
+                                rows="5"
+                                placeholder="Type your answer here..."
+                                class="w-full p-3 border-[1px] border-[#E1E1E1] rounded-[8px] focus:outline-none focus:ring-2 focus:ring-[<?php echo store_color('color_primary'); ?>]"
                                 required
                                 minlength="20"
                             ></textarea>
-                            <p class="text-xs text-gray-500 mt-1">Minimum 20 characters. Please include specific details to help us resolve your issue more efficiently.</p>
+                            <p class="text-xs text-gray-500 mt-1">Minimum 20 characters. The more detail you share, the faster we can help.</p>
+                            <div class="flex items-center justify-between mt-5">
+                                <button type="button" class="wizard-prev py-2 px-5 bg-[#F3F3F3] text-[#262626] rounded-[4px] font-['Open Sans'] text-[14px]">Back</button>
+                                <button type="button" class="wizard-next py-2 px-5 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[4px] font-['Open Sans'] text-[14px]">Continue</button>
+                            </div>
                         </div>
-                        
-                        <div>
-                            <label for="issue_images" class="block text-[14px] font-medium mb-2">Upload Images (Optional)</label>
-                            <input 
-                                type="file" 
-                                id="issue_images" 
-                                name="issue_images[]" 
-                                accept="image/*" 
-                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2185B]"
+
+                        <!-- Step 3: Photos -->
+                        <div class="wizard-step hidden" data-step="3">
+                            <label for="issue_images" class="block text-[15px] font-['Open Sans'] font-medium text-gray-700 mb-2">Care to add a photo? <span class="text-gray-400 font-normal">(optional)</span></label>
+                            <p class="text-[13px] text-gray-500 mb-3">A picture of the item or packaging can really speed things up.</p>
+                            <input
+                                type="file"
+                                id="issue_images"
+                                name="issue_images[]"
+                                accept="image/*"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[<?php echo store_color('color_primary'); ?>]"
                                 multiple
                             />
-                            <p class="text-xs text-gray-500 mt-1">You can upload up to 3 images to help us understand your issue (JPEG, PNG, max 5MB each)</p>
+                            <p class="text-xs text-gray-500 mt-1">You can upload up to 3 images (JPEG, PNG, max 5MB each).</p>
+                            <div class="flex items-center justify-between mt-5">
+                                <button type="button" class="wizard-prev py-2 px-5 bg-[#F3F3F3] text-[#262626] rounded-[4px] font-['Open Sans'] text-[14px]">Back</button>
+                                <button type="button" class="wizard-next py-2 px-5 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[4px] font-['Open Sans'] text-[14px]">Continue</button>
+                            </div>
                         </div>
-                        
-                        <div class="flex justify-end space-x-3 mt-6">
-                            <a href="./orders.php" class="py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[16px] font-['Open Sans'] rounded-[4px]">Cancel</a>
-                            <button type="submit" name="submit_issue" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Submit Report</button>
+
+                        <!-- Step 4: Confirm -->
+                        <div class="wizard-step hidden" data-step="4">
+                            <p class="text-[15px] font-['Open Sans'] font-medium text-gray-700 mb-3">Does this look right?</p>
+                            <div class="flex flex-col gap-3 bg-gray-50 rounded-[8px] p-4">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-tag text-[16px] text-[<?php echo store_color('color_primary'); ?>]"></i></span>
+                                    <div>
+                                        <p class="text-[12px] text-gray-400 font-['Open Sans']">Issue</p>
+                                        <p id="confirmType" class="text-[14px] font-['Open Sans'] font-medium text-[#262626]">—</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-comment text-[16px] text-[<?php echo store_color('color_primary'); ?>]"></i></span>
+                                    <div>
+                                        <p class="text-[12px] text-gray-400 font-['Open Sans']">What you told us</p>
+                                        <p id="confirmDesc" class="text-[14px] font-['Open Sans'] text-[#262626] whitespace-pre-line">—</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-image text-[16px] text-[<?php echo store_color('color_primary'); ?>]"></i></span>
+                                    <div>
+                                        <p class="text-[12px] text-gray-400 font-['Open Sans']">Photos attached</p>
+                                        <p id="confirmPhotos" class="text-[14px] font-['Open Sans'] text-[#262626]">None</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-5">
+                                <button type="button" class="wizard-prev py-2 px-5 bg-[#F3F3F3] text-[#262626] rounded-[4px] font-['Open Sans'] text-[14px]">Back</button>
+                                <button type="submit" name="submit_issue" class="py-2 px-5 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[4px] font-['Open Sans'] text-[14px]">Submit Report</button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -359,6 +440,96 @@ require_once "../includes/auth/google.php";
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // ---- Conversational wizard ----
+        const steps = document.querySelectorAll('.wizard-step');
+        const dots = document.querySelectorAll('.wizard-dot');
+        const labels = document.querySelectorAll('.wizard-label');
+        const lines = document.querySelectorAll('.wizard-line');
+        const primary = '<?php echo store_color('color_primary'); ?>';
+        const tint = '<?php echo store_color('color_tint'); ?>';
+        const promptEl = document.getElementById('issuePrompt');
+        const catInputs = document.querySelectorAll('.issue-cat-input');
+        const issueDesc = document.getElementById('issue_description');
+
+        const CATEGORIES = {
+            <?php foreach ($available_categories as $cat => $meta): ?>
+            "<?php echo addslashes($cat); ?>": "<?php echo addslashes($meta['prompt']); ?>",
+            <?php endforeach; ?>
+        };
+
+        // Pre-select "Other" is not needed; leave unselected.
+
+        catInputs.forEach(function(input) {
+            input.addEventListener('change', function() {
+                document.querySelectorAll('.issue-cat').forEach(function(l) {
+                    l.classList.remove('border-[#E8B006]', 'bg-[' + tint + ']');
+                    l.style.borderColor = '#E1E1E1';
+                });
+                const card = input.closest('.issue-cat');
+                card.style.borderColor = primary;
+                card.classList.add('bg-[' + tint + ']');
+                if (promptEl) {
+                    promptEl.textContent = CATEGORIES[input.value] || '';
+                }
+            });
+        });
+
+        function goTo(step) {
+            steps.forEach(function(s) {
+                s.classList.toggle('hidden', parseInt(s.getAttribute('data-step')) !== step);
+            });
+            dots.forEach(function(d) {
+                const n = parseInt(d.getAttribute('data-step'));
+                const done = n < step;
+                const active = n === step;
+                d.style.background = done || active ? primary : '#E8E8E8';
+                d.style.color = done || active ? '#fff' : '#9CA3AF';
+            });
+            labels.forEach(function(l) {
+                l.style.color = parseInt(l.getAttribute('data-step')) <= step ? '#374151' : '#9CA3AF';
+            });
+            lines.forEach(function(l) {
+                l.style.background = parseInt(l.getAttribute('data-line')) <= step ? primary : '#E8E8E8';
+            });
+        }
+
+        document.querySelectorAll('.wizard-next').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const current = btn.closest('.wizard-step');
+                const step = parseInt(current.getAttribute('data-step'));
+                if (step === 1) {
+                    const selected = document.querySelector('.issue-cat-input:checked');
+                    if (!selected) { alert('Please choose the type of issue first.'); return; }
+                }
+                if (step === 2) {
+                    if (!issueDesc || issueDesc.value.trim().length < 20) {
+                        alert('Please add a little more detail (at least 20 characters).');
+                        issueDesc && issueDesc.focus();
+                        return;
+                    }
+                }
+                goTo(step + 1);
+            });
+        });
+
+        document.querySelectorAll('.wizard-prev').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const step = parseInt(btn.closest('.wizard-step').getAttribute('data-step'));
+                goTo(step - 1);
+            });
+        });
+
+        // Fill confirmation summary when submitting
+        document.getElementById('issueWizardForm').addEventListener('submit', function() {
+            const type = document.querySelector('.issue-cat-input:checked');
+            document.getElementById('confirmType').textContent = type ? type.value : '—';
+            document.getElementById('confirmDesc').textContent = issueDesc ? issueDesc.value : '—';
+            const files = document.getElementById('issue_images').files;
+            document.getElementById('confirmPhotos').textContent = files.length > 0 ? files.length + (files.length === 1 ? ' photo' : ' photos') : 'None';
+        });
+
+        goTo(1);
+
         // Image file validation
         const fileInput = document.getElementById('issue_images');
         if (fileInput) {

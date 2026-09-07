@@ -40,7 +40,7 @@ $return_requests = $result->fetch_all(MYSQLI_ASSOC);
 // Status colors
 $status_colors = [
     'Processing' => 'bg-[#E8B006]',
-    'Received' => 'bg-[#C2185B]',    // Added Received status
+    'Received' => 'bg-[' . store_color('color_primary') . ']',    // Added Received status
     'Accepted' => 'bg-[#39D959]',
     'Rejected' => 'bg-red-500',
     'Completed' => 'bg-[#39D959]'
@@ -80,25 +80,25 @@ require_once "../includes/auth/google.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
     <?php
     include(__DIR__ . '/../includes/header.php');
     include(__DIR__ . '/../includes/options.php');
     ?>
 
-        <section class="w-full bg-[#FFFFFF] py-1">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
             <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./account.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Account</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">My Returns</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">My Returns</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto max-w-[1440px] bg-[#FFFFFF] py-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <div class="w-full md:w-[90%] lg:w-[80%] mx-auto">
                 <h1 class="text-[24px] md:text-[28px] text-[#2C2C2C] font-['Open Sans'] font-medium mb-6 text-center">My Return Requests</h1>
                 
@@ -107,7 +107,7 @@ require_once "../includes/auth/google.php";
 
                     <h3 class="text-[18px] font-['Open Sans'] font-medium text-[#262626] mb-2">No Return Requests Found</h3>
                     <p class="text-[14px] text-[#777777] font-['Open Sans'] mb-4">You haven't made any return requests yet.</p>
-                    <a href="./orders.php" class="py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">View My Orders</a>
+                    <a href="./orders.php" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">View My Orders</a>
                 </div>
                 <?php else: ?>
 
@@ -165,7 +165,7 @@ require_once "../includes/auth/google.php";
                                         <span class="inline-block py-1 px-3 <?php echo $status_color; ?> text-white text-[13px] font-['Open Sans'] rounded-[15px]"><?php echo $request['status']; ?></span>
                                         
                                         <?php if (!empty($request['admin_message'])): ?>
-                                        <button class="view-message-btn mt-2 text-[13px] text-[#C2185B] underline" data-message="<?php echo htmlspecialchars($request['admin_message']); ?>">View Message</button>
+                                        <button class="view-message-btn mt-2 text-[13px] text-[<?php echo store_color('color_primary'); ?>] underline" data-message="<?php echo htmlspecialchars($request['admin_message']); ?>">View Message</button>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -198,7 +198,7 @@ require_once "../includes/auth/google.php";
                         <p id="modalMessage" class="text-[14px] text-[#262626] font-['Open Sans']"></p>
                     </div>
                     <div class="flex justify-end pt-2">
-                        <button class="modal-close px-4 bg-[#C2185B] p-3 rounded-lg text-white hover:bg-blue-800">Close</button>
+                        <button class="modal-close px-4 bg-[<?php echo store_color('color_primary'); ?>] p-3 rounded-lg text-white hover:bg-blue-800">Close</button>
                     </div>
                 </div>
             </div>

@@ -31,7 +31,8 @@ if (!$order_id) {
 // Get the order details
 $sql = "SELECT o.id, o.order_total, o.delivery_method, o.pickup_location, 
                o.payment_reference, o.order_status, o.created_at, o.updated_at,
-               o.payment_transaction_id, o.delivery_email, o.order_note,o.status_notes
+               o.payment_transaction_id, o.delivery_email, o.order_note,o.status_notes,
+               o.delivery_confirmed_at
         FROM orders o
         WHERE o.id = ? AND o.user_id = ?";
 
@@ -47,6 +48,38 @@ if ($result->num_rows == 0) {
 }
 
 $order = $result->fetch_assoc();
+
+// Buyer delivery-confirmation handler
+$confirm_message = '';
+$confirm_error = '';
+$buyer_confirmed = !empty($order['delivery_confirmed_at']);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delivery'])) {
+    // Only allow confirmation when the order is delivered and not yet confirmed
+    if ($order['order_status'] === 'Delivered' && empty($order['delivery_confirmed_at'])) {
+        $now = date('Y-m-d H:i:s');
+        $stmt = $conn->prepare("UPDATE orders SET delivery_confirmed_at = ?, updated_at = ? WHERE id = ? AND user_id = ?");
+        $stmt->bind_param("ssii", $now, $now, $order_id, $user_id);
+        if ($stmt->execute() && $stmt->affected_rows > 0) {
+            $order['delivery_confirmed_at'] = $now;
+            $buyer_confirmed = true;
+            $confirm_message = "Thank you! You've confirmed you received this order.";
+            // Log buyer confirmation in history
+            $hist_status = $order['order_status'];
+            $hist_note = 'Order delivery confirmed by buyer';
+            $hist = $conn->prepare("INSERT INTO order_status_history (order_id, old_status, new_status, notes, changed_by, changed_at)
+                                    VALUES (?, ?, ?, ?, ?, NOW())");
+            $hist->bind_param("isssi", $order_id, $hist_status, $hist_status, $hist_note, $user_id);
+            $hist->execute();
+            $hist->close();
+        } else {
+            $confirm_error = "We couldn't confirm your delivery. Please try again.";
+        }
+        $stmt->close();
+    } else {
+        $confirm_error = "This order isn't eligible for delivery confirmation.";
+    }
+}
 
 // Function to get order items for a specific order
 function getOrderItems($conn, $order_id) {
@@ -110,7 +143,7 @@ $current_status = $order['order_status'];
 $status_colors = [
     'Processing' => 'bg-[#E8B006]',
     'Confirmed' => 'bg-[#1A7E79]',
-    'Shipped' => 'bg-[#C2185B]',
+    'Shipped' => 'bg-[' . store_color('color_primary') . ']',
     'Delivered' => 'bg-[#39D959]',
     'Cancelled' => 'bg-red-500',
     'Returned' => 'bg-[#9C27B0]'
@@ -159,26 +192,26 @@ require_once "../includes/auth/google.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
 
     <?php
     include(__DIR__ . '/../includes/header.php');
     include(__DIR__ . '/../includes/options.php');
     ?>
 
-        <section class="w-full bg-[#FFFFFFF] py-1">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
             <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
                     <a href="./orders.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Track Order</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">Track Order</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto max-w-[1440px] bg-[#FFFFFF] py-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <div class="w-full md:w-[80%] lg:w-[70%] mx-auto">
                 <h1 class="text-[24px] md:text-[28px] text-[#2C2C2C] font-['Open Sans'] font-medium mb-6 text-center">Track Your Order</h1>
                 
@@ -221,9 +254,9 @@ require_once "../includes/auth/google.php";
                     
                     <?php if (isset($order['order_note']) && !empty($order['status_notes'])): ?>
     <div class="mb-4 bg-blue-100 border-l-4 border-blue-700 p-3 rounded-lg flex items-start gap-2">
-        <i class="fa-solid fa-circle-info text-[24px] text-[#C2185B] leading-none" alt="Note Icon"></i> 
+        <i class="fa-solid fa-circle-info text-[24px] text-[<?php echo store_color('color_primary'); ?>] leading-none" alt="Note Icon"></i> 
         <div>
-            <p class="text-[14px] md:text-[16px] text-[#C2185B] font-['Open Sans'] font-semibold">Order Notes:</p>
+            <p class="text-[14px] md:text-[16px] text-[<?php echo store_color('color_primary'); ?>] font-['Open Sans'] font-semibold">Order Notes:</p>
             <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">
                 <?php echo $order['status_notes']; ?>
             </p>
@@ -245,7 +278,7 @@ require_once "../includes/auth/google.php";
                           
 <!-- Processing Status -->
                           <div class="status-item relative flex mb-12">
-                              <div class="status-icon w-[40px] h-[40px] rounded-full <?php echo ($current_status_index >= 0) ? 'bg-[#C2185B]' : 'bg-[#E1E1E1]'; ?> flex items-center justify-center z-10">
+                              <div class="status-icon w-[40px] h-[40px] rounded-full <?php echo ($current_status_index >= 0) ? 'bg-[' . store_color('color_primary') . ']' : 'bg-[#E1E1E1]'; ?> flex items-center justify-center z-10">
                                   <!-- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                       <path d="M9 16.2L4.8 12L3.4 13.4L9 19L21 7L19.6 5.6L9 16.2Z" fill="white"/>
                                   </svg> -->
@@ -260,7 +293,7 @@ require_once "../includes/auth/google.php";
                           <!-- Confirmed Status -->
                           <div class="status-item relative flex mb-12">
                               <div class="status-icon w-[40px] h-[40px] rounded-full 
-  <?php echo ($current_status_index >= 1) ? 'bg-[#C2185B]' : 'bg-[#E1E1E1]'; ?> 
+  <?php echo ($current_status_index >= 1) ? 'bg-[' . store_color('color_primary') . ']' : 'bg-[#E1E1E1]'; ?> 
   flex items-center justify-center z-10">
 
 <i class="fa-solid fa-circle-check <?php echo ($current_status_index >= 1) ? 'text-white' : 'text-[#C5C5C5]'; ?> text-[20px] leading-none" 
@@ -277,7 +310,7 @@ require_once "../includes/auth/google.php";
                           <!-- Shipped Status -->
                           <div class="status-item relative flex mb-12">
                           <div class="status-icon w-[40px] h-[40px] rounded-full 
-  <?php echo ($current_status_index >= 2) ? 'bg-[#C2185B]' : 'bg-[#E1E1E1]'; ?> 
+  <?php echo ($current_status_index >= 2) ? 'bg-[' . store_color('color_primary') . ']' : 'bg-[#E1E1E1]'; ?> 
   flex items-center justify-center z-10">
   
 <i class="fa-solid fa-truck-fast <?php echo ($current_status_index >= 2) ? 'text-white' : 'text-[#C5C5C5]'; ?> text-[20px] leading-none" 
@@ -301,7 +334,7 @@ require_once "../includes/auth/google.php";
 <!-- Delivered Status -->
                           <div class="status-item relative flex">
                           <div class="status-icon w-[40px] h-[40px] rounded-full 
-  <?php echo ($current_status_index >= 3) ? 'bg-[#C2185B]' : 'bg-[#E1E1E1]'; ?> 
+  <?php echo ($current_status_index >= 3) ? 'bg-[' . store_color('color_primary') . ']' : 'bg-[#E1E1E1]'; ?> 
   flex items-center justify-center z-10">
 
 <i class="fa-solid fa-box <?php echo ($current_status_index >= 3) ? 'text-white' : 'text-[#C5C5C5]'; ?> text-[20px] leading-none" 
@@ -311,6 +344,19 @@ require_once "../includes/auth/google.php";
                               <div class="status-content ml-4">
                                   <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Delivered</h4>
                                   <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $delivered_date; ?></p>
+                                  <?php if ($current_status === 'Delivered'): ?>
+                                      <?php if ($buyer_confirmed): ?>
+                                      <p class="mt-2 inline-flex items-center gap-1.5 text-[13px] font-['Open Sans'] text-[#2FA05A]">
+                                          <i class="fa-solid fa-circle-check"></i> Delivery confirmed by you on <?php echo formatDate($order['delivery_confirmed_at']); ?>
+                                      </p>
+                                      <?php else: ?>
+                                      <form method="POST" class="mt-2" onsubmit="return confirm('Have you received all the items in this order?');">
+                                          <button type="submit" name="confirm_delivery" value="1" class="inline-flex items-center gap-1.5 py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[13px] font-['Open Sans'] rounded-[6px] cursor-pointer">
+                                              <i class="fa-solid fa-hand-pointer"></i> I've Received My Order
+                                          </button>
+                                      </form>
+                                      <?php endif; ?>
+                                  <?php endif; ?>
                               </div>
                           </div>
                           
@@ -419,9 +465,9 @@ require_once "../includes/auth/google.php";
                     <?php if ($can_request_return): ?>
                     <div class="mt-2">
                         <?php if ($has_return_request): ?>
-                        <span class="text-[13px] text-[#C2185B] font-['Open Sans'] italic">Return request pending</span>
+                        <span class="text-[13px] text-[<?php echo store_color('color_primary'); ?>] font-['Open Sans'] italic">Return request pending</span>
                         <?php else: ?>
-                        <a href="./return-request.php?order_id=<?php echo $order_id; ?>&item_id=<?php echo $item['id']; ?>" class="inline-block py-1 px-3 bg-[#C2185B] text-white text-[13px] font-['Open Sans'] rounded-[4px]">Request Return</a>
+                        <a href="./return-request.php?order_id=<?php echo $order_id; ?>&item_id=<?php echo $item['id']; ?>" class="inline-block py-1 px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[13px] font-['Open Sans'] rounded-[4px]">Request Return</a>
                         <?php endif; ?>
                     </div>
                     <?php endif; ?>
@@ -445,11 +491,11 @@ require_once "../includes/auth/google.php";
                     <a href="./orders.php" class="py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
                     
                     <div class="flex items-center gap-3">
-                    <?php if ($current_status != 'Cancelled' && $current_status != 'Delivered'): ?>
+                    <?php if ($current_status != 'Cancelled'): ?>
                     <a href="./report-issue.php?id=<?php echo $order_id; ?>" class="w-full py-2 px-4 bg-[#E8B006] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px] text-nowrap">Report an Issue</a>
                     <?php endif; ?>
                     
-                    <a href="<?php echo product_url($order_items[0]); ?>" class="w-full py-2 px-4 bg-[#C2185B] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Re-Order</a>
+                    <a href="<?php echo product_url($order_items[0]); ?>" class="w-full py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Re-Order</a>
                     </div>
                 </div>
             </div>

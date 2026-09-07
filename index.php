@@ -25,8 +25,8 @@ require_once "./includes/auth/google.php";
 <head>
     <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
-    <title>GLOREFY</title>
+    <link rel="icon" type="image/png" href="<?php echo store_escape(store('favicon_url')); ?>">
+    <title><?php echo store_escape(store('store_name')); ?></title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
@@ -35,7 +35,7 @@ require_once "./includes/auth/google.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
             <!-- Add to Cart Toast Notification -->
 <div id="cart-toast" class="hidden fixed bottom-4 right-4 bg-green-600 text-white py-2 px-4 rounded-md shadow-lg z-50 transition-opacity duration-300">
     Item added to your cart!

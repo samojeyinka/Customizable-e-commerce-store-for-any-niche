@@ -12,7 +12,8 @@ if(isset($_GET['logout'])) {
 }
 ?> 
 
-<header class="w-full bg-[#F5EEF2] flex items-center justify-center p-3">
+<header class="w-full flex items-center justify-center p-3" style="background-color: var(--glor-tint, #F5EEF2)">
+    <?php echo store_theme_style(); ?>
 
 
     <!-- The nav and sidemenu -->

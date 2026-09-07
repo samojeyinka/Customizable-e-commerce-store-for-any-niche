@@ -22,6 +22,9 @@
             <a href="<?php echo DOMAIN; ?>/admin/dashboard/issues.php" class="nav-link" onclick="setActive(this)">
                 <i class="fa-solid fa-circle-exclamation"></i><span>Issues</span>
             </a>
+            <a href="<?php echo DOMAIN; ?>/admin/dashboard/store-config.php" class="nav-link" onclick="setActive(this)">
+                <i class="fa-solid fa-store"></i><span>Storefront</span>
+            </a>
         </div>
     </div>
 

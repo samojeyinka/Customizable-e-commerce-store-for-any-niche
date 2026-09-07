@@ -7,11 +7,11 @@ if (!function_exists('buildFilterUrl')) {
 
 function filter_facet_links($type, $options, $all_label = 'All')
 {
-    $html = '<a href="' . htmlspecialchars(buildFilterUrl($type, '')) . '" class="' . (isSelected($type, '') ? 'font-bold text-[#C2185B]' : '') . '">' . htmlspecialchars($all_label) . '</a>';
+    $html = '<a href="' . htmlspecialchars(buildFilterUrl($type, '')) . '" class="' . (isSelected($type, '') ? 'font-bold text-[' . store_color('color_primary') . ']' : '') . '">' . htmlspecialchars($all_label) . '</a>';
 
     foreach ($options as $opt) {
         $sel = isSelected($type, $opt['value']);
-        $html .= '<a href="' . htmlspecialchars(buildFilterUrl($type, $opt['value'])) . '" class="' . ($sel ? 'font-bold text-[#C2185B]' : '') . '">'
+        $html .= '<a href="' . htmlspecialchars(buildFilterUrl($type, $opt['value'])) . '" class="' . ($sel ? 'font-bold text-[' . store_color('color_primary') . ']' : '') . '">'
             . htmlspecialchars($opt['label'])
             . ' <span class="' . ($opt['count'] > 0 ? 'text-[#B8BBD7]' : 'text-[#D8D8D8]') . '">(' . (int)$opt['count'] . ')</span></a>';
     }
@@ -43,7 +43,7 @@ function filter_dropdown_active($type)
                 <div class="flex items-center gap-3">
                     <div class="flex flex-col gap-3 text-[13px] text-[#262626] cursor-pointer">
                         <?php foreach ($sort_options as $opt): ?>
-                        <a href="<?php echo htmlspecialchars(buildFilterUrl('sort', $opt['value'])); ?>" class="<?php echo isSelected('sort', $opt['value']) ? 'font-bold text-[#C2185B]' : ''; ?>"><?php echo $opt['label']; ?></a>
+                        <a href="<?php echo htmlspecialchars(buildFilterUrl('sort', $opt['value'])); ?>" class="<?php echo isSelected('sort', $opt['value']) ? 'font-bold text-[' . store_color('color_primary') . ']' : ''; ?>"><?php echo $opt['label']; ?></a>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -159,14 +159,14 @@ function filter_dropdown_active($type)
         <div class="flex flex-col gap-4">
             <!-- Sort By -->
             <div class="custom-dropdown w-full">
-                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('sort') ? ' border-[#C2185B]' : ''; ?>">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('sort') ? ' border-[' . store_color('color_primary') . ']' : ''; ?>">
                     <span class="text-[#262626] text-[14px] font-Onest font-regular"><?php echo sort_label(); ?></span>
                     <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
                 </div>
                 <div class="dropdown-content">
                     <div class="flex flex-col gap-2 p-2">
                         <?php foreach ($sort_options as $opt): ?>
-                        <a href="<?php echo htmlspecialchars(buildFilterUrl('sort', $opt['value'])); ?>" class="<?php echo isSelected('sort', $opt['value']) ? 'text-[#C2185B] font-medium' : ''; ?>"><?php echo $opt['label']; ?></a>
+                        <a href="<?php echo htmlspecialchars(buildFilterUrl('sort', $opt['value'])); ?>" class="<?php echo isSelected('sort', $opt['value']) ? 'text-[' . store_color('color_primary') . '] font-medium' : ''; ?>"><?php echo $opt['label']; ?></a>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -174,7 +174,7 @@ function filter_dropdown_active($type)
 
             <!-- Category -->
             <div class="custom-dropdown w-full">
-                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('category') ? ' border-[#C2185B]' : ''; ?>">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('category') ? ' border-[' . store_color('color_primary') . ']' : ''; ?>">
                     <span class="text-[#262626] text-[14px] font-Onest font-regular"><?php echo $category_label !== '' ? htmlspecialchars($category_label) : 'Category'; ?></span>
                     <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
                 </div>
@@ -187,7 +187,7 @@ function filter_dropdown_active($type)
 
             <!-- Brand -->
             <div class="custom-dropdown w-full">
-                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('brand') ? ' border-[#C2185B]' : ''; ?>">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('brand') ? ' border-[' . store_color('color_primary') . ']' : ''; ?>">
                     <span class="text-[#262626] text-[14px] font-Onest font-regular"><?php echo $brand_label !== '' ? htmlspecialchars($brand_label) : 'Brand'; ?></span>
                     <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
                 </div>
@@ -200,7 +200,7 @@ function filter_dropdown_active($type)
 
             <!-- Color -->
             <div class="custom-dropdown w-full">
-                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('color') ? ' border-[#C2185B]' : ''; ?>">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('color') ? ' border-[' . store_color('color_primary') . ']' : ''; ?>">
                     <span class="text-[#262626] text-[14px] font-Onest font-regular"><?php echo $color_filter !== '' ? ucfirst($color_filter) : 'Color'; ?></span>
                     <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
                 </div>
@@ -213,7 +213,7 @@ function filter_dropdown_active($type)
 
             <!-- Price Range -->
             <div class="custom-dropdown w-full">
-                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('price') ? ' border-[#C2185B]' : ''; ?>">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('price') ? ' border-[' . store_color('color_primary') . ']' : ''; ?>">
                     <span class="text-[#262626] text-[14px] font-Onest font-regular"><?php echo ($price_range !== '' && isset($price_ranges[$price_range])) ? $price_ranges[$price_range] : 'Amount'; ?></span>
                     <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
                 </div>
@@ -226,7 +226,7 @@ function filter_dropdown_active($type)
 
             <!-- Size -->
             <div class="custom-dropdown w-full">
-                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('size') ? ' border-[#C2185B]' : ''; ?>">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('size') ? ' border-[' . store_color('color_primary') . ']' : ''; ?>">
                     <span class="text-[#262626] text-[14px] font-Onest font-regular"><?php echo $size_filter !== '' ? htmlspecialchars($size_filter) : 'Size'; ?></span>
                     <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
                 </div>
@@ -239,7 +239,7 @@ function filter_dropdown_active($type)
 
             <!-- Texture -->
             <div class="custom-dropdown w-full">
-                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('texture') ? ' border-[#C2185B]' : ''; ?>">
+                <div class="w-full rounded-[4px] border-[1px] border-[#C5C5C5] flex items-center justify-between py-2 px-3 dropdown-toggle<?php echo filter_dropdown_active('texture') ? ' border-[' . store_color('color_primary') . ']' : ''; ?>">
                     <span class="text-[#262626] text-[14px] font-Onest font-regular"><?php echo $texture_filter !== '' ? ucfirst($texture_filter) : 'Texture'; ?></span>
                     <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none"></i>
                 </div>

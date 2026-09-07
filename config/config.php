@@ -121,3 +121,6 @@ function product_url($product) {
     }
     return DOMAIN . '/products/show.php?id=' . (int) $product['product_id'];
 }
+
+// Storefront configuration helpers (site_settings / store_reviews)
+require_once __DIR__ . '/../includes/store-config.php';

@@ -64,7 +64,7 @@ if(isset($_POST['login'])) {
                 } else {
                     // Store email in session for verification page
                     $_SESSION['email'] = $email;
-                    $error = "Please verify your account first. <a href='" . DOMAIN . "/includes/auth/verify.php' class='text-[#C2185B]'>Verify now</a>";
+                    $error = "Please verify your account first. <a href='" . DOMAIN . "/includes/auth/verify.php' class='text-[" . store_color('color_primary') . "]'>Verify now</a>";
                 }
             } else {
                 $error = "Invalid email or password";
@@ -97,7 +97,7 @@ require_once "../google.php";
     include(__DIR__ . '/../../options.php');
    ?>
 
-<div class="w-full bg-[#FEFEFE]">
+<div class="w-full bg-[<?php echo store_color('color_bg'); ?>]">
     <div class="md:w-[50%] mx-auto p-4 bg-white border border-[1px] border-[#EFEFEF] my-5 rounded-md">
         <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Welcome Back!</h3>
         
@@ -156,10 +156,10 @@ require_once "../google.php";
                     <input type="checkbox" name="remember" id="remember" class="w-4 h-4" />
                     <label for="remember" class="font-['Open Sans'] text-[14px] text-[#2C2C2C]">Remember me</label>
                 </div>
-                <a href="<?php echo DOMAIN; ?>/includes/auth/password-reset/mail.php" class="font-['Open Sans'] text-[14px] text-[#C2185B]">Forgot password?</a>
+                <a href="<?php echo DOMAIN; ?>/includes/auth/password-reset/mail.php" class="font-['Open Sans'] text-[14px] text-[<?php echo store_color('color_primary'); ?>]">Forgot password?</a>
             </div>
             
-            <button type="submit" name="login" value="1" class="w-full py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">
+            <button type="submit" name="login" value="1" class="w-full py-[8px] px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">
                 Sign In
             </button>
         </form>
@@ -176,7 +176,7 @@ require_once "../google.php";
         </a>
         
         <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#7A7A7A] mt-4">
-            Don't have an account? <a href="../create-account/sign-up.php" class="text-[#C2185B]">Create an account</a>
+            Don't have an account? <a href="../create-account/sign-up.php" class="text-[<?php echo store_color('color_primary'); ?>]">Create an account</a>
         </p>
     </div>
 </div>

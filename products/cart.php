@@ -160,18 +160,18 @@ require_once "../includes/auth/google.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
 
     <?php
     include(__DIR__ . '/../includes/header.php');
     include(__DIR__ . '/../includes/options.php');
         ?>
-        <section class="w-full bg-[#FFFFFFF] py-4">
+        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-4">
             <div class="w-[90%] mx-auto max-w-[1440px]">
                 <div class="flex items-center gap-1 cursor-pointer">
                     <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Cart</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">Cart</span>
                 </div>
             </div>
         </section>
@@ -192,13 +192,13 @@ require_once "../includes/auth/google.php";
         <?php if (empty($cart_items) && !$guest_cart): ?>
             <div class='py-4 text-center text-[#262626] font-medium font-[Open Sans]'>
                             <div>
-                            <i class="fa-regular fa-heart text-[80px] text-[#D8C4CE] mx-auto leading-none"></i>
+                            <i class="fa-regular fa-heart text-[80px] text-[<?php echo store_color('color_tint'); ?>] mx-auto leading-none"></i>
                            You have not added any items to cart yet.
                             </div>
                             </div>
         <?php else: ?>
 <!-- <h2 class="text-lg font-medium text-gray-900">Cart Items (<?php echo $total_items; ?>)</h2> -->
-        <div class="w-full bg-[#FFFFFF] py-5">
+        <div class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block">
 
 
@@ -223,7 +223,7 @@ require_once "../includes/auth/google.php";
                                                 class="h-full w-full object-cover object-center">
                                 </div>
                                 <div class="flex flex-col gap-[2px]">
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">    <a href="<?php echo product_url($item); ?>" class="hover:text-[#C2185B]">
+                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">    <a href="<?php echo product_url($item); ?>" class="hover:text-[<?php echo store_color('color_primary'); ?>]">
                                                             <?php echo htmlspecialchars($item['product_name']); ?>
                                                         </a></p>
                                                         <?php if (!empty($item['variant_id'])): ?>
@@ -255,7 +255,7 @@ require_once "../includes/auth/google.php";
                                                             <button type="button" class="quantity-btn px-2 py-1 text-gray-600 hover:text-gray-900" data-action="increase">+</button>
                                                         </div>
                                                         
-                                                        <button type="submit" class="ml-2 text-sm text-[#C2185B] hover:text-[#C2185B]/80">
+                                                        <button type="submit" class="ml-2 text-sm text-[<?php echo store_color('color_primary'); ?>] hover:text-[<?php echo store_color('color_primary'); ?>]/80">
                                                             Update
                                                         </button>
                                                     </form>
@@ -266,7 +266,7 @@ require_once "../includes/auth/google.php";
                           
                             <?php if (!empty($item['status'])): ?>
     <?php if ($item['status'] === 'available'): ?>
-        <button type="button" class="py-2 px-4 bg-[#D51E5E] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px]">In Stock</button>
+        <button type="button" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px]">In Stock</button>
     <?php elseif ($item['status'] === 'outOfStock'): ?>
         <button type="button" class="py-2 px-4 bg-black text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px]">Out of Stock</button>
     <?php elseif ($item['status'] === 'discontinued'): ?>
@@ -297,11 +297,11 @@ require_once "../includes/auth/google.php";
                 </table>
 
                 <?php if ($guest_cart): ?>
-                <a href="#" onclick="openAuthModal('SignIn'); return false;" class="flex items-center justify-center gap-2 mt-2 max-w-[377px] py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+                <a href="#" onclick="openAuthModal('SignIn'); return false;" class="flex items-center justify-center gap-2 mt-2 max-w-[377px] py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
                     <span>Sign in to Checkout</span>
                 </a>
                 <?php else: ?>
-                <a href="./checkout.php" class="flex items-center justify-center gap-2 mt-2 max-w-[377px] py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+                <a href="./checkout.php" class="flex items-center justify-center gap-2 mt-2 max-w-[377px] py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
                     <span>Continue to Checkout</span>
                     <i class="fa-solid fa-arrow-right text-[16px] text-[#262626] leading-none mt-[2px]"></i>
 </a>
@@ -317,7 +317,7 @@ require_once "../includes/auth/google.php";
                     <div class="flex flex-col gap-2">
                     <?php if (!empty($item['status'])): ?>
     <?php if ($item['status'] === 'available'): ?>
-        <button type="button" class="max-w-[87px] py-2 px-4 bg-[#D51E5E] text-white text-[13px] font-['Open Sans'] cursor-pointer rounded-[28px]">In Stock</button>
+        <button type="button" class="max-w-[87px] py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[13px] font-['Open Sans'] cursor-pointer rounded-[28px]">In Stock</button>
     <?php elseif ($item['status'] === 'outOfStock'): ?>
         <button type="button" class="max-w-[87px]  py-2 px-4 bg-black text-white text-[13px] font-['Open Sans'] cursor-pointer rounded-[28px]">Out of Stock</button>
     <?php elseif ($item['status'] === 'discontinued'): ?>
@@ -336,7 +336,7 @@ require_once "../includes/auth/google.php";
                                                 class="h-full w-full object-cover object-center">
                             </div>
                             <div class="flex flex-col gap-[2px]">
-                                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">  <a href="<?php echo product_url($item); ?>" class="hover:text-[#C2185B]">
+                                <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">  <a href="<?php echo product_url($item); ?>" class="hover:text-[<?php echo store_color('color_primary'); ?>]">
                                                             <?php echo htmlspecialchars($item['product_name']); ?>
                                                         </a></p>
 
@@ -379,7 +379,7 @@ require_once "../includes/auth/google.php";
                                                             <button type="button" class="quantity-btn px-2 py-1 text-gray-600 hover:text-gray-900" data-action="increase">+</button>
                                                         </div>
                                                         
-                                                        <button type="submit" class="ml-2 text-sm text-[#C2185B] hover:text-[#C2185B]/80">
+                                                        <button type="submit" class="ml-2 text-sm text-[<?php echo store_color('color_primary'); ?>] hover:text-[<?php echo store_color('color_primary'); ?>]/80">
                                                             Update
                                                         </button>
                                                     </form>
@@ -393,11 +393,11 @@ require_once "../includes/auth/google.php";
                     <?php endif; ?>
 
                     <?php if ($guest_cart): ?>
-                    <a href="#" onclick="openAuthModal('SignIn'); return false;" class="flex items-center justify-center gap-2 mt-2 w-full py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+                    <a href="#" onclick="openAuthModal('SignIn'); return false;" class="flex items-center justify-center gap-2 mt-2 w-full py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
                         <span>Sign in to Checkout</span>
                     </a>
                     <?php else: ?>
-                    <a href="./checkout.php" class="flex items-center justify-center gap-2 mt-2 w-full py-2 px-4 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
+                    <a href="./checkout.php" class="flex items-center justify-center gap-2 mt-2 w-full py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">
                     <span>Continue to Checkout</span>
                     <i class="fa-solid fa-arrow-right text-[16px] text-[#262626] leading-none mt-[2px]"></i>
                 </a>

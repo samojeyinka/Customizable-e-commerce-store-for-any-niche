@@ -24,8 +24,8 @@ if ($search !== '') {
 <head>
     <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
-    <title>GLOREFY</title>
+    <link rel="icon" type="image/png" href="<?php echo store_escape(store('favicon_url')); ?>">
+    <title><?php echo store_escape(store('store_name')); ?> | <?php echo htmlspecialchars($page_title); ?></title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,17 +57,17 @@ include(__DIR__ . '/../includes/options.php');
             <?php if ($category_id): ?>
                 <a href="<?php echo DOMAIN; ?>/products/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Products</a>
                 <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">
+                <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">
                     <?php echo htmlspecialchars($category_name); ?>
                     <?php if ($brand_id): ?>
                         <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                        <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">
+                        <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">
                             <?php echo htmlspecialchars(trim($brand_name, " -")); ?>
                         </span>
                     <?php endif; ?>
                 </span>
             <?php else: ?>
-                <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-medium">Products</span>
+                <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">Products</span>
             <?php endif; ?>
         </div>
     </div>
@@ -91,8 +91,8 @@ include(__DIR__ . '/../includes/options.php');
     <div class="w-[90%] mx-auto max-w-[1440px] mt-3">
         <?php foreach ($filter_notices as $notice): ?>
         <div class="flex items-center justify-between gap-3 border-[1px] border-[#EDC7D3] bg-[#FDF2F6] rounded-[6px] px-3 py-2 mb-2">
-            <span class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-regular"><?php echo htmlspecialchars($notice['message']); ?></span>
-            <a href="<?php echo htmlspecialchars($notice['url']); ?>" class="text-[#C2185B] text-[13px] md:text-[14px] font-Onest font-regular underline shrink-0">Remove</a>
+            <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-regular"><?php echo htmlspecialchars($notice['message']); ?></span>
+            <a href="<?php echo htmlspecialchars($notice['url']); ?>" class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-regular underline shrink-0">Remove</a>
         </div>
         <?php endforeach; ?>
     </div>
@@ -131,7 +131,7 @@ include(__DIR__ . '/../includes/options.php');
                             }
                             ?>
                         </p>
-                        <a href="<?php echo $base_filter_url; ?>" class="inline-block mt-5 bg-[#C2185B] text-white rounded-[28px] px-6 py-2 text-[14px] font-Onest font-medium cursor-pointer">
+                        <a href="<?php echo $base_filter_url; ?>" class="inline-block mt-5 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[28px] px-6 py-2 text-[14px] font-Onest font-medium cursor-pointer">
                             Clear all filters
                         </a>
                     </div>
@@ -174,7 +174,7 @@ include(__DIR__ . '/../includes/options.php');
 
             for ($i = $start_page; $i <= $end_page; $i++) {
                 if ($i == $current_page) {
-                    echo '<span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[#C2185B]">' . $i . '</span>';
+                    echo '<span class="text-[#FFFFFF] rounded-[50%] py-1 px-[10px] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer bg-[' . store_color('color_primary') . ']">' . $i . '</span>';
                 } else {
                     echo '<a href="' . htmlspecialchars(buildFilterUrl('page', $i)) . '" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-regular cursor-pointer">' . $i . '</a>';
                 }

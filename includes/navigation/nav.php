@@ -1,6 +1,6 @@
 <nav class="w-[90%] flex items-center justify-between">
     <a href="<?php echo DOMAIN; ?>/index.php" class="flex items-center gap-1 md:gap-2">
-        <img src="<?php echo DOMAIN; ?>/assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
+        <img src="<?php echo store_escape(store('logo_url')); ?>" alt="<?php echo store_escape(store('store_name')); ?>" class="w-[31.35px] md:w-[41.35px]" />
     </a>
     <?php
 // Hardcoded categories and brands data for direct implementation
@@ -39,12 +39,12 @@ $brands = [
             type="text" 
             id="searchInput" 
             data-glor-q
-            placeholder="Search skincare, makeup, beauty..." 
+            placeholder="<?php echo store_escape(store('search_placeholder')); ?>" 
             class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7] bg-transparent" 
             autocomplete="off"
         />
     </div>
-    <button type="submit" id="searchButton" data-glor-btn class="py-2 px-4 bg-[#C2185B] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
+    <button type="submit" id="searchButton" data-glor-btn class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
     
     <!-- Search Results Dropdown (content rendered by search.js) -->
     <div id="searchResults" data-glor-panel class="absolute top-full left-0 w-full bg-white shadow-md rounded-b-md z-50 mt-1 hidden"></div>
@@ -56,7 +56,7 @@ $brands = [
             <i class="fa-solid fa-bag-shopping text-[22px] md:text-[24px] text-[#262626] leading-none" alt="bag"></i>
             
             <div id="cart-badge" class="hidden absolute top-[-8px] right-[-8px] flex items-center justify-center">
-    <span id="cart-count" class="inline-flex items-center justify-center bg-[#C2185B] text-white text-[10px] font-['Open_Sans'] font-medium rounded-full w-[15px] h-[15px]">0</span>
+    <span id="cart-count" class="inline-flex items-center justify-center bg-[<?php echo store_color('color_primary'); ?>] text-white text-[10px] font-['Open_Sans'] font-medium rounded-full w-[15px] h-[15px]">0</span>
 </div>
         </a>
         <a href="<?php echo DOMAIN; ?>/products/favourites.php">

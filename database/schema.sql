@@ -289,3 +289,25 @@ CREATE TABLE IF NOT EXISTS `order_status_history` (
     FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE,
     INDEX `idx_order` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- Storefront configuration (multi-purpose store builder)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS `site_settings` (
+    `setting_key` VARCHAR(191) NOT NULL PRIMARY KEY,
+    `setting_value` LONGTEXT DEFAULT NULL,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `store_reviews` (
+    `review_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL,
+    `rating` TINYINT NOT NULL DEFAULT 5,
+    `text` TEXT DEFAULT NULL,
+    `row` TINYINT DEFAULT 0,
+    `sort_order` INT DEFAULT 0,
+    `active` TINYINT(1) DEFAULT 1,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX `idx_active` (`active`, `row`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

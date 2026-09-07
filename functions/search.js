@@ -25,7 +25,7 @@
         if (idx === -1) return escapeHtml(str);
         return (
             escapeHtml(str.slice(0, idx)) +
-            '<mark class="bg-transparent text-[#C2185B] font-medium">' +
+            '<mark class="bg-transparent glor-text font-medium">' +
             escapeHtml(str.slice(idx, idx + safe.length)) +
             '</mark>' +
             escapeHtml(str.slice(idx + safe.length))
@@ -69,7 +69,7 @@
         function setLoading() {
             panel.innerHTML =
                 '<div class="flex items-center gap-2 p-4" aria-live="polite">' +
-                '<span class="inline-block w-4 h-4 rounded-full border-2 border-[#C2185B] border-t-transparent animate-spin"></span>' +
+                '<span class="inline-block w-4 h-4 rounded-full border-2 glor-border border-t-transparent animate-spin"></span>' +
                 '<span class="text-[13px] text-[#777777] font-Onest font-regular">Searching\u2026</span>' +
                 '</div>';
             openPanel();
@@ -85,17 +85,17 @@
 
             if (hasProducts) {
                 html += '<div class="mb-4">' +
-                    '<h4 class="text-[#C2185B] font-medium text-[14px] mb-2 font-Onest">Products</h4>' +
+                    '<h4 class="glor-text font-medium text-[14px] mb-2 font-Onest">Products</h4>' +
                     '<div class="flex flex-col glor-product-list"></div></div>';
             }
             if (hasCategories) {
                 html += '<div class="mb-3">' +
-                    '<h4 class="text-[#C2185B] font-medium text-[14px] mb-1 font-Onest">Categories</h4>' +
+                    '<h4 class="glor-text font-medium text-[14px] mb-1 font-Onest">Categories</h4>' +
                     '<div class="flex flex-col glor-cat-list"></div></div>';
             }
             if (hasBrands) {
                 html += '<div class="mb-3">' +
-                    '<h4 class="text-[#C2185B] font-medium text-[14px] mb-1 font-Onest">Brands</h4>' +
+                    '<h4 class="glor-text font-medium text-[14px] mb-1 font-Onest">Brands</h4>' +
                     '<div class="flex flex-col glor-brand-list"></div></div>';
             }
             if (!hasAny) {
@@ -103,7 +103,7 @@
                     '<p class="text-[14px] text-[#777777] font-Onest font-regular">No results for &ldquo;' + escapeHtml(term) + '&rdquo;</p></div>';
             }
             html += '<div class="border-t-[1px] border-[#F0EDF2] pt-2">' +
-                '<a href="' + escapeHtml(domain + '/products/index.php?search=' + encodeURIComponent(term)) + '" class="glor-viewall flex items-center justify-between py-1 text-[13px] font-Onest font-medium text-[#262626] hover:text-[#C2185B] cursor-pointer">' +
+                '<a href="' + escapeHtml(domain + '/products/index.php?search=' + encodeURIComponent(term)) + '" class="glor-viewall flex items-center justify-between py-1 text-[13px] font-Onest font-medium text-[#262626] hover:glor-text cursor-pointer">' +
                 'See all results for &ldquo;' + escapeHtml(term) + '&rdquo;' +
                 '<i class="fa-solid fa-arrow-right text-[11px] leading-none"></i>' +
                 '</a></div>';
@@ -128,7 +128,7 @@
 
                         var el = document.createElement('a');
                         el.href = url;
-                        el.className = 'glor-item flex items-center gap-3 py-2 px-2 rounded-[6px] hover:bg-[#F5EEF2] cursor-pointer';
+                        el.className = 'glor-item flex items-center gap-3 py-2 px-2 rounded-[6px] hover:glor-tintbg cursor-pointer';
                         el.innerHTML =
                             '<img src="' + escapeHtml(img) + '" alt="" loading="lazy" class="w-10 h-10 object-cover rounded-[4px] shrink-0">' +
                             '<span class="flex-1 min-w-0">' +
@@ -148,7 +148,7 @@
                     data.categories.forEach(function (cat) {
                         var el = document.createElement('a');
                         el.href = domain + '/products/index.php?category=' + cat.category_id;
-                        el.className = 'glor-item block py-1.5 px-2 rounded-[4px] text-[13px] text-[#262626] hover:bg-[#F5EEF2] hover:text-[#C2185B] cursor-pointer';
+                        el.className = 'glor-item block py-1.5 px-2 rounded-[4px] text-[13px] text-[#262626] hover:glor-tintbg hover:glor-text cursor-pointer';
                         el.innerHTML = highlight(cat.category_label, term);
                         catList.appendChild(el);
                         items.push(el);
@@ -162,7 +162,7 @@
                     data.brands.forEach(function (brand) {
                         var el = document.createElement('a');
                         el.href = domain + '/products/index.php?brand=' + brand.brand_id;
-                        el.className = 'glor-item block py-1.5 px-2 rounded-[4px] text-[13px] text-[#262626] hover:bg-[#F5EEF2] hover:text-[#C2185B] cursor-pointer';
+                        el.className = 'glor-item block py-1.5 px-2 rounded-[4px] text-[13px] text-[#262626] hover:glor-tintbg hover:glor-text cursor-pointer';
                         el.innerHTML = highlight(brand.brand_label, term);
                         brandList.appendChild(el);
                         items.push(el);
@@ -227,9 +227,9 @@
         function highlightItem() {
             items.forEach(function (el, i) {
                 if (i === selIndex) {
-                    el.classList.add('bg-[#F5EEF2]');
+                    el.classList.add('glor-tintbg');
                 } else {
-                    el.classList.remove('bg-[#F5EEF2]');
+                    el.classList.remove('glor-tintbg');
                 }
             });
         }

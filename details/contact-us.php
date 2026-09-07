@@ -1,6 +1,14 @@
 <?php
 require_once __DIR__ . "/../config/config.php";
 
+$contact = store('contact');
+$cHeroImage = !empty($contact['hero_image']) ? $contact['hero_image'] : '';
+$cHeroHeading = !empty($contact['hero_heading']) ? $contact['hero_heading'] : 'Contact Us';
+$cPhone = !empty($contact['phone']) ? $contact['phone'] : '';
+$cEmail = !empty($contact['email']) ? $contact['email'] : '';
+$cAddress = !empty($contact['address']) ? $contact['address'] : '';
+$cMapUrl = !empty($contact['map_url']) ? $contact['map_url'] : '';
+$cFormSubject = !empty($contact['form_subject']) ? $contact['form_subject'] : 'Message from ' . store('store_name');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -8,8 +16,8 @@ require_once __DIR__ . "/../config/config.php";
 <head>
     <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
-    <title>GLOREFY | Contact Us</title>
+    <link rel="icon" type="image/png" href="<?php echo store_escape(store('favicon_url')); ?>">
+    <title><?php echo store_escape(store('store_name')) . ' | ' . store_escape($cHeroHeading); ?></title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,41 +26,41 @@ require_once __DIR__ . "/../config/config.php";
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
     <?php
       include('../includes/header.php');
       include('../includes/options.php');
       ?>
-        <div class="details-sec contactus flex items-center justify-center">
-            <h3 class="text-white text-center text-[30px] md:text-[60px] font-['Open Sans'] font-medium text-center">Contact Us</h3>
+        <div class="details-sec contactus flex items-center justify-center" style="background-image:url('<?php echo store_escape($cHeroImage); ?>')">
+            <h3 class="text-white text-center text-[30px] md:text-[60px] font-['Open Sans'] font-medium text-center"><?php echo store_escape($cHeroHeading); ?></h3>
         </div>
 
         <div class="w-[90%] flex flex-col md:flex-row justify-between gap-6 mx-auto pt-[4rem] pb-5">
             <div class="w-full md:w-[50%]">
-                <h3 class="text-[#C2185B] text-[25px] md:text-[32px] font-['Open Sans'] font-medium">Get in touch</h3>
+                <h3 class="text-[<?php echo store_color('color_primary'); ?>] text-[25px] md:text-[32px] font-['Open Sans'] font-medium">Get in touch</h3>
 
                 <div class="flex flex-col gap-4 pt-[1.5rem]">
                     <div class="w-full md:w-[70%] p-2 flex items-start gap-3 rounded-[4px] border-[1px] border-[#E6E6E6]">
-                        <i class="fa-solid fa-phone text-[35px] text-[#C2185B] leading-none"></i>
+                        <i class="fa-solid fa-phone text-[35px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>
                         <div class="flex flex-col gap-1">
                             <p class="text-[#262626] text-[18px] md:text-[20px] font-['Open Sans'] font-medium">Contact number</p>
-                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">+1 (212) 555-0147</p>
+                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular"><?php echo store_escape($cPhone); ?></p>
                         </div>
                     </div>
 
                     <div class="w-full md:w-[70%] p-2 flex items-start gap-3 rounded-[4px] border-[1px] border-[#E6E6E6]">
-                        <i class="fa-solid fa-envelope text-[35px] text-[#C2185B] leading-none"></i>
+                        <i class="fa-solid fa-envelope text-[35px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>
                         <div class="flex flex-col gap-1">
                             <p class="text-[#262626] text-[18px] md:text-[20px] font-['Open Sans'] font-medium">Email</p>
-                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">support@glorefy.com</p>
+                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular"><?php echo store_escape($cEmail); ?></p>
                         </div>
                     </div>
 
                     <div class="w-full md:w-[70%] p-2 flex items-start gap-3 rounded-[4px] border-[1px] border-[#E6E6E6]">
-                        <i class="fa-solid fa-location-dot text-[35px] text-[#C2185B] leading-none"></i>
+                        <i class="fa-solid fa-location-dot text-[35px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>
                         <div class="flex flex-col gap-1">
                             <p class="text-[#262626] text-[18px] md:text-[20px] font-['Open Sans'] font-medium">Location</p>
-                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">245 Fifth Avenue, Suite 1203, New York, NY 10016</p>
+                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular"><?php echo store_escape($cAddress); ?></p>
                         </div>
                     </div>
                 </div>
@@ -120,9 +128,9 @@ require_once __DIR__ . "/../config/config.php";
                         </div>
 
                         <!-- Hidden field for subject -->
-                        <input type="hidden" name="subject" value="Message from GLOREFY">
+                        <input type="hidden" name="subject" value="<?php echo store_escape($cFormSubject); ?>">
 
-                        <button type="submit" name="send" class="w-[30%] py-[8px] px-3 bg-[#C2185B] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] mt-4" id="submitBtn">Submit</button>
+                        <button type="submit" name="send" class="w-[30%] py-[8px] px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] mt-4" id="submitBtn">Submit</button>
                         
                         <?php if(isset($_SESSION['contact_status'])): ?>
                             <div class="mt-4 py-2 px-4 rounded <?php echo $_SESSION['contact_status'] == 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'; ?>">
@@ -138,7 +146,7 @@ require_once __DIR__ . "/../config/config.php";
         <div class="w-[90%] mx-auto max-w-[1440px] my-10">
             <!-- Dynamic Google Maps embed -->
             <iframe 
-                src="https://maps.google.com/maps?q=245%20Fifth%20Avenue%2C%20New%20York%2C%20NY%2010016&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                src="<?php echo store_escape($cMapUrl); ?>" 
                 width="100%" 
                 height="450" 
                 style="border:0;" 

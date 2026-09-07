@@ -133,7 +133,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
 
             <button
                 type="submit"
-                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer">
+                class="text-center mx-auto w-full text-[18px] font-regular font-Satoshi py-2 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] mt-10 cursor-pointer">
                 Continue
             </button>
         </form>

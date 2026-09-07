@@ -58,7 +58,8 @@ if (!defined('ABSPATH') && !function_exists('glorefy_tailwind_components_guard')
         @apply w-[16px] h-[16px] bg-white rounded-full mx-[5px] cursor-pointer;
     }
     .indicators .active {
-        @apply w-[61px] h-[12px] bg-[#C2185B] rounded-[12px];
+        @apply w-[61px] h-[12px] rounded-[12px];
+        background-color: var(--glor-primary, #C2185B);
     }
 
     /* ===== Navigation / sidemenu ===== */
@@ -97,7 +98,7 @@ if (!defined('ABSPATH') && !function_exists('glorefy_tailwind_components_guard')
         transition: color 0.2s ease;
     }
     .dropdown-content a:hover {
-        color: #C2185B;
+        color: var(--glor-primary, #C2185B);
     }
     .mobileOnlySearchResults {
         z-index: 100;
@@ -165,10 +166,10 @@ if (!defined('ABSPATH') && !function_exists('glorefy_tailwind_components_guard')
         @apply block py-[4px] transition-all duration-200;
     }
     .filter-menu a:hover {
-        color: #C2185B;
+        color: var(--glor-primary, #C2185B);
     }
     .has-filter .filter-toggle {
-        border-color: #C2185B;
+        border-color: var(--glor-primary, #C2185B);
     }
 
     /* ===== Modals ===== */
@@ -229,7 +230,8 @@ if (!defined('ABSPATH') && !function_exists('glorefy_tailwind_components_guard')
         @apply cursor-pointer;
     }
     .tab button.active {
-        @apply text-[#C2185B] underline;
+        @apply underline;
+        color: var(--glor-primary, #C2185B);
     }
     .tabcontent {
         @apply pt-[1.5rem] hidden;
@@ -324,7 +326,7 @@ if (!defined('ABSPATH') && !function_exists('glorefy_tailwind_components_guard')
         height: calc(100% - 40px);
     }
     .status-line-active {
-        @apply bg-[#C2185B];
+        background-color: var(--glor-primary, #C2185B);
     }
     .status-cancelled .status-icon {
         @apply bg-[#E1E1E1];

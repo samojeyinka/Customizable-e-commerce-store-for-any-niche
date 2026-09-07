@@ -55,7 +55,7 @@ if(isset($_SESSION['user_new_password'])) {
             You have successfully reset your password
         </p>
 
-        <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[#C2185B] text-white rounded-[8px] mt-10 cursor-pointer"
+        <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-center w-full text-[16px] font-regular font-Satoshi py-2 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] mt-10 cursor-pointer"
             id="closeprsucces">
             Sign In
         </a>
