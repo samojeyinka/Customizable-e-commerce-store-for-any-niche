@@ -344,7 +344,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
             <div class="flex items-center gap-5 md:gap-8 lg:gap-10">
                 <a href="./index.php" class="flex items-center gap-1 md:gap-2">
-                    <img src="../assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
+                    <img src="<?php echo store_escape(store('logo_url')); ?>" alt="<?php echo store_escape(store('store_name')); ?>" class="w-[31.35px] md:w-[41.35px]" />
                 </a>
 
                 <i class="fa-solid fa-bars text-[24px] cursor-pointer" onclick="toggleNav()" alt="Search"></i>

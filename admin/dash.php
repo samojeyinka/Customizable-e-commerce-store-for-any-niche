@@ -54,7 +54,7 @@ $admin = $result->fetch_assoc();
 
     <div class="sidebar" id="sidebar">
         <div class="flex items-center justify-center py-5 border-b border-white/10">
-            <img src="<?php echo DOMAIN; ?>/assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
+            <img src="<?php echo store_escape(store('logo_url')); ?>" alt="<?php echo store_escape(store('store_name')); ?>" class="w-[31.35px] md:w-[41.35px]" />
         </div>
         
         <ul class="sidebar-menu mt-5">

@@ -8,7 +8,6 @@
             <table cols="" class="w-full shrink-0">
                 <thead class="w-full bg-[#E7E7E7] text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
                     <th class="text-nowrap p-2 flex items-center gap-2">
-                        <input type="checkbox" />
                         <span class="text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Tag</span>
                     </th>
                     <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Logo</th>
@@ -44,7 +43,6 @@
                             ?>
                             <tr>
                                 <td class="flex items-center gap-[10px] p-3">
-                                    <input type="checkbox" class="border-[#E1E1E1]" />
                                     <div class="flex flex-col gap-[4px]">
                                         <span class="text-[#262626] text-[13px] md:text-[14px] font-regular font-['Open Sans']"><?php echo $brand_title; ?></span>
                                     </div>

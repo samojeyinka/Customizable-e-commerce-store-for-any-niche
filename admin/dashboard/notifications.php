@@ -298,7 +298,7 @@ if ($type_result) {
             </div>
 
             <!-- Activity Feed Section -->
-            <div class="tab-content">
+            <div class="tab-content active">
                 <div class="space-y-2">
                     <div class="flex flex-col gap-2">
                         <?php if (empty($notifications)): ?>
@@ -315,41 +315,6 @@ if ($type_result) {
                                                 echo $created_at->format('M d, Y h:i A'); 
                                                 ?>
                                             </span>
-                                            <i class="fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer" onclick="openNotimenu(this)"></i>
-                                            <!-- The dropdown menu -->
-                                            <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-                                                <div class="flex flex-col gap-3">
-                                                <?php if ($notification['type'] === 'order' && !empty($notification['reference_id'])): ?>
-    <a href="./order-details.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-<?php elseif ($notification['type'] === 'return' && !empty($notification['reference_id'])): ?>
-    <a href="./admin-view-return.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-<?php elseif ($notification['type'] === 'issue' && !empty($notification['reference_id'])): ?>
-    <a href="./issues.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-<?php elseif ($notification['type'] === 'review' && !empty($notification['reference_id'])): ?>
-    <a href="./reviews.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-<?php else: ?>
-    <a href="#" class="text-[16px] font-medium text-[#262626]">View Details</a>
-<?php endif; ?>
-                                                    
-                                                    <?php if ($notification['is_read']): ?>
-                                                        <a href="?notification_action=unread&notification_id=<?php echo $notification['notification_id']; ?>&<?php echo http_build_query(array_filter([
-                                                            'tab' => $current_tab !== 'all' ? $current_tab : null,
-                                                            'search' => !empty($search_query) ? $search_query : null,
-                                                            'status' => $status_filter !== 'all' ? $status_filter : null,
-                                                            'date' => $date_filter !== 'all' ? $date_filter : null,
-                                                            'page' => $page > 1 ? $page : null
-                                                        ])); ?>" class="text-[16px] font-medium text-[#E8B006]">Mark as unread</a>
-                                                    <?php else: ?>
-                                                        <a href="?notification_action=read&notification_id=<?php echo $notification['notification_id']; ?>&<?php echo http_build_query(array_filter([
-                                                            'tab' => $current_tab !== 'all' ? $current_tab : null,
-                                                            'search' => !empty($search_query) ? $search_query : null,
-                                                            'status' => $status_filter !== 'all' ? $status_filter : null,
-                                                            'date' => $date_filter !== 'all' ? $date_filter : null,
-                                                            'page' => $page > 1 ? $page : null
-                                                        ])); ?>" class="text-[16px] font-medium text-[#E8B006]">Mark as read</a>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                     <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]">

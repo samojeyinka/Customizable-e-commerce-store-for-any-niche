@@ -16,7 +16,7 @@
             <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">SETUP ACCOUNT</h3>
 
             <div class="flex items-center gap-1 md:gap-2">
-                <img src="./assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
+                <img src="<?php echo (function_exists('store') ? store_escape(store('logo_url')) : './assets/global/logo.png'); ?>" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
             </div>
         </div>
         

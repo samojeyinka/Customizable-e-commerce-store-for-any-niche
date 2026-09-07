@@ -59,6 +59,7 @@ $stmt = mysqli_prepare($con, $query);
 mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
+$favorite_products = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 // Get the user's cart count
 $cart_count = 0;
@@ -132,7 +133,7 @@ require_once "../includes/auth/google.php";
             </div>
         </section>
 
-        <?php if (mysqli_num_rows($result) > 0): ?>
+        <?php if (count($favorite_products) > 0): ?>
         <div class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block">
 
@@ -148,8 +149,8 @@ require_once "../includes/auth/google.php";
                     </thead>
 
                     <tbody class="">
-                    <?php while ($product = mysqli_fetch_assoc($result)): ?>
-                        <tr data-favorite-id="<?php echo $product['favorite_id']; ?>" data-product-id="<?php echo $product['product_id']; ?>">
+                    <?php foreach ($favorite_products as $product): ?>
+                        <tr class="favorite-item" data-favorite-id="<?php echo $product['favorite_id']; ?>" data-product-id="<?php echo $product['product_id']; ?>">
                             <td class="py-3 flex gap-2">
 
                                 <div class="w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden">
@@ -234,13 +235,13 @@ require_once "../includes/auth/google.php";
                                     class="remove-favorite-btn text-[15px] md:text-[16px] font-['Open Sans] text-[#EE3F3F] font-regular underline cursor-pointer"
                                     data-favorite-id="<?php echo $product['favorite_id']; ?>"
                                     data-product-id="<?php echo $product['product_id']; ?>">
-                                 Remove from cart
+                                 Remove from favorite
                                 </button>
 
                             </td>
 
                         </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                      
 
                     </tbody>
@@ -254,13 +255,12 @@ require_once "../includes/auth/google.php";
 
             <div class="w-[90%] mx-auto max-w-[1440px]  md:hidden">
                 <div class="w-full flex flex-col gap-4">
-
-                    <div class="border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2">
-
+                    <?php foreach ($favorite_products as $product): ?>
+                    <div class="favorite-item border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2" data-favorite-id="<?php echo $product['favorite_id']; ?>" data-product-id="<?php echo $product['product_id']; ?>">
 
                         <div class="flex items-center justify-between">
-                            <button type="submit" class="max-w-[87px] py-[6px] px-3 bg-[#39D959] text-white text-[14px] font-['Open Sans'] cursor-pointer rounded-[28px]">In Stock</button>
-                            <p class='text-[14px] font-["Open Sans] text-[#EE3F3F] font-regular underline cursor-pointer'>Remove from favorite</p>
+                            <button type="submit" class="max-w-[87px] py-[6px] px-3 <?php echo $product['first_quantity'] > 0 ? 'bg-[#39D959]' : 'bg-[#262626]'; ?> text-white text-[14px] font-['Open Sans'] cursor-pointer rounded-[28px]"><?php echo $product['first_quantity'] > 0 ? 'In Stock' : 'Out of Stock'; ?></button>
+                            <button class="remove-favorite-btn text-[14px] font-['Open Sans'] text-[#EE3F3F] font-regular underline cursor-pointer" data-favorite-id="<?php echo $product['favorite_id']; ?>" data-product-id="<?php echo $product['product_id']; ?>">Remove from favorite</button>
                         </div>
 
                         <div class="w-full h-[1px] bg-[#E1E1E1]"></div>
@@ -271,63 +271,40 @@ require_once "../includes/auth/google.php";
                                 <div class="flex gap-2">
 
                                     <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
-                                        <img src="../assets/products/img1.svg" class="w-full h-full object-cover" />
+                                        <img src="<?php echo !empty($product['main_image']) ? DOMAIN . '/assets/products/' . $product['main_image'] : DOMAIN . '/assets/products/default.svg'; ?>" class="w-full h-full object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
                                     </div>
                                     <div class="flex flex-col gap-[2px]">
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Dewy Glow Serum</p>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> Blue</p>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> King size (6 a 4 in)</p>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Quantity:</b>1</p>
+                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> <?php echo htmlspecialchars($product['product_name']); ?></p>
+                                        <?php $firstColor = trim(explode(',', $product['colors'])[0]); ?>
+                                        <?php if (!empty($firstColor)): ?>
+                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> <?php echo htmlspecialchars($firstColor); ?></p>
+                                        <?php endif; ?>
+                                        <?php if (!empty($product['first_size'])): ?>
+                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> <?php echo htmlspecialchars($product['first_size']); ?></p>
+                                        <?php endif; ?>
+                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Quantity:</b> 1</p>
                                     </div>
 
                                 </div>
 
-                                <button type="submit" class="w-[fit-content] rounded-[4px] py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointerprounded-[8px]">Add to Cart</button>
+                                <?php if (array_key_exists($product['product_id'], $cart_items)): ?>
+                                <button class="cart-toggle-button w-[fit-content] rounded-[4px] py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer" data-product-id="<?php echo $product['product_id']; ?>" data-cart-id="<?php echo $cart_items[$product['product_id']]; ?>" data-in-cart="true">Added to Cart</button>
+                                <?php else: ?>
+                                <button class="cart-toggle-button w-[fit-content] rounded-[4px] py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer" data-product-id="<?php echo $product['product_id']; ?>" data-in-cart="false">Add to Cart</button>
+                                <?php endif; ?>
                             </div>
 
-                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
+                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">
+                                <?php if (!empty($product['min_discount_price'])): ?>
+                                    ₦<?php echo number_format((float)$product['min_discount_price']); ?>
+                                <?php else: ?>
+                                    ₦<?php echo number_format((float)$product['min_price']); ?>
+                                <?php endif; ?>
+                            </p>
                         </div>
-
-
 
                     </div>
-
-                    <div class="border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2">
-
-
-                        <div class="flex items-center justify-between">
-                            <button type="submit" class="min-w-[87px] py-[6px] px-3 bg-[#262626] text-white text-[14px] font-['Open Sans'] cursor-pointer rounded-[28px]">Out of Stock</button>
-                            <p class='text-[14px] font-["Open Sans] text-[#EE3F3F] font-regular underline cursor-pointer'>Remove from favorite</p>
-                        </div>
-
-                        <div class="w-full h-[1px] bg-[#E1E1E1]"></div>
-
-                        <div class="flex justify-between">
-                            <div class="flex flex-col gap-2">
-
-                                <div class="flex gap-2">
-
-                                    <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
-                                        <img src="../assets/products/img1.svg" class="w-full h-full object-cover" />
-                                    </div>
-                                    <div class="flex flex-col gap-[2px]">
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> Dewy Glow Serum</p>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> Blue</p>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> King size (6 a 4 in)</p>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Quantity:</b>1</p>
-                                    </div>
-
-                                </div>
-
-                                <button type="submit" class="w-[fit-content] rounded-[4px] py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointerprounded-[8px]">Add to Cart</button>
-                            </div>
-
-                            <p class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular">₦300,000</p>
-                        </div>
-
-
-
-                    </div>
+                    <?php endforeach; ?>
 
                 </div>
             </div>
@@ -359,7 +336,7 @@ include(__DIR__ . '/../includes/footer.php');
             button.addEventListener('click', function() {
                 const favoriteId = this.getAttribute('data-favorite-id');
                 const productId = this.getAttribute('data-product-id');
-                const favoriteItem = document.querySelector(`.favorite-item[data-favorite-id="${favoriteId}"]`);
+                const favoriteItems = document.querySelectorAll(`.favorite-item[data-favorite-id="${favoriteId}"]`);
                 
                 // Send AJAX request to remove from favorites
                 const formData = new FormData();
@@ -373,13 +350,15 @@ include(__DIR__ . '/../includes/footer.php');
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Remove item from DOM with animation
-                        favoriteItem.style.transition = 'all 0.3s ease';
-                        favoriteItem.style.opacity = '0';
-                        favoriteItem.style.transform = 'scale(0.9)';
+                        // Remove item(s) from DOM with animation
+                        favoriteItems.forEach(item => {
+                            item.style.transition = 'all 0.3s ease';
+                            item.style.opacity = '0';
+                            item.style.transform = 'scale(0.9)';
+                        });
                         
                         setTimeout(() => {
-                            favoriteItem.remove();
+                            favoriteItems.forEach(item => item.remove());
                             
                             // Check if there are no more favorites
                             if (document.querySelectorAll('.favorite-item').length === 0) {

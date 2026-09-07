@@ -95,14 +95,14 @@ $page_title = $page_titles[$page_basename] ?? 'Dashboard';
 
         <div class="flex items-center gap-4 md:gap-6">
             <a href="./overview.php" class="flex items-center">
-                <img src="../assets/global/logo.png" alt="GLOREFY" class="w-[32px] md:w-[40px]" />
+                <img src="<?php echo store_escape(store('logo_url')); ?>" alt="<?php echo store_escape(store('store_name')); ?>" class="w-[32px] md:w-[40px]" />
             </a>
 
             <i class="fa-solid fa-bars text-[22px] text-[#4B5563] cursor-pointer lg:hidden" onclick="toggleNav()"></i>
             <h1 class="hidden lg:block text-[18px] md:text-[20px] font-Onest font-semibold text-[#111827]"><?php echo htmlspecialchars($page_title); ?></h1>
         </div>
 
-        <div class="hidden md:flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 w-[220px] lg:w-[320px] focus-within:border-[#C2185B] focus-within:ring-2 focus-within:ring-[#C2185B]/10 transition-all">
+        <div class="hidden md:flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 w-[220px] lg:w-[320px] focus-within:border-[<?php echo store_color('color_primary'); ?>] focus-within:ring-2 focus-within:ring-[<?php echo store_color('color_primary'); ?>]/10 transition-all">
             <i class="fa-solid fa-magnifying-glass text-[15px] text-gray-400"></i>
             <input type="text" placeholder="Search orders, users, products..." class="bg-transparent text-[14px] font-['Open Sans'] border-none outline-none placeholder:text-gray-400 flex-1" />
         </div>
@@ -112,7 +112,7 @@ $page_title = $page_titles[$page_basename] ?? 'Dashboard';
                 <button onclick="openNotification()" class="relative w-[40px] h-[40px] rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-colors cursor-pointer">
                     <i class="fa-regular fa-bell text-[18px] text-[#4B5563]"></i>
                     <?php if ($unread_count > 0): ?>
-                    <span class="absolute -top-[2px] -right-[2px] min-w-[18px] h-[18px] px-1 rounded-full bg-[#C2185B] text-white text-[10px] font-bold flex items-center justify-center">
+                    <span class="absolute -top-[2px] -right-[2px] min-w-[18px] h-[18px] px-1 rounded-full bg-[<?php echo store_color('color_primary'); ?>] text-white text-[10px] font-bold flex items-center justify-center">
                         <?php echo $unread_count > 99 ? '99+' : $unread_count; ?>
                     </span>
                     <?php endif; ?>
@@ -124,14 +124,14 @@ $page_title = $page_titles[$page_basename] ?? 'Dashboard';
                         <div class="flex items-center gap-2">
                             <h1 class="text-[16px] font-['Open Sans'] font-semibold text-[#111827]">Notifications</h1>
                             <?php if ($unread_count > 0): ?>
-                            <span class="flex items-center justify-center bg-[#C2185B] min-w-[20px] h-[20px] px-1 rounded-full">
+                            <span class="flex items-center justify-center bg-[<?php echo store_color('color_primary'); ?>] min-w-[20px] h-[20px] px-1 rounded-full">
                                 <span class="text-white text-[11px] font-semibold font-['Open Sans']">
                                     <?php echo $unread_count > 99 ? '99+' : $unread_count; ?>
                                 </span>
                             </span>
                             <?php endif; ?>
                         </div>
-                        <a href="./notifications.php" class="text-[14px] font-['Open Sans'] font-medium text-[#C2185B] hover:underline">See all</a>
+                        <a href="./notifications.php" class="text-[14px] font-['Open Sans'] font-medium text-[<?php echo store_color('color_primary'); ?>] hover:underline">See all</a>
                     </div>
 
                     <div class="flex flex-col max-h-[60vh] overflow-y-auto">
@@ -139,7 +139,7 @@ $page_title = $page_titles[$page_basename] ?? 'Dashboard';
                         <div class="p-8 text-center text-gray-400 text-[14px] font-['Open Sans']">No notifications yet</div>
                         <?php else: ?>
                             <?php foreach ($latest_notifications as $notification): ?>
-                        <div class="flex flex-col gap-1 px-4 py-3 border-b border-gray-50 <?php echo $notification['is_read'] ? '' : 'bg-[#FDF0F5] border-l-[3px] border-l-[#C2185B]'; ?>">
+                        <div class="flex flex-col gap-1 px-4 py-3 border-b border-gray-50 <?php echo $notification['is_read'] ? '' : 'bg-[' . store_color('color_tint') . '] border-l-[3px] border-l-[' . store_color('color_primary') . ']'; ?>">
                             <div class="flex items-center justify-between gap-2">
                                 <h1 class="text-[14px] font-['Open Sans'] font-semibold text-[#111827]"><?php echo htmlspecialchars($notification['title']); ?></h1>
                                 <div class="relative flex items-center gap-2 shrink-0">
@@ -153,35 +153,13 @@ $page_title = $page_titles[$page_basename] ?? 'Dashboard';
                                         }
                                         ?>
                                     </span>
-                                    <i class="fa-solid fa-ellipsis-vertical text-[16px] cursor-pointer text-gray-400" onclick="openNotimenu(this)"></i>
-                                    <div class="not-content bg-white border border-gray-100 shadow-lg rounded-lg p-2">
-                                        <div class="flex flex-col gap-2">
-                                        <?php if ($notification['type'] === 'order' && !empty($notification['reference_id'])): ?>
-            <a href="./order-details.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[14px] font-medium text-[#262626] px-2 py-1 rounded hover:bg-gray-50">View Details</a>
-        <?php elseif ($notification['type'] === 'return' && !empty($notification['reference_id'])): ?>
-            <a href="./admin-view-return.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[14px] font-medium text-[#262626] px-2 py-1 rounded hover:bg-gray-50">View Details</a>
-        <?php elseif ($notification['type'] === 'issue' && !empty($notification['reference_id'])): ?>
-            <a href="./issues.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[14px] font-medium text-[#262626] px-2 py-1 rounded hover:bg-gray-50">View Details</a>
-        <?php elseif ($notification['type'] === 'review' && !empty($notification['reference_id'])): ?>
-            <a href="./reviews.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[14px] font-medium text-[#262626] px-2 py-1 rounded hover:bg-gray-50">View Details</a>
-        <?php else: ?>
-            <a href="#" class="text-[14px] font-medium text-[#262626] px-2 py-1 rounded hover:bg-gray-50">View Details</a>
-        <?php endif; ?>
-
-                                            <?php if ($notification['is_read']): ?>
-                                                <a href="?notification_action=unread&notification_id=<?php echo $notification['notification_id']; ?>" class="text-[14px] font-medium text-[#E8B006] px-2 py-1 rounded hover:bg-amber-50">Mark as unread</a>
-                                            <?php else: ?>
-                                                <a href="?notification_action=read&notification_id=<?php echo $notification['notification_id']; ?>" class="text-[14px] font-medium text-[#E8B006] px-2 py-1 rounded hover:bg-amber-50">Mark as read</a>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                             <span class="text-[13px] font-['Open Sans'] text-gray-500"><?php echo htmlspecialchars($notification['message']); ?></span>
                         </div>
                         <?php endforeach; ?>
                         <div class="p-3 text-center border-t border-gray-100">
-                            <a href="./notifications.php" class="text-[13px] font-['Open Sans'] font-medium text-[#C2185B] hover:underline">View all notifications</a>
+                            <a href="./notifications.php" class="text-[13px] font-['Open Sans'] font-medium text-[<?php echo store_color('color_primary'); ?>] hover:underline">View all notifications</a>
                         </div>
                         <?php endif; ?>
                     </div>

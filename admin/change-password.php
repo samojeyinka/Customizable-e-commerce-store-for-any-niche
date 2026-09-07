@@ -90,7 +90,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
 
             <div class="flex items-center gap-1 md:gap-2">
-                <img src="<?php echo DOMAIN; ?>/assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
+                <img src="<?php echo store_escape(store('logo_url')); ?>" alt="<?php echo store_escape(store('store_name')); ?>" class="w-[31.35px] md:w-[41.35px]" />
             </div>
         </div>
         <h3 class="text-[#262626] text-center text-[18px] md:text-[22px] font-['Open Sans'] font-medium pt-5">ADMIN PANEL</h3>

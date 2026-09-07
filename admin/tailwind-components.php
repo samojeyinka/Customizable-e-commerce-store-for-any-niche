@@ -5,8 +5,14 @@
  * compiles it with the rest of the page utilities. No external .css files.
  */
 ?>
+<link rel="icon" type="image/png" href="<?php echo (function_exists('store') ? store_escape(store('favicon_url')) : '../../assets/global/logo.png'); ?>">
 <style type="text/tailwindcss">
 @layer base {
+    :root {
+        --glorefy-primary: <?php echo (function_exists('store') ? store_color('color_primary', '#C2185B') : '#C2185B'); ?>;
+        --glorefy-primary-tint: <?php echo (function_exists('store') ? store_color('color_tint', '#FDECF2') : '#FDECF2'); ?>;
+    }
+
     body {
         @apply overflow-x-hidden bg-[#FAFAFA];
     }
@@ -163,13 +169,13 @@
         @apply bg-gray-50 text-[#111827];
     }
     .sidenav .nav-link:hover i {
-        @apply text-[#C2185B];
+        @apply text-[var(--glorefy-primary)];
     }
     .sidenav .nav-link.active {
-        @apply bg-[#FDECF2] text-[#C2185B] font-semibold;
+        @apply bg-[var(--glorefy-primary-tint)] text-[var(--glorefy-primary)] font-semibold;
     }
     .sidenav .nav-link.active i {
-        @apply text-[#C2185B];
+        @apply text-[var(--glorefy-primary)];
     }
     .sidenav .nav-link.nav-logout span,
     .sidenav .nav-link.nav-logout i {

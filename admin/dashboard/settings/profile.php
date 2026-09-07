@@ -248,7 +248,7 @@ if (!empty($admin['profile_photo'])) {
 
         <div class="flex items-center gap-5 md:gap-8 lg:gap-10">
             <a href="./index.php" class="flex items-center gap-1 md:gap-2">
-                <img src="<?php echo DOMAIN; ?>/assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
+                <img src="<?php echo store_escape(store('logo_url')); ?>" alt="<?php echo store_escape(store('store_name')); ?>" class="w-[31.35px] md:w-[41.35px]" />
             </a>
 
             <i class="fa-solid fa-bars text-[24px] cursor-pointer" onclick="toggleNav()" alt="Search"></i>
@@ -297,7 +297,7 @@ if (!empty($admin['profile_photo'])) {
 <div class="flex items-center gap-1">
     <h1 class="text-[18px] md:text-[20px] font-['Open Sans'] font-medium">Notifications</h1>
     <?php if ($unread_count > 0): ?>
-        <div class="flex items-center justify-center bg-[#C2185B] w-[20px] h-[20px] rounded-[50%]">
+        <div class="flex items-center justify-center bg-[<?php echo store_color('color_primary'); ?>] w-[20px] h-[20px] rounded-[50%]">
             <h1 class="text-white text-[11px] md:text-[12px] font-['Open Sans'] font-medium">
                 <?php echo $unread_count > 99 ? '99+' : $unread_count; ?>
             </h1>
@@ -305,7 +305,7 @@ if (!empty($admin['profile_photo'])) {
     <?php endif; ?>
 </div>
 
-    <a href="./notifications.php" class="text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[#C2185B]">See all</a>
+    <a href="../notifications.php" class="text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-[<?php echo store_color('color_primary'); ?>]">See all</a>
 
 
 </div>
@@ -326,42 +326,13 @@ if (!empty($admin['profile_photo'])) {
                                     $created_at = new DateTime($notification['created_at']);
                                     echo $created_at->format('d M, Y h:i A'); 
                                     ?></span>
-                    <i class="fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer" onclick="openNotimenu(this)"></i>
-                    <div class="not-content h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]">
-                                        <div class="flex flex-col gap-3">
-                                        <?php if ($notification['type'] === 'order' && !empty($notification['reference_id'])): ?>
-    <a href="../order-details.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-<?php elseif ($notification['type'] === 'return' && !empty($notification['reference_id'])): ?>
-    <a href="../admin-view-return.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-<?php elseif ($notification['type'] === 'issue' && !empty($notification['reference_id'])): ?>
-    <a href="../issues.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-<?php elseif ($notification['type'] === 'review' && !empty($notification['reference_id'])): ?>
-    <a href="../reviews.php?id=<?php echo htmlspecialchars($notification['reference_id']); ?>" class="text-[16px] font-medium text-[#262626]">View Details</a>
-<?php else: ?>
-    <a href="#" class="text-[16px] font-medium text-[#262626]">View Details</a>
-<?php endif; ?>
-                                            
-                                            <?php 
-                                            // Current page URL for redirect
-                                            $current_url = htmlspecialchars($_SERVER['REQUEST_URI']);
-                                            
-                                            if ($notification['is_read']): 
-                                            ?>
-                                                <a href="?notification_action=unread&notification_id=<?php echo $notification['notification_id']; ?>" class="text-[16px] font-medium text-[#E8B006]">Mark as unread</a>
-                                            <?php else: ?>
-                                                <a href="?notification_action=read&notification_id=<?php echo $notification['notification_id']; ?>" class="text-[16px] font-medium text-[#E8B006]">Mark as read</a>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                    <!-- The small menu ends -->
-
                 </div>
             </div>
             <span class="text-[14px] md:text-[15px] font-['Open Sans'] font-regular text-[#9A9A9A]"><?php echo htmlspecialchars($notification['message']); ?></span>
         </div>
         <?php endforeach; ?>
                 <div class="p-2 text-center">
-                    <a href="notifications.php" class="text-[14px] text-blue-600 hover:text-blue-800">View all notifications</a>
+                    <a href="../notifications.php" class="text-[14px] text-blue-600 hover:text-blue-800">View all notifications</a>
                 </div>
             <?php endif; ?>
 

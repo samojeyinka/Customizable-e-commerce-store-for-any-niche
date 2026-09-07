@@ -26,7 +26,7 @@ if (!isset($_SESSION['setup_email'])) {
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-[#262626] text-[20px] md:text-[24px] font-medium">Verify OTP</h3>
             <div class="flex items-center gap-2">
-                <img src="./assets/global/logo.png" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
+                <img src="<?php echo (function_exists('store') ? store_escape(store('logo_url')) : './assets/global/logo.png'); ?>" alt="GLOREFY" class="w-[31.35px] md:w-[41.35px]" />
             </div>
         </div>
         

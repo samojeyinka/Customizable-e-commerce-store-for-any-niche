@@ -10,7 +10,6 @@
                     <thead class="w-full bg-[#E7E7E7] text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
                         <thead class="w-full bg-[#E7E7E7] text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
                             <th class="text-nowrap p-2 flex items-center gap-2">
-                                <input type="checkbox" />
                                 <span class="text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Category</span>
                             </th>
                             <th class="text-nowrap text-[#262626] text-[13px] md:text-[15px] font-medium font-['Open Sans']">Date Added</th>
@@ -39,7 +38,6 @@
 
 
                                 <td class="flex items-center gap-[10px] p-3">
-                                    <input type="checkbox" class="border-[#E1E1E1]" />
                                     <div class="flex items-center gap-2">
                                     <?php if (!empty($category_image) && file_exists("../../assets/categories/" . $category_image)): ?>
                                         <div class="w-[68px] h-[46px] rounded-[4px] overflow-hidden">

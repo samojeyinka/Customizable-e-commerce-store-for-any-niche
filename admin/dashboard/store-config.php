@@ -352,20 +352,20 @@ $tabActive = [
     <nav class="w-full flex items-center justify-between">
         <div class="flex items-center gap-4 md:gap-6">
             <a href="./overview.php">
-                <img src="<?php echo DOMAIN; ?>/assets/global/logo.png" alt="Store" class="w-[32px] md:w-[40px]" />
+                <img src="<?php echo store_escape(store('logo_url')); ?>" alt="<?php echo store_escape(store('store_name')); ?>" class="w-[32px] md:w-[40px]" />
             </a>
             <i class="fa-solid fa-bars text-[22px] text-[#4B5563] cursor-pointer lg:hidden" onclick="toggleNav()"></i>
             <h1 class="text-[18px] md:text-[20px] font-Onest font-semibold text-[#111827]">Storefront Settings</h1>
         </div>
         <div class="flex items-center gap-3 md:gap-5">
-            <a href="<?php echo DOMAIN; ?>/index.php" target="_blank" class="hidden sm:inline-flex items-center gap-2 text-[13px] font-['Open Sans'] font-medium text-[#C2185B] hover:underline">
+            <a href="<?php echo DOMAIN; ?>/index.php" target="_blank" class="hidden sm:inline-flex items-center gap-2 text-[13px] font-['Open Sans'] font-medium text-[<?php echo store_color('color_primary'); ?>] hover:underline">
                 <i class="fa-solid fa-arrow-up-right-from-square text-[12px]"></i> View storefront
             </a>
             <div class="relative">
                 <button onclick="openNotification()" class="relative w-[40px] h-[40px] rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-colors cursor-pointer">
                     <i class="fa-regular fa-bell text-[18px] text-[#4B5563]"></i>
                     <?php if ($unread_count > 0): ?>
-                    <span class="absolute -top-[2px] -right-[2px] min-w-[18px] h-[18px] px-1 rounded-full bg-[#C2185B] text-white text-[10px] font-bold flex items-center justify-center"><?php echo $unread_count > 99 ? '99+' : $unread_count; ?></span>
+                    <span class="absolute -top-[2px] -right-[2px] min-w-[18px] h-[18px] px-1 rounded-full bg-[<?php echo store_color('color_primary'); ?>] text-white text-[10px] font-bold flex items-center justify-center"><?php echo $unread_count > 99 ? '99+' : $unread_count; ?></span>
                     <?php endif; ?>
                 </button>
             </div>
