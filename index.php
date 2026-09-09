@@ -33,7 +33,7 @@ require_once "./includes/auth/google.php";
 
 <body>
     <main class="bg-[<?php echo store_color('color_bg'); ?>]">
-            <!-- Add to Cart Toast Notification -->
+        
 <div id="cart-toast" class="hidden fixed bottom-4 right-4 bg-green-600 text-white py-2 px-4 rounded-md shadow-lg z-50 transition-opacity duration-300">
     Item added to your cart!
 </div>
