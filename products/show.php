@@ -178,7 +178,7 @@ require_once "../includes/auth/google.php";
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 <?php include '../includes/tailwind-components.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -195,27 +195,27 @@ require_once "../includes/auth/google.php";
     Item added to your cart!
 </div>
 
-        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-4">
+        <section class="w-full pt-7 pb-3 border-b border-[#262626]/[0.05]">
             <div class="w-[90%] mx-auto max-w-[1440px]">
 
-<div class="hidden md:flex items-center gap-1 cursor-pointer">
-                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
+<div class="hidden md:flex items-center gap-2">
+                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#5F5F5F] text-[12px] md:text-[13px] tracking-[0.03em] font-['Montserrat'] font-medium">Home</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium"><?php echo $product['category_title']; ?></a>
+                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#5F5F5F] text-[12px] md:text-[13px] tracking-[0.03em] font-['Montserrat'] font-medium"><?php echo $product['category_title']; ?></a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
               
-                    <a href="./show.php?slug=<?php echo urlencode($product['product_slug']); ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">      <?php
+                    <a href="./show.php?slug=<?php echo urlencode($product['product_slug']); ?>" class="text-[#5F5F5F] text-[12px] md:text-[13px] tracking-[0.03em] font-['Montserrat'] font-medium">      <?php
                     $product_name = htmlspecialchars($product['product_name']);
     echo (strlen($product_name) > 20) ? substr($product_name, 0, 30) . '...' : $product_name; 
 ?></a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-['Montserrat'] font-medium">View details</span>
                 </div>
 
-                <div class="flex items-center gap-1 cursor-pointer md:hidden">
-                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
+                <div class="flex items-center gap-2 md:hidden">
+                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#5F5F5F] text-[12px] md:text-[13px] tracking-[0.03em] font-['Montserrat'] font-medium">Home</a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">
+                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#5F5F5F] text-[12px] md:text-[13px] tracking-[0.03em] font-['Montserrat'] font-medium">
 <?php 
     // Truncate the category title to 10 characters maximum
     $truncated_title = (strlen($product['category_title']) > 10) 
@@ -226,29 +226,29 @@ require_once "../includes/auth/google.php";
 </a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
               
-                    <a href="./show.php?slug=<?php echo urlencode($product['product_slug']); ?>" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">      <?php
+                    <a href="./show.php?slug=<?php echo urlencode($product['product_slug']); ?>" class="text-[#5F5F5F] text-[12px] md:text-[13px] tracking-[0.03em] font-['Montserrat'] font-medium">      <?php
                     $product_name = htmlspecialchars($product['product_name']);
     echo (strlen($product_name) > 9) ? substr($product_name, 0, 10) . '...' : $product_name; 
 ?></a>
                     <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">View details</span>
+                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-['Montserrat'] font-medium">View details</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto max-w-[1440px] flex flex-col md:flex-row gap-5">
+        <div class="w-[90%] mx-auto max-w-[1440px] flex flex-col md:flex-row gap-8 lg:gap-12 xl:gap-16 py-8 md:py-10 lg:py-14 items-start">
 
             <div class="w-full flex flex-col gap-3">
             <div class="flex flex-col gap-2">
     <!-- Main Image -->
-    <div class="w-full h-[397px] rounded-[4px] overflow-hidden">
+    <div class="w-full h-[340px] sm:h-[500px] lg:h-[600px] rounded-[20px] overflow-hidden bg-[<?php echo store_color('color_tint'); ?>]/50">
         <img id="mainImage" src="<?php echo $main_image; ?>" class="w-full h-full object-cover" alt="<?php echo $product['product_name']; ?>" />
     </div>
 
     <!-- Thumbnail Images -->
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-3 mt-3 sm:mt-4 overflow-x-auto pb-1">
         <?php foreach ($images as $index => $image): ?>
-            <div class="w-[127.4px] h-[80px] rounded-[4px] overflow-hidden flex-shrink-0 cursor-pointer thumbnail-image"
+            <div class="w-[100px] h-[66px] sm:w-[130px] sm:h-[86px] rounded-[10px] overflow-hidden flex-shrink-0 cursor-pointer thumbnail-image border-2 border-transparent hover:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200"
                 data-img="<?php echo htmlspecialchars(product_image_url($image['image_path'])); ?>" 
                 onclick="changeMainImage('<?php echo htmlspecialchars(product_image_url($image['image_path'])); ?>')">
                 <img src="<?php echo htmlspecialchars(product_image_url($image['image_path'])); ?>" class="w-full h-full object-cover" alt="Product image <?php echo $index + 1; ?>" />
@@ -257,87 +257,39 @@ require_once "../includes/auth/google.php";
     </div>
 </div>
 
-<!-- The large screen reviews starts -->
-<div class="w-full border-b-[1.5px] border-[#E1E1E1] hidden md:block">
-    <div class="accordion w-full flex items-center justify-between cursor-pointer" id="accordionHeader">
-        <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">
-            View Reviews (<?php echo $total_reviews; ?>)
-        </span>
-    </div>
-
-    <div class="revs flex flex-col gap-3" id="accordionContent">
-        <?php if (empty($reviews)): ?>
-            <div class="text-center py-4">
-                <p class="text-[#5B5B5B] text-[14px] font-['Montserrat']">No reviews yet for this product.</p>
-                <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[<?php echo store_color('color_primary'); ?>] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
-                <?php endif; ?>
-            </div>
-        <?php else: ?>
-            <?php foreach ($reviews as $review): ?>
-                <div class="flex flex-col gap-2 border-b-[1px] pb-1 border-[#E1E1E1]">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <?php 
-                            $reviewer_avatar = !empty($review['profile_image']) 
-                                ? DOMAIN . '/' . $review['profile_image'] 
-                                : DOMAIN . '/assets/global/avatar.svg'; 
-                            ?>
-                            <img src="<?php echo htmlspecialchars($reviewer_avatar); ?>" 
-                                 alt="<?php echo htmlspecialchars($review['reviewer_name']); ?>" 
-                                 class="w-[24px] h-[24px] rounded-full object-cover" />
-                            <span class="text-[#262626] text-[13px] md:text-[14px] font-['Montserrat'] font-medium"><?php echo htmlspecialchars($review['reviewer_name']); ?></span>
-                            <?php echo generateStarRating($review['rating']); ?>
-                        </div>
-                        <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular"><?php echo date('m/d/Y', strtotime($review['created_at'])); ?></span>
-                    </div>
-                    <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular"><?php echo htmlspecialchars($review['review_text']); ?></span>
-                </div>
-            <?php endforeach; ?>
-            
-            <?php if ($total_reviews > count($reviews)): ?>
-                <div class="text-center mt-2">
-                    <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[<?php echo store_color('color_primary'); ?>] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
-                </div>
-            <?php endif; ?>
-        <?php endif; ?>
-    </div>
 </div>
-<!-- The large screen reviews ends -->
-
-
-            </div>
 
             <div class="w-full flex flex-col gap-6">
-                <div class="flex flex-col gap-1">
-                    <div class="flex items-start gap-2"> <span class="text-[#262626] text-[24px] md:text-[28px] font-['Montserrat'] font-medium"><?php echo $product['product_name']; ?></span>
+                <div class="flex flex-col gap-2.5">
+                    <span class="text-[11px] md:text-[12px] tracking-[0.32em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_primary'); ?>]"><?php echo htmlspecialchars($product['category_title'] ?? ''); ?></span>
+                    <div class="flex items-start gap-3 flex-wrap">
+                        <h1 class="text-[<?php echo store_color('color_heading'); ?>] text-[30px] md:text-[36px] xl:text-[40px] leading-[1.12] font-['Cormorant_Garamond'] font-medium"><?php echo $product['product_name']; ?></h1>
                     <?php if ($product['is_featured']): ?>
-                            <button class="w-[fit-content] h-[fit-content] bg-[<?php echo store_color('color_primary'); ?>]  rounded-[28px] text-white text-[12px] md:text-[13px] font-Onest font-regular py-[1.5px] px-2 text-nowrap">Featured</button>
-                            <?php endif; ?>
- </div>
-                    <span class="text-[#262626] text-[18px] md:text-[20px] font-['Montserrat'] font-medium">₦<?php echo number_format((float)$lowest_price, 2); ?></span>
-                    <div class="text-[#5B5B5B] text-[14px] font-['Montserrat']">
-                        <!-- Category: <?php echo $product['category_title']; ?> -->
+                            <span class="bg-[<?php echo store_color('color_primary'); ?>] text-white text-[10px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold py-1 px-3 rounded-full mt-2">Featured</span>
+                    <?php endif; ?>
+                    </div>
+                    <div class="flex items-center gap-3 md:gap-4 flex-wrap pt-1">
+                        <span class="text-[22px] md:text-[25px] font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]">₦<?php echo number_format((float)$lowest_price, 2); ?></span>
                         <?php if (!empty($product['brand_title'])): ?>
-                            Tag: <?php echo $product['brand_title']; ?>
+                        <span class="text-[#777777] text-[13px] md:text-[14px] font-['Open_Sans']">Tag: <?php echo htmlspecialchars($product['brand_title']); ?></span>
                         <?php endif; ?>
                     </div>
-                    <div class="flex items-center gap-2">
-    <div class="flex items-center gap-1">
+                    <div class="flex items-center gap-2.5 pt-1">
+                        <div class="flex items-center gap-1">
         <?php echo generateStarRating($avg_rating); ?>
     </div>
-    <span class="text-[#9A9A9A] text-[13px] md:text-[14px] font-['Open Sans'] font-medium">(<?php echo $total_reviews; ?> reviews)</span>
+    <span class="text-[#9A9A9A] text-[13px] md:text-[14px] font-['Open_Sans'] font-medium">(<?php echo $total_reviews; ?> reviews)</span>
 </div>
 
 
                 </div>
 
                 <div class="flex flex-col gap-3">
-                    <div class="w-[90%] md:w-[70%] flex items-center gap-4">
+                    <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 items-end">
                 <!-- Color Selection -->
                          <div class="w-full flex flex-col gap-1">
-                         <label class="text-[#262626] text-[13px]  md:text-[14px] font-Onest font-medium">Select Color</label>
-    <select name="productColor" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none">
+                         <label class="text-[#262626] text-[12px] tracking-[0.12em] uppercase font-['Montserrat'] font-semibold">Select Color</label>
+    <select name="productColor" class="w-full px-3.5 py-2.5 bg-white border border-[#262626]/15 rounded-[10px] text-[13px] md:text-[14px] font-['Montserrat'] text-[#262626] outline-none focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">
         <?php 
         // Get the colors array and make sure it's valid
         $colors_array = !empty($product['colors']) ? explode(',', $product['colors']) : [];
@@ -362,8 +314,8 @@ require_once "../includes/auth/google.php";
                     
 <div class="w-full flex flex-col gap-1">
 
-    <label class="text-[#262626] text-[13px]  md:text-[14px] font-Onest font-medium">   Select Size</label>
-    <select name="productSize" id="product-size" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="updatePrice(this)">
+    <label class="text-[#262626] text-[12px] tracking-[0.12em] uppercase font-['Montserrat'] font-semibold">   Select Size</label>
+    <select name="productSize" id="product-size" class="w-full px-3.5 py-2.5 bg-white border border-[#262626]/15 rounded-[10px] text-[13px] md:text-[14px] font-['Montserrat'] text-[#262626] outline-none focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" onchange="updatePrice(this)">
         <?php 
         // Fetch variants and check if they exist
         $variants_query = "SELECT * FROM product_variants WHERE product_id = ? ORDER BY original_price";
@@ -404,11 +356,11 @@ require_once "../includes/auth/google.php";
                     </div>
                     
 
-                    <div class="flex items-end gap-4">
-                    <div class="w-[50%] flex flex-col gap-1">
+                    <div class="flex items-end justify-between gap-4">
+                    <div class="w-full max-w-[240px] flex flex-col gap-1">
    
-    <label class="text-[#262626] text-[13px]  md:text-[14px] font-Onest font-medium">  Select Quantity</label>
-    <select name="quantity" id="quantity-select" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="updateTotalPrice()">
+    <label class="text-[#262626] text-[12px] tracking-[0.12em] uppercase font-['Montserrat'] font-semibold">  Select Quantity</label>
+    <select name="quantity" id="quantity-select" class="w-full px-3.5 py-2.5 bg-white border border-[#262626]/15 rounded-[10px] text-[13px] md:text-[14px] font-['Montserrat'] text-[#262626] outline-none focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" onchange="updateTotalPrice()">
         <?php 
         // Get max quantity from first variant or use default
         $first_variant_quantity = 5; // Default value
@@ -428,126 +380,51 @@ require_once "../includes/auth/google.php";
 </div>
 
 
-                        <span class="text-[#262626] text-[16px] md:text-[17px] font-['Montserrat'] font-medium"> Total: ₦<span id="total-price"><?php echo number_format((float)$lowest_price, 2); ?></span></span>
+                        <span class="text-[#262626] text-[17px] md:text-[19px] font-['Montserrat'] font-semibold">Total: ₦<span id="total-price"><?php echo number_format((float)$lowest_price, 2); ?></span></span>
 
                     </div>
 
                     <!-- <div class="flex items-center gap-4">
-                        <a href="./products/cart.php" class="w-[180px] bg-[#E8E9F2] border-[1px] border-[#969AC4] rounded-[8px] text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2 text-center">Add to cart</a>
+                        <a href="./products/cart.php" class="w-[180px] bg-[#E8E9F2] border-[1px] border-[#969AC4] rounded-[8px] text-[#262626] text-[15px] md:text-[16px] font-['Montserrat'] font-medium cursor-pointer py-[5px] px-2 text-center">Add to cart</a>
 
-                        <a href="./checkout.php" class="text-center w-[180px] bg-[<?php echo store_color('color_primary'); ?>] rounded-[8px] text-white text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2">Buy now</a>
+                        <a href="./checkout.php" class="text-center w-[180px] bg-[<?php echo store_color('color_primary'); ?>] rounded-[8px] text-white text-[15px] md:text-[16px] font-['Montserrat'] font-medium cursor-pointer py-[5px] px-2">Buy now</a>
                         <img src="../assets/products/fav.svg" class="w-[24px] cursor-pointer" />
                     </div> -->
 
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3 md:gap-4 flex-wrap pt-2">
     <button 
         id="add-to-cart-btn"
-        class="w-[180px] bg-[#E8E9F2] border-[1px] border-[#969AC4] rounded-[8px] text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2 text-center"
+        class="flex-1 min-w-[160px] py-3.5 px-6 bg-white border-[1.5px] border-[<?php echo store_color('color_primary'); ?>] rounded-full text-[<?php echo store_color('color_primary'); ?>] text-[12px] md:text-[13px] tracking-[0.12em] uppercase font-['Montserrat'] font-semibold cursor-pointer hover:bg-[<?php echo store_color('color_primary'); ?>] hover:text-white transition-all duration-300"
     >
         Add to cart
     </button>
 
     <button 
         id="buy-now-btn"
-        class="w-[180px] bg-[<?php echo store_color('color_primary'); ?>] rounded-[8px] text-white text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer py-[5px] px-2 text-center"
+        class="flex-1 min-w-[160px] py-3.5 px-6 bg-[<?php echo store_color('color_primary'); ?>] rounded-full text-white text-[12px] md:text-[13px] tracking-[0.12em] uppercase font-['Montserrat'] font-semibold cursor-pointer hover:bg-[<?php echo store_color('color_primary_dark'); ?>] transition-all duration-300"
     >
         Buy now
     </button>
     <?php $show_fav = isset($favorites[$product_id]) ? 'fa-solid text-[' . store_color('color_primary') . '] favorite-active' : 'fa-regular text-[#262626]'; ?>
-<i id="product-fav-heart" data-product-id="<?php echo (int)$product_id; ?>" class="<?php echo $show_fav; ?> fa-heart text-[24px] cursor-pointer leading-none"></i>
+    <span class="flex items-center justify-center w-12 h-12 rounded-full border border-[#262626]/10 hover:border-[<?php echo store_color('color_primary'); ?>] transition-colors cursor-pointer shrink-0">
+    <i id="product-fav-heart" data-product-id="<?php echo (int)$product_id; ?>" class="<?php echo $show_fav; ?> fa-heart text-[20px] leading-none"></i>
+    </span>
 </div>
                 </div>
 
-                <!--<div class="w-full flex flex-col gap-2 rounded-[8px] border-[#E1E1E1] border-[1px] p-3">
-                    
-             
-                
-                
-                <div class="flex flex-col gap-0 border-b-[1.2px] py-0 border-[#E1E1E1]">
-                <div class="accordion w-full flex items-center justify-between cursor-pointer">
-                        <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">Details</span>
-                    </div> 
-
-                    <div class="faqext text-[16px] font-regular text-[#777777]">
-                        <p>
-                        <?php echo $product['details']; ?>
-                        </p>
-                    </div>
-
-                    </div>
-                    
-
-                      
-                <div class="flex flex-col gap-0 border-b-[1.2px] py-0 border-[#E1E1E1]">
-                <div class="accordion w-full flex items-center justify-between cursor-pointer">
-                        <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">Sizes</span>
-                    </div> 
-
-                    <div class="faqext text-[16px] font-regular text-[#777777]">
-                    <p>
-    <?php 
-    if (!empty($product['sizes_details'])) {
-        echo $product['sizes_details'];
-    } else {
-        echo "No sizes details available.";
-    }
-    ?>
-</p>
-                    </div>
-
-                    </div>
-
-
-                      
-                <div class="flex flex-col gap-0 border-b-[1.2px] py-0 border-[#E1E1E1]">
-                <div class="accordion w-full flex items-center justify-between cursor-pointer">
-                        <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">Warranty</span>
-                    </div> 
-
-                    <div class="faqext text-[16px] font-regular text-[#777777]">
-                        <p>
-                        <?php echo $product['warranty']; ?>
-                        </p>
-                    </div>
-
-                    </div>
-
-
-                      
-                <div class="flex flex-col gap-0">
-                <div class="accordion w-full flex items-center justify-between cursor-pointer">
-                        <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">Care</span>
-                    </div> 
-
-                    <div class="faqext text-[16px] font-regular text-[#777777]">
-                        <p>
-                        <?php echo $product['care']; ?>
-                        </p>
-                    </div>
-
-                    </div>
-
-                      
-               
-
-                   
-
-
-                </div>-->
-
-            </div>
+</div>
 
 <!-- The mobile reviews starts -->
-<div class="w-full border-b-[1.5px] border-[#E1E1E1] md:hidden">
-    <div class="accordion w-full flex items-center justify-between cursor-pointer" id="mobileAccordionHeader">
-        <span class="text-[#262626] text-[15px] md:text-[16px] font-Onest font-medium">
+<div class="w-full md:hidden rounded-[16px] border border-[#262626]/[0.08] bg-white overflow-hidden mt-6">
+    <div class="accordion w-full flex items-center justify-between cursor-pointer px-5 py-4" id="mobileAccordionHeader">
+        <span class="text-[#262626] text-[15px] font-['Montserrat'] font-semibold">
             View Reviews (<?php echo $total_reviews; ?>)
         </span>
     </div>
 
-    <div class="faqext flex flex-col gap-3 transition-all duration-300 ease-in-out" id="mobileAccordionContent">
+    <div class="faqext flex flex-col gap-4 px-5 transition-all duration-300 ease-in-out" id="mobileAccordionContent">
         <?php if (empty($reviews)): ?>
-            <div class="text-center py-4">
+            <div class="text-center py-6">
                 <p class="text-[#5B5B5B] text-[14px] font-['Montserrat']">No reviews yet for this product.</p>
                 <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[<?php echo store_color('color_primary'); ?>] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
@@ -555,7 +432,7 @@ require_once "../includes/auth/google.php";
             </div>
         <?php else: ?>
             <?php foreach ($reviews as $review): ?>
-                <div class="flex flex-col gap-2 border-b-[1px] pb-1 border-[#E1E1E1]">
+                <div class="flex flex-col gap-2 border-b border-[#262626]/[0.07] pb-4">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <?php 
@@ -585,15 +462,96 @@ require_once "../includes/auth/google.php";
 <!-- The mobile reviews ends -->
         </div>
 
+        <?php
+        $infoRows = [];
+        if (trim((string)($product['details'] ?? '')) !== '') $infoRows[] = ['Details', $product['details']];
+        if (trim((string)($product['sizes_details'] ?? '')) !== '') $infoRows[] = ['Sizes', $product['sizes_details']];
+        if (trim((string)($product['warranty'] ?? '')) !== '') $infoRows[] = ['Warranty', $product['warranty']];
+        if (trim((string)($product['care'] ?? '')) !== '') $infoRows[] = ['Care', $product['care']];
+        ?>
+        <!-- The reviews + product details row starts -->
+        <div class="w-[90%] mx-auto max-w-[1440px] mt-6 md:mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
 
-        <div class="w-[90%] mx-auto max-w-[1440px] mt-[3rem]"> <span class="text-[#262626] text-[22px]  md:text-[27px] font-Onest font-regular">You May Also Like</span></div>
+            <!-- The large screen reviews starts -->
+            <div class="w-full hidden md:block rounded-[16px] border border-[#262626]/[0.08] bg-white overflow-hidden">
+                <div class="accordion w-full flex items-center justify-between cursor-pointer px-5 md:px-6 py-4 md:py-5" id="accordionHeader">
+                    <span class="text-[#262626] text-[15px] md:text-[16px] font-['Montserrat'] font-semibold">
+                        View Reviews (<?php echo $total_reviews; ?>)
+                    </span>
+                </div>
 
-        
+                <div class="revs flex flex-col gap-4 px-5 md:px-6 pb-5 md:pb-6" id="accordionContent">
+                    <?php if (empty($reviews)): ?>
+                        <div class="text-center py-6">
+                            <p class="text-[#5B5B5B] text-[14px] font-['Montserrat']">No reviews yet for this product.</p>
+                            <?php if (isset($_SESSION['user_id'])): ?>
+                            <a href="../user/write-review.php?product_id=<?php echo $product_id; ?>" class="text-[<?php echo store_color('color_primary'); ?>] text-[14px] hover:underline mt-2 inline-block">Be the first to leave a review!</a>
+                            <?php endif; ?>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($reviews as $review): ?>
+                            <div class="flex flex-col gap-2 border-b border-[#262626]/[0.07] pb-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <?php 
+                                        $reviewer_avatar = !empty($review['profile_image']) 
+                                            ? DOMAIN . '/' . $review['profile_image'] 
+                                            : DOMAIN . '/assets/global/avatar.svg'; 
+                                        ?>
+                                        <img src="<?php echo htmlspecialchars($reviewer_avatar); ?>" 
+                                             alt="<?php echo htmlspecialchars($review['reviewer_name']); ?>" 
+                                             class="w-[24px] h-[24px] rounded-full object-cover" />
+                                        <span class="text-[#5F5F5F] text-[12px] md:text-[13px] tracking-[0.03em] font-['Montserrat'] font-medium"><?php echo htmlspecialchars($review['reviewer_name']); ?></span>
+                                        <?php echo generateStarRating($review['rating']); ?>
+                                    </div>
+                                    <span class="text-[#777777] text-[13px] md:text-[14px] font-['Montserrat'] font-regular"><?php echo date('m/d/Y', strtotime($review['created_at'])); ?></span>
+                                </div>
+                                <span class="text-[#5B5B5B] text-[13px] md:text-[14px] font-['Montserrat'] font-regular"><?php echo htmlspecialchars($review['review_text']); ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                        
+                        <?php if ($total_reviews > count($reviews)): ?>
+                            <div class="text-center mt-2">
+                                <a href="../products/product-reviews.php?id=<?php echo $product_id; ?>" class="text-[<?php echo store_color('color_primary'); ?>] text-[14px] hover:underline">View all <?php echo $total_reviews; ?> reviews</a>
+                            </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <!-- The large screen reviews ends -->
 
-        <!-- The similar produts starts -->
-         <div class="reviews-container" id="reviews">
-         <!-- <div class="reviews-wrapper w-[90%] mx-auto max-w-[1440px] flex items-center gap-5 bg-[#FFFFFF] py-3 overflow-scroll mb-5"> -->
-        <div class="reviews-wrapper">
+            <?php if (!empty($infoRows)): ?>
+            <!-- The product details starts -->
+            <div class="w-full">
+                <h2 class="text-[12px] tracking-[0.3em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]">Product Details</h2>
+                <div class="mt-6 rounded-[16px] border border-[#262626]/[0.08] bg-white overflow-hidden">
+                    <?php foreach ($infoRows as $k => $row): ?>
+                    <div class="border-b border-[#262626]/[0.07] last:border-b-0">
+                        <div class="accordion w-full flex items-center justify-between cursor-pointer px-5 md:px-6 py-4 md:py-5 info-accordion-header">
+                            <span class="text-[#262626] text-[15px] md:text-[16px] font-['Montserrat'] font-medium"><?php echo $row[0]; ?></span>
+                        </div>
+                        <div class="faqext px-5 md:px-6 info-accordion-content"<?php if ($k === 0) echo ' data-open="true"'; ?>>
+                            <div class="text-[#5B5B5B] text-[15px] md:text-[16px] font-['Open_Sans'] leading-relaxed mb-5 md:mb-6"><?php echo $row[1]; ?></div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <!-- The product details ends -->
+            <?php endif; ?>
+
+        </div>
+        <!-- The reviews + product details row ends -->
+
+
+        <div class="w-[90%] mx-auto max-w-[1440px] mt-16 md:mt-24">
+            <div class="flex items-center gap-6 md:gap-8 mb-7 md:mb-9">
+                <h2 class="shrink-0 text-[<?php echo store_color('color_heading'); ?>] text-[26px] md:text-[34px] font-['Cormorant_Garamond'] font-medium">You May Also Like</h2>
+                <span class="h-px flex-1 bg-[#262626]/[0.07]"></span>
+            </div>
+
+            <!-- The similar produts starts -->
+            <div class="overflow-x-auto pb-3 -mb-3" id="reviews">
             <!-- The products cards -->
 
             <?php 
@@ -686,6 +644,32 @@ document.addEventListener("DOMContentLoaded", function () {
             // Close the accordion with animation
             accordionContent.style.maxHeight = "0px";
         }
+    });
+});
+
+// Product details accordions
+document.addEventListener("DOMContentLoaded", function () {
+    const infoContents = document.querySelectorAll(".info-accordion-content");
+    if (!infoContents.length) return;
+
+    infoContents.forEach(function (content) {
+        if (content.getAttribute("data-open") === "true") {
+            content.style.maxHeight = content.scrollHeight + "px";
+        } else {
+            content.style.maxHeight = "0px";
+        }
+        content.style.overflow = "hidden";
+
+        const header = content.previousElementSibling;
+        header.addEventListener("click", function () {
+            const wasOpen = content.style.maxHeight && content.style.maxHeight !== "0px";
+            infoContents.forEach(function (c) {
+                c.style.maxHeight = "0px";
+            });
+            if (!wasOpen) {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
     });
 });
 
@@ -851,7 +835,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Thumbnail image clicks
     document.querySelectorAll('.thumbnail-image').forEach(thumb => {
         thumb.addEventListener('click', function() {
-            const mainImg = document.querySelector('.w-full.h-[397px].rounded-[4px].overflow-hidden img');
+            const mainImg = document.getElementById('mainImage');
             if (mainImg) {
                 mainImg.src = this.getAttribute('data-img');
             }
@@ -861,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Buttons
     document.querySelectorAll('.thumbnail-image').forEach(thumb => {
         thumb.addEventListener('click', function() {
-            const mainImg = document.querySelector('.w-full.h-[397px].rounded-[4px].overflow-hidden img');
+            const mainImg = document.getElementById('mainImage');
             if (mainImg) {
                 mainImg.src = this.getAttribute('data-img');
             }

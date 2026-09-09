@@ -87,7 +87,7 @@ require_once "../includes/auth/google.php";
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 <?php include '../includes/tailwind-components.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -101,41 +101,46 @@ require_once "../includes/auth/google.php";
         ?>
 
 
-        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
+        <section class="w-full pt-7 pb-3 border-b border-[#262626]/[0.05]">
             <div class="w-[90%] mx-auto max-w-[1440px]">
-                <div class="flex items-center gap-1 cursor-pointer">
-                    <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</span>
+                <div class="flex items-center gap-2 text-[12px] font-['Montserrat'] font-medium tracking-[0.03em]">
+                    <a href="../index.php" class="text-[#5F5F5F] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">Home</a>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-[#262626]/20 leading-none"></i>
+                    <span class="text-[<?php echo store_color('color_heading'); ?>] font-semibold">My Orders</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] gap-3 mx-auto bg-[<?php echo store_color('color_bg'); ?>] py-5 flex items-center flex-col-reverse md:flex-row justify-between">
-            <div class="w-full flex items-center gap-4 overflow-x-auto">
-                <a href="?status=all" class="py-1 px-4 bg-[<?php echo $status_filter == 'all' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'all' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">All</a>
-                <a href="?status=Processing" class="py-1 px-4 bg-[<?php echo $status_filter == 'Processing' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Processing' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Processing</a>
-                <a href="?status=Shipped" class="py-1 px-4 bg-[<?php echo $status_filter == 'Shipped' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Shipped' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Shipped</a>
-                <a href="?status=Delivered" class="py-1 px-4 bg-[<?php echo $status_filter == 'Delivered' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Delivered' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Delivered</a>
-                <a href="?status=Returned" class="py-1 px-4 bg-[<?php echo $status_filter == 'Returned' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Returned' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Returned</a>
-                <a href="?status=Cancelled" class="py-1 px-4 bg-[<?php echo $status_filter == 'Cancelled' ? store_color('color_primary') : '#F3F3F3'; ?>] text-[<?php echo $status_filter == 'Cancelled' ? 'white' : '#262626'; ?>] text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px]">Cancelled</a>
+        <div class="w-[90%] mx-auto max-w-[1440px] flex flex-col gap-6 py-6 md:py-8">
+            <div>
+                <h1 class="text-[<?php echo store_color('color_heading'); ?>] text-[30px] md:text-[38px] leading-[1.12] font-['Cormorant_Garamond'] font-medium">My Orders</h1>
             </div>
 
-            <div class="w-full md:w-[80%] lg:w-[70%] flex items-center justify-between">
-                <form action="" method="GET" class="w-full flex">
-                    <div class="w-full flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#B8BBD7] rounded-l-[4px] p-2">
-                        <input type="text" name="search" placeholder="Search order ID" value="<?php echo htmlspecialchars($search_query); ?>" class="w-full lg:w-[18rem] text-[14px] border-[#B8BBD7] outline-none placeholder:text-[#B8BBD7]" />
+            <div class="flex flex-col-reverse md:flex-row md:items-center justify-between gap-4 md:gap-6">
+                <div class="flex items-center gap-2 overflow-x-auto pb-1">
+                    <a href="?status=all" class="shrink-0 px-4 py-2 rounded-full text-[12px] tracking-[0.08em] uppercase font-['Montserrat'] font-semibold cursor-pointer transition-colors duration-200 whitespace-nowrap <?php echo $status_filter == 'all' ? 'bg-[#' . substr(store_color('color_primary'), 1) . '] text-white shadow-[0_8px_20px_-10px_rgba(0,0,0,0.35)]' : 'bg-white border border-[#262626]/10 text-[#262626]/70 hover:text-[#262626] hover:border-[#262626]/25'; ?>">All</a>
+                    <a href="?status=Processing" class="shrink-0 px-4 py-2 rounded-full text-[12px] tracking-[0.08em] uppercase font-['Montserrat'] font-semibold cursor-pointer transition-colors duration-200 whitespace-nowrap <?php echo $status_filter == 'Processing' ? 'bg-[#' . substr(store_color('color_primary'), 1) . '] text-white shadow-[0_8px_20px_-10px_rgba(0,0,0,0.35)]' : 'bg-white border border-[#262626]/10 text-[#262626]/70 hover:text-[#262626] hover:border-[#262626]/25'; ?>">Processing</a>
+                    <a href="?status=Shipped" class="shrink-0 px-4 py-2 rounded-full text-[12px] tracking-[0.08em] uppercase font-['Montserrat'] font-semibold cursor-pointer transition-colors duration-200 whitespace-nowrap <?php echo $status_filter == 'Shipped' ? 'bg-[#' . substr(store_color('color_primary'), 1) . '] text-white shadow-[0_8px_20px_-10px_rgba(0,0,0,0.35)]' : 'bg-white border border-[#262626]/10 text-[#262626]/70 hover:text-[#262626] hover:border-[#262626]/25'; ?>">Shipped</a>
+                    <a href="?status=Delivered" class="shrink-0 px-4 py-2 rounded-full text-[12px] tracking-[0.08em] uppercase font-['Montserrat'] font-semibold cursor-pointer transition-colors duration-200 whitespace-nowrap <?php echo $status_filter == 'Delivered' ? 'bg-[#' . substr(store_color('color_primary'), 1) . '] text-white shadow-[0_8px_20px_-10px_rgba(0,0,0,0.35)]' : 'bg-white border border-[#262626]/10 text-[#262626]/70 hover:text-[#262626] hover:border-[#262626]/25'; ?>">Delivered</a>
+                    <a href="?status=Returned" class="shrink-0 px-4 py-2 rounded-full text-[12px] tracking-[0.08em] uppercase font-['Montserrat'] font-semibold cursor-pointer transition-colors duration-200 whitespace-nowrap <?php echo $status_filter == 'Returned' ? 'bg-[#' . substr(store_color('color_primary'), 1) . '] text-white shadow-[0_8px_20px_-10px_rgba(0,0,0,0.35)]' : 'bg-white border border-[#262626]/10 text-[#262626]/70 hover:text-[#262626] hover:border-[#262626]/25'; ?>">Returned</a>
+                    <a href="?status=Cancelled" class="shrink-0 px-4 py-2 rounded-full text-[12px] tracking-[0.08em] uppercase font-['Montserrat'] font-semibold cursor-pointer transition-colors duration-200 whitespace-nowrap <?php echo $status_filter == 'Cancelled' ? 'bg-[#' . substr(store_color('color_primary'), 1) . '] text-white shadow-[0_8px_20px_-10px_rgba(0,0,0,0.35)]' : 'bg-white border border-[#262626]/10 text-[#262626]/70 hover:text-[#262626] hover:border-[#262626]/25'; ?>">Cancelled</a>
+                </div>
+
+                <form action="" method="GET" class="w-full md:w-auto shrink-0">
+                    <div class="flex items-center gap-2 w-full md:w-[300px] bg-white rounded-full pl-4 pr-1.5 py-1.5 border border-[#262626]/10 focus-within:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-300 shadow-[0_2px_12px_-6px_rgba(38,38,38,0.15)]">
+                        <i class="fa-solid fa-magnifying-glass text-[14px] text-[#262626]/30 leading-none" aria-hidden="true"></i>
+                        <input type="text" name="search" placeholder="Search order ID" value="<?php echo htmlspecialchars($search_query); ?>" class="flex-1 min-w-0 bg-transparent text-[13px] border-none outline-none placeholder:text-[#B8BBD7] font-['Open_Sans']" />
+                        <button type="submit" class="shrink-0 px-4 py-1.5 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[11px] tracking-[0.12em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] transition-colors duration-200">Search</button>
                     </div>
-                    <button type="submit" class="py-2 px-4 bg-[#E8E9F2] text-black text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px] border-[1px] border-[]">Search</button>
                 </form>
             </div>
         </div>
 
         <div class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <!-- Desktop View -->
-            <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block">
-                <table cols="" class="w-full">
-                    <thead class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
+            <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)] overflow-x-auto">
+                <table class="w-full [&_th]:px-5 [&_th]:py-4 [&_td]:px-5 [&_td]:py-4 [&_td]:border-b [&_td]:border-[#262626]/[0.05] [&_tr]:align-middle">
+                    <thead class="text-[#6B6B6B] text-[11px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-left bg-[#FBF9FA] border-b border-[#262626]/10">
                         <th>Product</th>
                         <th>Amount/Quantity</th>
                         <th>Order ID</th>
@@ -163,12 +168,7 @@ require_once "../includes/auth/google.php";
                         }
 
                         if (empty($filtered_orders)) {
-                            echo "<tr><td colspan='7' class='py-4 text-center text-[#262626] font-medium font-[Open Sans]'>
-                            <div>
-                            <i class='fa-regular fa-heart text-[80px] text-[<?php echo store_color('color_tint'); ?>] mx-auto leading-none'></i>
-                           You have not made any orders yet
-                            </div>
-                            </td></tr>";
+                            echo "<tr><td colspan='7' class='py-14'><div class='flex flex-col items-center gap-3 text-center'><div class='w-16 h-16 rounded-full bg-[#F8F0F4] flex items-center justify-center'><i class='fa-regular fa-heart text-[22px] leading-none' style='color:var(--glor-primary)'></i></div><p class='text-[#6B6B6B] text-[15px]'>You have not made any orders yet</p></div></td></tr>";
                         } else {
                             foreach ($filtered_orders as $order) {
                                 $order_items = $order_items_map[$order['id']] ?? [];
@@ -203,46 +203,46 @@ require_once "../includes/auth/google.php";
                                   echo "
 <tr>
     <td class='py-3 flex gap-2'>
-        <div class='w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden'>
+        <div class='w-24 h-20 rounded-[10px] overflow-hidden shrink-0'>
             <img src='{$image_path}' class='w-full h-full object-cover' />
         </div>
         <div class='flex flex-col gap-[2px]'>
-            <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Name: {$item['product_name']}</p>
-            <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Color: {$color}</p>
-            <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Size: {$variant['size']}</p>
+            <p class='text-[#5F5F5F] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Name: {$item['product_name']}</p>
+            <p class='text-[#5F5F5F] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Color: {$color}</p>
+            <p class='text-[#5F5F5F] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>Size: {$variant['size']}</p>
         </div>
     </td>
     <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>₦" . number_format((float)$item['price']) . "/{$item['quantity']}</td>
     <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>#{$order['id']}</td>
     <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order['delivery_method']}</td>
     <td>
-        <button type='button' class='py-1 px-4 {$status_color} text-white text-[16px] font-[\"Open Sans\"] cursor-pointer rounded-[28px]'>{$status_text}</button>
+        <button type='button' class='px-4 py-1.5 {} text-white text-[11px] md:text-[12px] tracking-[0.1em] uppercase font-semibold cursor-pointer rounded-full whitespace-nowrap'>{$status_text}</button>
     </td>
     <td class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order_date}</td>
     <td class='relative'>
         <i class='fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer openAdminOrderMenu leading-none'></i>
 
         <!-- The menu for each order starts -->
-        <div class='adminordersMenu h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px]'>
+        <div class='adminordersMenu h-full bg-white border border-[#262626]/10 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.3)] p-2 rounded-[12px] min-w-[11rem] z-20'>
             <div class='flex flex-col gap-3'>
-                <a href='{$reorder_url}' class='text-[16px] font-medium text-[#262626]'>Re-Order</a>
-                <a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Track Order</a>";
+                <a href='{$reorder_url}' class='text-[13px] font-medium text-[#262626] px-2.5 py-1.5 hover:bg-[#F8F0F4] rounded-[8px] transition-colors whitespace-nowrap'>Re-Order</a>
+                <a href='./track-order.php?id={$order['id']}' class='text-[13px] font-medium text-[#262626] px-2.5 py-1.5 hover:bg-[#F8F0F4] rounded-[8px] transition-colors whitespace-nowrap'>Track Order</a>";
                 
 if ($status_text == 'Delivered') {
     $delivery_confirmed = !empty($order['delivery_confirmed_at']);
     if ($delivery_confirmed) {
-        echo "<a href='./write-review.php?order_id={$order['id']}&product_id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>";
+        echo "<a href='./write-review.php?order_id={$order['id']}&product_id={$item['product_id']}' class='text-[13px] font-medium text-[#262626] px-2.5 py-1.5 hover:bg-[#F8F0F4] rounded-[8px] transition-colors whitespace-nowrap'>Leave a review</a>";
     } else {
-        echo "<span class='text-[16px] font-medium text-gray-400 cursor-not-allowed' title='Confirm you received this order to unlock reviews'>Leave a review</span>";
-        echo "<a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#2FA05A]'>Confirm delivery received</a>";
+        echo "<span class='text-[13px] font-medium text-gray-400 cursor-not-allowed px-2.5 py-1.5 whitespace-nowrap' title='Confirm you received this order to unlock reviews'>Leave a review</span>";
+        echo "<a href='./track-order.php?id={$order['id']}' class='text-[13px] font-medium text-[#2FA05A] px-2.5 py-1.5 hover:bg-[#E7F6EC] rounded-[8px] transition-colors whitespace-nowrap'>Confirm delivery received</a>";
     }
-    echo "<a href='./return-request.php?item_id={$item['id']}&order_id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Return Item</a>";
+    echo "<a href='./return-request.php?item_id={$item['id']}&order_id={$order['id']}' class='text-[13px] font-medium text-[#262626] px-2.5 py-1.5 hover:bg-[#F8F0F4] rounded-[8px] transition-colors whitespace-nowrap'>Return Item</a>";
 } else {
-    echo "<span class='text-[16px] font-medium text-gray-400 cursor-not-allowed' title='You can review this product after delivery'>Leave a review</span>";
+    echo "<span class='text-[13px] font-medium text-gray-400 cursor-not-allowed px-2.5 py-1.5 whitespace-nowrap' title='You can review this product after delivery'>Leave a review</span>";
 }
 
 echo "
-                <a href='./report-issue.php?id={$order['id']}' class='text-[16px] font-medium text-[#E8B006]'>Report an issue</a>
+                <a href='./report-issue.php?id={$order['id']}' class='text-[13px] font-medium text-[#A67C00] px-2.5 py-1.5 hover:bg-[#FFF4D6] rounded-[8px] transition-colors whitespace-nowrap'>Report an issue</a>
           
             </div>
         </div>
@@ -279,12 +279,12 @@ echo "
 
                     if (empty($filtered_orders)) {
                         echo "
-                        <div class='py-4 text-center text-[#262626] font-medium font-[Open Sans]'>
-                            <div>
-                            <i class='fa-regular fa-heart text-[80px] text-[<?php echo store_color('color_tint'); ?>] mx-auto leading-none'></i>
-                           You have not made any orders yet
+                        <div class='flex flex-col items-center gap-3 text-center py-8'>
+                            <div class='w-16 h-16 rounded-full bg-[#F8F0F4] flex items-center justify-center'>
+                                <i class='fa-regular fa-heart text-[22px] leading-none' style='color:var(--glor-primary)'></i>
                             </div>
-                            </div>
+                            <p class='text-[#6B6B6B] text-[15px]'>You have not made any orders yet</p>
+                        </div>
                         ";
                     } else {
                         foreach ($filtered_orders as $order) {
@@ -320,7 +320,7 @@ echo "
                                 $reorder_url = product_url($item);
                                 
                                 echo "
-                                <div class='border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2'>
+                                <div class='bg-white border border-[#262626]/10 rounded-[16px] p-4 flex flex-col gap-3 shadow-[0_2px_14px_-8px_rgba(0,0,0,0.12)]'>
                                     <div class='flex items-center justify-between relative'>
                                         <p class='text-[#262626] text-[15px] md:text-[16px] font-[\"Open Sans\"] font-regular'>{$order_date}</p>
                                    
@@ -329,26 +329,26 @@ echo "
  <i class='fa-solid fa-ellipsis-vertical text-[20px] cursor-pointer openAdminOrderMenuForMobile leading-none'></i>
 
         <!-- The menu for each order starts -->
-       <div class='adminordersMenuformobile hidden h-full bg-white border-[1px] border-[#E1E1E1] shadow-md p-4 rounded-[4px] absolute right-0 top-[2rem]   min-h-[10rem] min-h-[10rem]'>
+       <div class='adminordersMenuformobile hidden bg-white border border-[#262626]/10 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.3)] p-2 rounded-[12px] absolute right-0 top-[2.6rem] min-w-[11rem] z-20'>
             <div class='flex flex-col gap-3'>
-                <a href='{$reorder_url}' class='text-[16px] font-medium text-[#262626]'>Re-Order</a>
-                <a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Track Order</a>";
+                <a href='{$reorder_url}' class='text-[13px] font-medium text-[#262626] px-2.5 py-1.5 hover:bg-[#F8F0F4] rounded-[8px] transition-colors whitespace-nowrap'>Re-Order</a>
+                <a href='./track-order.php?id={$order['id']}' class='text-[13px] font-medium text-[#262626] px-2.5 py-1.5 hover:bg-[#F8F0F4] rounded-[8px] transition-colors whitespace-nowrap'>Track Order</a>";
                 
 if ($status_text == 'Delivered') {
     $delivery_confirmed = !empty($order['delivery_confirmed_at']);
     if ($delivery_confirmed) {
-        echo "<a href='./write-review.php?order_id={$order['id']}&product_id={$item['product_id']}' class='text-[16px] font-medium text-[#262626]'>Leave a review</a>";
+        echo "<a href='./write-review.php?order_id={$order['id']}&product_id={$item['product_id']}' class='text-[13px] font-medium text-[#262626] px-2.5 py-1.5 hover:bg-[#F8F0F4] rounded-[8px] transition-colors whitespace-nowrap'>Leave a review</a>";
     } else {
-        echo "<span class='text-[16px] font-medium text-gray-400 cursor-not-allowed' title='Confirm you received this order to unlock reviews'>Leave a review</span>";
-        echo "<a href='./track-order.php?id={$order['id']}' class='text-[16px] font-medium text-[#2FA05A]'>Confirm delivery received</a>";
+        echo "<span class='text-[13px] font-medium text-gray-400 cursor-not-allowed px-2.5 py-1.5 whitespace-nowrap' title='Confirm you received this order to unlock reviews'>Leave a review</span>";
+        echo "<a href='./track-order.php?id={$order['id']}' class='text-[13px] font-medium text-[#2FA05A] px-2.5 py-1.5 hover:bg-[#E7F6EC] rounded-[8px] transition-colors whitespace-nowrap'>Confirm delivery received</a>";
     }
-    echo "<a href='./return-request.php?item_id={$item['id']}&order_id={$order['id']}' class='text-[16px] font-medium text-[#262626]'>Return Item</a>";
+    echo "<a href='./return-request.php?item_id={$item['id']}&order_id={$order['id']}' class='text-[13px] font-medium text-[#262626] px-2.5 py-1.5 hover:bg-[#F8F0F4] rounded-[8px] transition-colors whitespace-nowrap'>Return Item</a>";
 } else {
-    echo "<span class='text-[16px] font-medium text-gray-400 cursor-not-allowed' title='You can review this product after delivery'>Leave a review</span>";
+    echo "<span class='text-[13px] font-medium text-gray-400 cursor-not-allowed px-2.5 py-1.5 whitespace-nowrap' title='You can review this product after delivery'>Leave a review</span>";
 }
 
 echo "
-                <a href='./report-issue.php?id={$order['id']}' class='text-[16px] font-medium text-[#E8B006]'>Report an issue</a>
+                <a href='./report-issue.php?id={$order['id']}' class='text-[13px] font-medium text-[#A67C00] px-2.5 py-1.5 hover:bg-[#FFF4D6] rounded-[8px] transition-colors whitespace-nowrap'>Report an issue</a>
             </div>
         </div>
                                 <!-- The order menu ends -->
@@ -357,28 +357,28 @@ echo "
                                      
                                     </div>
                                     
-                                    <div class='w-full h-[1px] bg-[#E1E1E1]'></div>
+                                    <div class='w-full h-px bg-[#262626]/[0.06]'></div>
                                     
                                     <div class='flex items-center justify-between'>
-                                        <button type='button' class='max-w-[87px] py-[6px] px-3 {$status_color} text-white text-[14px] font-[\"Open Sans\"] cursor-pointer rounded-[28px]'>{$status_text}</button>
+                                        <button type='button' class='max-w-[120px] py-1.5 px-4 {} text-white text-[10px] tracking-[0.12em] uppercase font-semibold cursor-pointer rounded-full whitespace-nowrap'>{$status_text}</button>
                                         <div class='flex flex-col gap-[2px] text-right'>
-                                            <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>" . ucfirst($order['delivery_method']) . "</p>
-                                            <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Order ID:</b> #{$order['id']}</p>
+                                            <p class='text-[#5F5F5F] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'>" . ucfirst($order['delivery_method']) . "</p>
+                                            <p class='text-[#5F5F5F] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Order ID:</b> #{$order['id']}</p>
                                         </div>
                                     </div>
                                     
-                                    <div class='w-full h-[1px] bg-[#E1E1E1]'></div>
+                                    <div class='w-full h-px bg-[#262626]/[0.06]'></div>
                                     
                                     <div class='flex justify-between'>
                                         <div class='flex flex-col gap-2'>
                                             <div class='flex gap-2'>
-                                                <div class='w-[80px] h-[80px] rounded-[4px] overflow-hidden'>
+                                                <div class='w-[88px] h-[88px] rounded-[12px] overflow-hidden shrink-0'>
                                                     <img src='{$image_path}' class='w-full h-full object-cover' />
                                                 </div>
                                                 <div class='flex flex-col gap-[2px]'>
-                                                    <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Name:</b> {$item['product_name']}</p>
-                                                    <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Color:</b> {$color}</p>
-                                                    <p class='text-[#262626] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Size:</b> {$variant['size']}</p>
+                                                    <p class='text-[#5F5F5F] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Name:</b> {$item['product_name']}</p>
+                                                    <p class='text-[#5F5F5F] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Color:</b> {$color}</p>
+                                                    <p class='text-[#5F5F5F] text-[13px] md:text-[14px] font-[\"Open Sans\"] font-regular'><b>Size:</b> {$variant['size']}</p>
                                                 </div>
                                             </div>
                                             <a href='./track-order.php?id={$order['id']}' class='text-[14px] font-[\"Open Sans\"] text-[" . store_color('color_primary') . "] font-regular underline cursor-pointer'>Track your order</a>

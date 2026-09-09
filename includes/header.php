@@ -12,7 +12,7 @@ if(isset($_GET['logout'])) {
 }
 ?> 
 
-<header class="w-full flex items-center justify-center p-3" style="background-color: var(--glor-tint, #F5EEF2)">
+<header class="w-full flex items-center justify-center py-3 md:py-3.5 relative z-30 border-b border-[#262626]/[0.07]" style="background-color: var(--glor-tint, #F5EEF2)">
     <?php echo store_theme_style(); ?>
 
 
@@ -29,13 +29,14 @@ if(isset($_GET['logout'])) {
     <!-- The Modal -->
     <div id="myModal" class="modal reg">
         <!-- Modal content -->
-        <div class="modal-content overflow-hidden p-4">
+        <div class="modal-content overflow-hidden p-6 md:p-8 rounded-[20px] md:max-w-[440px] max-h-[88vh] overflow-y-auto">
 
-            <i class="fa-solid fa-xmark text-[26px] md:text-[32px] text-[#262626] cursor-pointer absolute right-4 leading-none" id="closeauth" alt="close"></i>
+            <i class="fa-solid fa-xmark text-[22px] md:text-[24px] text-[#262626]/35 hover:text-[#262626] cursor-pointer absolute top-5 right-5 leading-none transition-colors" id="closeauth" alt="close"></i>
 
-            <div class="w-[fit-content] flex items-center mx-auto gap-10 tab">
-                <button class="tablinks text-[16px] font-['Open Sans'] font-medium" onclick="openTab(event, 'SignUp')" id="defaultOpen">Create an account</button>
-                <button class="tablinks text-[16px] font-['Open Sans'] font-medium" onclick="openTab(event, 'SignIn')" id="signinTab">Sign In</button>
+            <div class="flex items-center justify-center mx-auto w-fit tab mb-6">
+                <button class="tablinks text-[12px] md:text-[13px] tracking-[0.18em] uppercase font-['Montserrat'] font-semibold pb-2 px-2 text-[#262626]/40 hover:text-[#262626] transition-colors" onclick="openTab(event, 'SignUp')" id="defaultOpen">Create an account</button>
+                <span class="w-px h-4 bg-[#262626]/10 mx-5"></span>
+                <button class="tablinks text-[12px] md:text-[13px] tracking-[0.18em] uppercase font-['Montserrat'] font-semibold pb-2 px-2 text-[#262626]/40 hover:text-[#262626] transition-colors" onclick="openTab(event, 'SignIn')" id="signinTab">Sign In</button>
             </div>
 
             <!-- The signup and signin directory -->

@@ -74,7 +74,7 @@ require_once "../includes/auth/google.php";
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 <?php include '../includes/tailwind-components.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -86,55 +86,59 @@ require_once "../includes/auth/google.php";
     include(__DIR__ . '/../includes/options.php');
     ?>
 
-        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
+        <section class="w-full pt-7 pb-3 border-b border-[#262626]/[0.05]">
             <div class="w-[90%] mx-auto max-w-[1440px]">
-                <div class="flex items-center gap-1 cursor-pointer">
-                    <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <a href="./account.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Account</a>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">My Returns</span>
+                <div class="flex items-center gap-2 text-[12px] font-['Montserrat'] font-medium tracking-[0.03em]">
+                    <a href="../index.php" class="text-[#5F5F5F] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">Home</a>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-[#262626]/20 leading-none"></i>
+                    <a href="./account.php" class="text-[#5F5F5F] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">My Account</a>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-[#262626]/20 leading-none"></i>
+                    <span class="text-[<?php echo store_color('color_heading'); ?>] font-semibold">My Returns</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto max-w-[1440px] bg-[<?php echo store_color('color_bg'); ?>] py-5">
-            <div class="w-full md:w-[90%] lg:w-[80%] mx-auto">
-                <h1 class="text-[24px] md:text-[28px] text-[#2C2C2C] font-['Open Sans'] font-medium mb-6 text-center">My Return Requests</h1>
+        <div class="w-[90%] mx-auto max-w-[1440px] py-8 md:py-12">
+            <div class="w-full max-w-[900px] mx-auto">
+                <h1 class="text-[<?php echo store_color('color_heading'); ?>] text-[30px] md:text-[38px] leading-[1.12] font-['Cormorant_Garamond'] font-medium text-center mb-8 md:mb-10">My Return Requests</h1>
                 
                 <?php if (empty($return_requests)): ?>
-                <div class="text-center py-10">
-
-                    <h3 class="text-[18px] font-['Open Sans'] font-medium text-[#262626] mb-2">No Return Requests Found</h3>
-                    <p class="text-[14px] text-[#777777] font-['Open Sans'] mb-4">You haven't made any return requests yet.</p>
-                    <a href="./orders.php" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">View My Orders</a>
+                <div class="flex flex-col items-center gap-5 text-center bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)] px-6 py-14">
+                    <div class="w-16 h-16 rounded-full bg-[#F8F0F4] flex items-center justify-center">
+                        <i class="fa-solid fa-rotate-left text-[22px] leading-none" style="color:var(--glor-primary)" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-[20px] font-['Montserrat'] font-semibold text-[#262626]">No Return Requests Found</h3>
+                        <p class="text-[14px] text-[#777777] font-['Open_Sans'] mt-1">You haven't made any return requests yet.</p>
+                    </div>
+                    <a href="./orders.php" class="inline-flex items-center gap-2 py-3 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] transition-all duration-300">View My Orders</a>
                 </div>
                 <?php else: ?>
 
                 <!-- Return Status Guide -->
-                <div class="mb-6 p-4 bg-gray-50 border rounded-lg">
-                    <h3 class="text-[16px] font-['Open Sans'] font-medium mb-2">Return Status Guide</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="mb-6 p-5 md:p-6 bg-white rounded-[16px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)]">
+                    <h3 class="text-[12px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[#262626] mb-4">Return Status Guide</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
                         <?php foreach($status_descriptions as $status => $description): 
                             $color = isset($status_colors[$status]) ? $status_colors[$status] : 'bg-gray-500';
                         ?>
-                        <div class="flex items-center">
-                            <span class="inline-block w-3 h-3 rounded-full <?php echo $color; ?> mr-2"></span>
-                            <span class="text-[13px] font-medium"><?php echo $status; ?>:</span>
-                            <span class="text-[13px] ml-1"><?php echo $description; ?></span>
+                        <div class="flex items-center gap-2.5">
+                            <span class="inline-block w-2.5 h-2.5 rounded-full <?php echo $color; ?> shrink-0"></span>
+                            <span class="text-[12px] font-['Montserrat'] font-semibold text-[#262626]"><?php echo $status; ?>:</span>
+                            <span class="text-[12px] md:text-[13px] text-[#6B6B6B] font-['Open_Sans']"><?php echo $description; ?></span>
                         </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
                 
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)]">
                     <table class="w-full border-collapse">
                         <thead>
-                            <tr class="bg-[#F8F8F8]">
-                                <th class="p-3 border-y-[1px] border-[#E1E1E1] text-left text-[14px] md:text-[16px] font-['Open Sans'] font-semibold">Product</th>
-                                <th class="p-3 border-y-[1px] border-[#E1E1E1] text-left text-[14px] md:text-[16px] font-['Open Sans'] font-semibold">Return Details</th>
-                                <th class="p-3 border-y-[1px] border-[#E1E1E1] text-center text-[14px] md:text-[16px] font-['Open Sans'] font-semibold">Status</th>
-                                <th class="p-3 border-y-[1px] border-[#E1E1E1] text-center text-[14px] md:text-[16px] font-['Open Sans'] font-semibold">Actions</th>
+                            <tr class="bg-[#FBF9FA]">
+                                <th class="p-4 border-b border-[#262626]/[0.05] text-left text-[11px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[#6B6B6B]">Product</th>
+                                <th class="p-4 border-b border-[#262626]/[0.05] text-left text-[11px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[#6B6B6B]">Return Details</th>
+                                <th class="p-4 border-b border-[#262626]/[0.05] text-center text-[11px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[#6B6B6B]">Status</th>
+                                <th class="p-4 border-b border-[#262626]/[0.05] text-center text-[11px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[#6B6B6B]">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -142,38 +146,36 @@ require_once "../includes/auth/google.php";
                                 $image_path = isset($request['image_path']) && $request['image_path'] !== '' ? product_image_url($request['image_path'], '../assets/products/') : "../assets/products/img1.svg";
                                 $status_color = isset($status_colors[$request['status']]) ? $status_colors[$request['status']] : 'bg-[#E8B006]';
                             ?>
-                            <tr class="border-b-[1px] border-[#E1E1E1]">
-                                <td class="p-3">
+                            <tr class="border-b border-[#262626]/[0.06] last:border-b-0">
+                                <td class="p-4 align-top">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-[60px] h-[60px] rounded-[4px] overflow-hidden">
+                                        <div class="w-[72px] h-[72px] rounded-[12px] overflow-hidden shrink-0">
                                             <img src="<?php echo $image_path; ?>" class="w-full h-full object-cover" alt="<?php echo $request['product_name']; ?>" />
                                         </div>
                                         <div>
-                                            <h4 class="text-[15px] font-['Open Sans'] font-medium"><?php echo $request['product_name']; ?></h4>
-                                            <p class="text-[13px] text-[#262626] font-['Open Sans']">Size: <?php echo $request['size']; ?> • Color: <?php echo $request['colors']; ?></p>
-                                            <p class="text-[13px] text-[#262626] font-['Open Sans']">Qty: <?php echo $request['return_quantity']; ?> • ₦<?php echo number_format((float)$request['price']); ?></p>
+                                            <h4 class="text-[15px] font-['Montserrat'] font-semibold text-[#262626]"><?php echo $request['product_name']; ?></h4>
+                                            <p class="text-[12px] md:text-[13px] text-[#5F5F5F] font-['Open_Sans'] mt-0.5">Size: <?php echo $request['size']; ?> • Color: <?php echo $request['colors']; ?></p>
+                                            <p class="text-[12px] md:text-[13px] text-[#5F5F5F] font-['Open_Sans'] mt-0.5">Qty: <?php echo $request['return_quantity']; ?> • ₦<?php echo number_format((float)$request['price']); ?></p>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="p-3">
-                                    <p class="text-[14px] font-['Open Sans'] font-medium">Reason: <?php echo $request['return_reason']; ?></p>
-                                    <p class="text-[13px] text-[#777777] font-['Open Sans'] mt-1"><?php echo formatDate($request['created_at']); ?></p>
-                                    <p class="text-[13px] text-[#262626] font-['Open Sans'] mt-1">Order #<?php echo $request['order_id']; ?></p>
+                                <td class="p-4 align-top">
+                                    <p class="text-[13px] md:text-[14px] font-['Montserrat'] font-semibold text-[#262626]">Reason: <?php echo $request['return_reason']; ?></p>
+                                    <p class="text-[12px] text-[#8A8A8A] font-['Open_Sans'] mt-1"><?php echo formatDate($request['created_at']); ?></p>
+                                    <p class="text-[12px] md:text-[13px] text-[#5F5F5F] font-['Open_Sans'] mt-1">Order #<?php echo $request['order_id']; ?></p>
 
                                     <?php if (!empty($request['admin_message'])): ?>
-                                    <div class="mt-3 rounded-[4px] border-l-[3px] p-3 bg-[<?php echo store_color('color_tint'); ?>]" style="border-color:<?php echo store_color('color_primary'); ?>">
-                                        <p class="text-[12px] font-['Open Sans'] font-semibold text-[<?php echo store_color('color_primary'); ?>]">Update on your return</p>
-                                        <p class="text-[13px] text-[#262626] font-['Open Sans'] mt-1"><?php echo nl2br(htmlspecialchars($request['admin_message'])); ?></p>
+                                    <div class="mt-3 rounded-[12px] border-l-[3px] p-4 bg-[<?php echo store_color('color_tint'); ?>]" style="border-color:<?php echo store_color('color_primary'); ?>">
+                                        <p class="text-[11px] tracking-[0.12em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_primary'); ?>]">Update on your return</p>
+                                        <p class="text-[13px] text-[#262626] font-['Open_Sans'] mt-1 leading-relaxed"><?php echo nl2br(htmlspecialchars($request['admin_message'])); ?></p>
                                     </div>
                                     <?php endif; ?>
                                 </td>
-                                <td class="p-3 text-center">
-                                    <div class="flex flex-col items-center">
-                                        <span class="inline-block py-1 px-3 <?php echo $status_color; ?> text-white text-[13px] font-['Open Sans'] rounded-[15px]"><?php echo $request['status']; ?></span>
-                                    </div>
+                                <td class="p-4 text-center align-middle">
+                                    <span class="inline-block px-3 py-1.5 <?php echo $status_color; ?> text-white text-[10px] tracking-[0.1em] uppercase font-['Montserrat'] font-semibold rounded-full whitespace-nowrap"><?php echo $request['status']; ?></span>
                                 </td>
-                                <td class="p-3 text-center">
-                                    <a href="./return-details.php?id=<?php echo $request['id']; ?>" class="inline-block py-1 px-3 bg-[#F3F3F3] text-[#262626] text-[13px] font-['Open Sans'] rounded-[4px]">View Details</a>
+                                <td class="p-4 text-center align-middle">
+                                    <a href="./return-details.php?id=<?php echo $request['id']; ?>" class="inline-block px-4 py-2 border border-[#262626]/15 text-[#262626] text-[11px] tracking-[0.1em] uppercase font-['Montserrat'] font-semibold rounded-full hover:border-[<?php echo store_color('color_primary'); ?>] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200 whitespace-nowrap">View Details</a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>

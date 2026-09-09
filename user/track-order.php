@@ -186,7 +186,7 @@ require_once "../includes/auth/google.php";
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 <?php include '../includes/tailwind-components.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -199,48 +199,51 @@ require_once "../includes/auth/google.php";
     include(__DIR__ . '/../includes/options.php');
     ?>
 
-        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
+        <section class="w-full pt-7 pb-3 border-b border-[#262626]/[0.05]">
             <div class="w-[90%] mx-auto max-w-[1440px]">
-                <div class="flex items-center gap-1 cursor-pointer">
-                    <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <a href="./orders.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</a>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">Track Order</span>
+                <div class="flex items-center gap-2 text-[12px] font-['Montserrat'] font-medium tracking-[0.03em]">
+                    <a href="../index.php" class="text-[#5F5F5F] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">Home</a>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-[#262626]/20 leading-none"></i>
+                    <a href="./orders.php" class="text-[#5F5F5F] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">My Orders</a>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-[#262626]/20 leading-none"></i>
+                    <span class="text-[<?php echo store_color('color_heading'); ?>] font-semibold">Track Order</span>
                 </div>
             </div>
         </section>
 
         <div class="w-[90%] mx-auto max-w-[1440px] bg-[<?php echo store_color('color_bg'); ?>] py-5">
             <div class="w-full md:w-[80%] lg:w-[70%] mx-auto">
-                <h1 class="text-[24px] md:text-[28px] text-[#2C2C2C] font-['Open Sans'] font-medium mb-6 text-center">Track Your Order</h1>
+                <h1 class="text-[<?php echo store_color('color_heading'); ?>] text-[32px] md:text-[40px] leading-[1.12] font-['Cormorant_Garamond'] font-medium text-center mb-2">Track Your Order</h1>
                 
                 <!-- Order Details Card -->
-                <div class="order-details bg-[#FBFBFB] p-4 md:p-6 rounded-[8px] mb-6 border-[1px] border-[#F3F3F3]">
+                <div class="order-details bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)] p-6 md:p-8 mb-6">
                     <!-- <div class="flex flex-col md:flex-row justify-between mb-4">
                         <div>
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">Order ID: <span class="font-medium">#<?php echo $order['id']; ?></span></p>
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">Order Date: <span class="font-medium"><?php echo formatDate($order['created_at']); ?></span></p>
+                            <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans']">Order ID: <span class="font-medium">#<?php echo $order['id']; ?></span></p>
+                            <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans']">Order Date: <span class="font-medium"><?php echo formatDate($order['created_at']); ?></span></p>
                         </div>
                         <div class="mt-3 md:mt-0">
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">Payment Ref: <span class="font-medium"><?php echo $order['payment_reference']; ?></span></p>
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">Delivery Method: <span class="font-medium"><?php echo ucfirst($order['delivery_method']); ?></span></p>
+                            <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans']">Payment Ref: <span class="font-medium"><?php echo $order['payment_reference']; ?></span></p>
+                            <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans']">Delivery Method: <span class="font-medium"><?php echo ucfirst($order['delivery_method']); ?></span></p>
                         </div>
                     </div> -->
 
-                    <div class="flex justify-between mb-4">
-                        <div>
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#777777]">Status</p>
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#777777]">Order ID</p>
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#777777]">Delivery Time</p>
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#777777]">Order Type</p>
-                                                        <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#777777]">Order Type</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-5 pb-6 mb-6 border-b border-[#262626]/[0.06]">
+                        <div class="flex items-center justify-between gap-4">
+                            <span class="text-[11px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[#777777]">Status</span>
+                            <span class="px-4 py-1.5 <?php echo $status_color; ?> text-white text-[11px] tracking-[0.1em] uppercase font-['Montserrat'] font-semibold rounded-full whitespace-nowrap"><?php echo $current_status; ?></span>
                         </div>
-                        <div class="text-right">
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#262626] font-medium"> <div class="py-1 px-4 <?php echo $status_color; ?> text-white text-[14px] md:text-[16px] font-['Open Sans'] rounded-[28px]"><?php echo $current_status; ?></div></p>
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#262626] font-medium">#<?php echo $order['id']; ?></p>
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#262626] font-medium">2-4 days</p>
-                            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] text-[#262626] font-medium"><?php echo ucfirst($order['delivery_method']); ?></p>
+                        <div class="flex items-center justify-between gap-4">
+                            <span class="text-[11px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[#777777]">Order ID</span>
+                            <span class="text-[15px] md:text-[16px] font-['Montserrat'] font-semibold text-[#262626]">#<?php echo $order['id']; ?></span>
+                        </div>
+                        <div class="flex items-center justify-between gap-4">
+                            <span class="text-[11px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[#777777]">Delivery Time</span>
+                            <span class="text-[15px] md:text-[16px] font-['Montserrat'] font-medium text-[#262626]">2-4 days</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-4">
+                            <span class="text-[11px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[#777777]">Order Type</span>
+                            <span class="text-[15px] md:text-[16px] font-['Montserrat'] font-medium text-[#262626] capitalize"><?php echo ucfirst($order['delivery_method']); ?></span>
                         </div>
                     </div>
 
@@ -248,7 +251,7 @@ require_once "../includes/auth/google.php";
                     
                     <?php if ($order['pickup_location']): ?>
                     <div class="mb-4">
-                        <p class="text-[14px] md:text-[16px] text-[#777777] font-['Open Sans']">Pickup Location: <span class="font-medium text-[#262626]"><?php echo $order['pickup_location']; ?></span></p>
+                        <p class="text-[13px] md:text-[14px] text-[#5F5F5F] font-['Open_Sans']">Pickup Location: <span class="font-medium text-[#262626]"><?php echo $order['pickup_location']; ?></span></p>
                     </div>
                     <?php endif; ?>
                     
@@ -257,7 +260,7 @@ require_once "../includes/auth/google.php";
         <i class="fa-solid fa-circle-info text-[24px] text-[<?php echo store_color('color_primary'); ?>] leading-none" alt="Note Icon"></i> 
         <div>
             <p class="text-[14px] md:text-[16px] text-[<?php echo store_color('color_primary'); ?>] font-['Open Sans'] font-semibold">Order Notes:</p>
-            <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']">
+            <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans']">
                 <?php echo $order['status_notes']; ?>
             </p>
         </div>
@@ -267,7 +270,7 @@ require_once "../includes/auth/google.php";
                 </div>
                 
                 <!-- Status Tracker -->
-                <div class="status-tracker p-4 md:p-6 border-[1px] border-[#E1E1E1] rounded-[8px] mb-6">
+                <div class="status-tracker bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)] p-6 md:p-8 mb-6">
                   
                     
                   <div class="tracker-timeline mt-8">
@@ -285,8 +288,8 @@ require_once "../includes/auth/google.php";
                                   <i class="fa-solid fa-clock <?php echo ($current_status_index >= 0) ? 'text-white' : 'text-[#C5C5C5]'; ?> text-[20px] leading-none" alt="processing"></i>
                               </div>
                               <div class="status-content ml-4">
-                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Processing</h4>
-                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $processing_date; ?></p>
+                                  <h4 class="text-[16px] md:text-[18px] font-['Montserrat'] font-semibold text-[#2C2C2C]">Order Processing</h4>
+                                  <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans']"><?php echo $processing_date; ?></p>
                               </div>
                           </div>
 
@@ -301,8 +304,8 @@ require_once "../includes/auth/google.php";
 </div>
 
                               <div class="status-content ml-4">
-                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Confirmed</h4>
-                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $confirmed_date; ?></p>
+                                  <h4 class="text-[16px] md:text-[18px] font-['Montserrat'] font-semibold text-[#2C2C2C]">Order Confirmed</h4>
+                                  <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans']"><?php echo $confirmed_date; ?></p>
                               </div>
 
                           </div>
@@ -318,11 +321,11 @@ require_once "../includes/auth/google.php";
 </div>
 
                               <div class="status-content ml-4">
-                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Shipped</h4>
-                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $shipped_date; ?></p>
+                                  <h4 class="text-[16px] md:text-[18px] font-['Montserrat'] font-semibold text-[#2C2C2C]">Order Shipped</h4>
+                                  <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans']"><?php echo $shipped_date; ?></p>
                                   <?php if (isset($order['dispatcher_details']) && !empty($order['dispatcher_details'])): ?>
                   <div class="mb-4">
-    <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] bg-white p-2 rounded-[4px] mt-1"><?php echo $order['dispatcher_details']; ?></p>
+    <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans'] bg-white p-2 rounded-[4px] mt-1"><?php echo $order['dispatcher_details']; ?></p>
                   </div>
                   <?php endif; ?>
                               </div>
@@ -342,8 +345,8 @@ require_once "../includes/auth/google.php";
 </div>
 
                               <div class="status-content ml-4">
-                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Delivered</h4>
-                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo $delivered_date; ?></p>
+                                  <h4 class="text-[16px] md:text-[18px] font-['Montserrat'] font-semibold text-[#2C2C2C]">Order Delivered</h4>
+                                  <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans']"><?php echo $delivered_date; ?></p>
                                   <?php if ($current_status === 'Delivered'): ?>
                                       <?php if ($buyer_confirmed): ?>
                                       <p class="mt-2 inline-flex items-center gap-1.5 text-[13px] font-['Open Sans'] text-[#2FA05A]">
@@ -351,7 +354,7 @@ require_once "../includes/auth/google.php";
                                       </p>
                                       <?php else: ?>
                                       <form method="POST" class="mt-2" onsubmit="return confirm('Have you received all the items in this order?');">
-                                          <button type="submit" name="confirm_delivery" value="1" class="inline-flex items-center gap-1.5 py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[13px] font-['Open Sans'] rounded-[6px] cursor-pointer">
+                                          <button type="submit" name="confirm_delivery" value="1" class="inline-flex items-center gap-1.5 py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[11px] tracking-[0.12em] uppercase font-['Montserrat'] font-semibold rounded-full cursor-pointer">
                                               <i class="fa-solid fa-hand-pointer"></i> I've Received My Order
                                           </button>
                                       </form>
@@ -369,10 +372,10 @@ require_once "../includes/auth/google.php";
                                   </svg>
                               </div>
                               <div class="status-content ml-4">
-                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Returned</h4>
-                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo formatDate($status_timestamps['Returned'] ?? null); ?></p>
+                                  <h4 class="text-[16px] md:text-[18px] font-['Montserrat'] font-semibold text-[#2C2C2C]">Order Returned</h4>
+                                  <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans']"><?php echo formatDate($status_timestamps['Returned'] ?? null); ?></p>
                                   <?php if (isset($order['order_note']) && !empty($order['order_note'])): ?>
-                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] mt-2 max-w-[300px] md:max-w-[500px]"><?php echo $order['order_note']; ?></p>
+                                  <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans'] mt-2 max-w-[300px] md:max-w-[500px]"><?php echo $order['order_note']; ?></p>
                                   <?php endif; ?>
                               </div>
                           </div>
@@ -385,10 +388,10 @@ require_once "../includes/auth/google.php";
                                   </svg>
                               </div>
                               <div class="status-content ml-4">
-                                  <h4 class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Order Cancelled</h4>
-                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans']"><?php echo formatDate($status_timestamps['Cancelled'] ?? null); ?></p>
+                                  <h4 class="text-[16px] md:text-[18px] font-['Montserrat'] font-semibold text-[#2C2C2C]">Order Cancelled</h4>
+                                  <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans']"><?php echo formatDate($status_timestamps['Cancelled'] ?? null); ?></p>
                                   <?php if (isset($order['order_note']) && !empty($order['order_note'])): ?>
-                                  <p class="text-[14px] md:text-[16px] text-[#262626] font-['Open Sans'] mt-2 max-w-[300px] md:max-w-[500px]"><?php echo $order['order_note']; ?></p>
+                                  <p class="text-[14px] md:text-[15px] text-[#5F5F5F] font-['Open_Sans'] mt-2 max-w-[300px] md:max-w-[500px]"><?php echo $order['order_note']; ?></p>
                                   <?php endif; ?>
                               </div>
                           </div>
@@ -397,34 +400,34 @@ require_once "../includes/auth/google.php";
                   </div>
               </div>
                 <!-- Order Items -->
-                <!-- <div class="order-items border-[1px] border-[#E1E1E1] rounded-[8px] p-4 md:p-6">
-                    <h3 class="text-[18px] md:text-[20px] font-['Open Sans'] font-semibold mb-4">Order Items</h3>
+                <!-- <div class="order-items bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)] p-6 md:p-8">
+                    <h3 class="text-[20px] md:text-[24px] font-['Cormorant_Garamond'] font-medium text-[<?php echo store_color('color_heading'); ?>] mb-5">Order Items</h3>
                     
                     <div class="flex flex-col gap-4">
                         <?php foreach ($order_items as $item): 
                             $color = getProductColor($conn, $item['product_id']);
                             $image_path = isset($item['image_path']) && $item['image_path'] !== '' ? product_image_url($item['image_path'], '../assets/products/') : "../assets/products/img1.svg";
                         ?>
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-3 border-[1px] border-[#E1E1E1] rounded-[4px]">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-[#FBF9FA] rounded-[14px] border border-[#262626]/5">
                             <div class="flex items-center gap-3">
-                                <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
+                                <div class="w-[88px] h-[88px] rounded-[12px] overflow-hidden shrink-0">
                                     <img src="<?php echo $image_path; ?>" class="w-full h-full object-cover" alt="<?php echo $item['product_name']; ?>" />
                                 </div>
                                 <div>
-                                    <h4 class="text-[16px] font-['Open Sans'] font-medium"><?php echo $item['product_name']; ?></h4>
-                                    <p class="text-[14px] text-[#262626] font-['Open Sans']">Size: <?php echo $item['size']; ?> • Color: <?php echo $color; ?></p>
-                                    <p class="text-[14px] text-[#262626] font-['Open Sans']">Qty: <?php echo $item['quantity']; ?></p>
+                                    <h4 class="text-[15px] md:text-[16px] font-['Montserrat'] font-semibold text-[#262626]"><?php echo $item['product_name']; ?></h4>
+                                    <p class="text-[13px] md:text-[14px] text-[#5F5F5F] font-['Open_Sans']">Size: <?php echo $item['size']; ?> • Color: <?php echo $color; ?></p>
+                                    <p class="text-[13px] md:text-[14px] text-[#5F5F5F] font-['Open_Sans']">Qty: <?php echo $item['quantity']; ?></p>
                                 </div>
                             </div>
                             <div class="mt-3 md:mt-0 ml-0 md:ml-auto">
-                                <p class="text-[16px] font-['Open Sans'] font-medium">₦<?php echo number_format((float)$item['price']); ?></p>
+                                <p class="text-[15px] md:text-[16px] font-['Montserrat'] font-semibold text-[#262626]">₦<?php echo number_format((float)$item['price']); ?></p>
                             </div>
                         </div>
                         <?php endforeach; ?>
                     </div>
                     
                     <div class="mt-6 flex justify-between">
-                        <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Total Amount:</p>
+                        <p class="text-[16px] md:text-[18px] font-['Montserrat'] font-semibold text-[#262626]">Total Amount:</p>
                         <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-bold">₦<?php echo number_format((float)$order['order_total']); ?></p>
                     </div>
                 </div> -->
@@ -433,8 +436,8 @@ require_once "../includes/auth/google.php";
 <!-- Replace the existing Order Items section with this code -->
 
 <!-- Order Items -->
-<div class="order-items border-[1px] border-[#E1E1E1] rounded-[8px] p-4 md:p-6">
-    <h3 class="text-[18px] md:text-[20px] font-['Open Sans'] font-semibold mb-4">Order Items</h3>
+<div class="order-items bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)] p-6 md:p-8">
+    <h3 class="text-[20px] md:text-[24px] font-['Cormorant_Garamond'] font-medium text-[<?php echo store_color('color_heading'); ?>] mb-5">Order Items</h3>
     
     <div class="flex flex-col gap-4">
         <?php foreach ($order_items as $item): 
@@ -452,50 +455,50 @@ require_once "../includes/auth/google.php";
             $return_result = $return_check_stmt->get_result();
             $has_return_request = ($return_result->num_rows > 0);
         ?>
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-3 border-[1px] border-[#E1E1E1] rounded-[4px]">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-[#FBF9FA] rounded-[14px] border border-[#262626]/5">
             <div class="flex items-center gap-3">
-                <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
+                <div class="w-[88px] h-[88px] rounded-[12px] overflow-hidden shrink-0">
                     <img src="<?php echo $image_path; ?>" class="w-full h-full object-cover" alt="<?php echo $item['product_name']; ?>" />
                 </div>
                 <div>
-                    <h4 class="text-[16px] font-['Open Sans'] font-medium"><?php echo $item['product_name']; ?></h4>
-                    <p class="text-[14px] text-[#262626] font-['Open Sans']">Size: <?php echo $item['size']; ?> • Color: <?php echo $color; ?></p>
-                    <p class="text-[14px] text-[#262626] font-['Open Sans']">Qty: <?php echo $item['quantity']; ?></p>
+                    <h4 class="text-[15px] md:text-[16px] font-['Montserrat'] font-semibold text-[#262626]"><?php echo $item['product_name']; ?></h4>
+                    <p class="text-[13px] md:text-[14px] text-[#5F5F5F] font-['Open_Sans']">Size: <?php echo $item['size']; ?> • Color: <?php echo $color; ?></p>
+                    <p class="text-[13px] md:text-[14px] text-[#5F5F5F] font-['Open_Sans']">Qty: <?php echo $item['quantity']; ?></p>
                     
                     <?php if ($can_request_return): ?>
                     <div class="mt-2">
                         <?php if ($has_return_request): ?>
                         <span class="text-[13px] text-[<?php echo store_color('color_primary'); ?>] font-['Open Sans'] italic">Return request pending</span>
                         <?php else: ?>
-                        <a href="./return-request.php?order_id=<?php echo $order_id; ?>&item_id=<?php echo $item['id']; ?>" class="inline-block py-1 px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[13px] font-['Open Sans'] rounded-[4px]">Request Return</a>
+                        <a href="./return-request.php?order_id=<?php echo $order_id; ?>&item_id=<?php echo $item['id']; ?>" class="inline-block py-1 px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[11px] tracking-[0.12em] uppercase font-['Montserrat'] font-semibold rounded-full">Request Return</a>
                         <?php endif; ?>
                     </div>
                     <?php endif; ?>
                 </div>
             </div>
             <div class="mt-3 md:mt-0 ml-0 md:ml-auto">
-                <p class="text-[16px] font-['Open Sans'] font-medium">₦<?php echo number_format((float)$item['price']); ?></p>
+                <p class="text-[15px] md:text-[16px] font-['Montserrat'] font-semibold text-[#262626]">₦<?php echo number_format((float)$item['price']); ?></p>
             </div>
         </div>
         <?php endforeach; ?>
     </div>
     
     <div class="mt-6 flex justify-between">
-        <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-medium">Total Amount:</p>
+        <p class="text-[16px] md:text-[18px] font-['Montserrat'] font-semibold text-[#262626]">Total Amount:</p>
         <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-bold">₦<?php echo number_format((float)$order['order_total']); ?></p>
     </div>
 </div>
               
                 <!-- Actions -->
                 <div class="actions mt-6 flex flex-col md:flex-row gap-3 justify-end">
-                    <a href="./orders.php" class="py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
+                    <a href="./orders.php" class="py-2 px-4 bg-[#F3F3F3] text-[#262626] text-center text-[12px] tracking-[0.1em] uppercase font-['Montserrat'] font-semibold rounded-full">Back to Orders</a>
                     
                     <div class="flex items-center gap-3">
                     <?php if ($current_status != 'Cancelled'): ?>
-                    <a href="./report-issue.php?id=<?php echo $order_id; ?>" class="w-full py-2 px-4 bg-[#E8B006] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px] text-nowrap">Report an Issue</a>
+                    <a href="./report-issue.php?id=<?php echo $order_id; ?>" class="w-full py-2 px-4 bg-[#E8B006] text-white text-center text-[12px] tracking-[0.1em] uppercase font-['Montserrat'] font-semibold rounded-full text-nowrap">Report an Issue</a>
                     <?php endif; ?>
                     
-                    <a href="<?php echo product_url($order_items[0]); ?>" class="w-full py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Re-Order</a>
+                    <a href="<?php echo product_url($order_items[0]); ?>" class="w-full py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[12px] tracking-[0.1em] uppercase font-['Montserrat'] font-semibold rounded-full">Re-Order</a>
                     </div>
                 </div>
             </div>

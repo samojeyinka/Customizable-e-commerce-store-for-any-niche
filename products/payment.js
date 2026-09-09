@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const orderRef = document.getElementById('order-ref').value;
         
         let handler = PaystackPop.setup({
-            key: 'pk_test_ed99e88c9f3e1caf961089161641b23813a8fc41', // Replace with your public key
+            key: window.PAYSTACK_PUBLIC_KEY || '',
             email: email,
             amount: amount * 100, // Convert to kobo
             currency: "NGN",

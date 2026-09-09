@@ -81,74 +81,67 @@ if(isset($_POST['login'])) {
 
 <!-- Your form HTML -->
 <div id="SignIn" class="tabcontent">
-    <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Welcome Back!</h3>
+    <div class="text-center mb-7">
+        <h3 class="text-[<?php echo store_color('color_heading'); ?>] text-[28px] md:text-[32px] leading-[1.15] font-['Cormorant_Garamond'] font-medium">Welcome Back!</h3>
+    </div>
     
     <!-- Show error message if exists -->
     <?php if(!empty($error)): ?>
-    <section id="dangeralert" class="flex flex-col items-center w-full bg-[#FDECEC] shadow-lg mt-2 py-3 px-4 rounded relative overflow-hidden">
-        <div class="h-[100%] w-[5px] bg-[#EE3F3F] absolute left-0 top-0"></div>
-        <div class="flex items-center gap-2 mr-auto">
-            <img src="<?php echo DOMAIN; ?>/assets/global/canceldanger.svg" id="closedangeralert" alt="Cancel danger alert" class="w-[24px] cursor-pointer" />
-            <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
-                Login Error
-            </p>
+    <section id="dangeralert" class="flex flex-col items-start w-full bg-[#FDECEC] border-l-[3px] border-[#EE3F3F] rounded-[10px] py-3 px-4 mb-4 relative overflow-hidden">
+        <div class="flex items-center gap-2 w-full">
+            <img src="<?php echo DOMAIN; ?>/assets/global/canceldanger.svg" id="closedangeralert" alt="Cancel danger alert" class="w-[18px] cursor-pointer" />
+            <p class="text-[15px] text-[#2C2C2C] font-['Open_Sans'] font-semibold">Login Error</p>
         </div>
-        <p class="text-[13px] md:text-[14px] text-start w-full font-Satoshi font-regular text-[#7F7F7F] mt-2 ml-[3rem] pr-3">
+        <p class="text-[13px] text-start w-full font-['Open_Sans'] text-[#7F7F7F] mt-1.5 pl-8 pr-2">
             <?php echo $error; ?>
         </p>
     </section>
     <?php endif; ?>
 
-    <form method="POST" class="flex flex-col gap-4 pt-4">
-        <div class="flex flex-col gap-1">
-            <label 
-                for="email" 
-                class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                Email
-            </label>
+    <form method="POST" class="flex flex-col gap-4 md:gap-5">
+        <div class="flex flex-col gap-1.5">
+            <label for="email" class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]/80">Email</label>
             <input
                 type="email"
                 name="email"
                 id="email"
                 required
                 placeholder="Enter your email address"
-                class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
+                class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
         </div>
 
-        <div class="flex flex-col gap-1">
-    <label
-        for="password"
-        class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-        Password
-    </label>
+        <div class="flex flex-col gap-1.5">
+            <label for="password" class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]/80">Password</label>
 
-    <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-        <input
-            type="password"
-            name="password"
-            id="signinpassword"
-            placeholder="Enter your password"
-            required
-            class="w-full font-['Open Sans'] bg-transparent outline-none font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-        <img src="<?php echo DOMAIN; ?>/assets/global/eye-slash.svg" id="showPasswordIcon" class="w-[24px] cursor-pointer" />
-        <img src="<?php echo DOMAIN; ?>/assets/global/eye.svg" id="hidePasswordIcon" class="w-[24px] cursor-pointer hidden" />
-    </div>
-</div>
+            <div class="flex items-center gap-1 bg-white border border-[#262626]/10 rounded-[10px] pl-4 pr-2 focus-within:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">
+                <input
+                    type="password"
+                    name="password"
+                    id="signinpassword"
+                    placeholder="Enter your password"
+                    required
+                    class="w-full font-['Open_Sans'] bg-transparent outline-none text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 text-[14px] md:text-[15px]" />
+                <img src="<?php echo DOMAIN; ?>/assets/global/eye-slash.svg" id="showPasswordIcon" class="w-[18px] cursor-pointer opacity-50 hover:opacity-100 transition-opacity" alt="Show password" />
+                <img src="<?php echo DOMAIN; ?>/assets/global/eye.svg" id="hidePasswordIcon" class="w-[18px] cursor-pointer opacity-50 hover:opacity-100 transition-opacity hidden" alt="Hide password" />
+            </div>
+        </div>
 
- <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-[14px] font-['Open Sans'] text-[<?php echo store_color('color_primary'); ?>] font-regular cursor-pointer">Forgot Password</a>
+        <div class="flex items-center justify-between gap-3">
+            <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-[12px] tracking-[0.08em] uppercase font-['Montserrat'] font-medium text-[<?php echo store_color('color_primary'); ?>] hover:underline cursor-pointer">Forgot Password?</a>
+        </div>
 
-        <button type="submit" name="login" class="w-full py-[8px] px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Sign In</button>
+        <button type="submit" name="login" class="w-full py-3.5 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[12px] md:text-[13px] tracking-[0.18em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] hover:shadow-[0_14px_30px_-12px_rgba(0,0,0,0.3)] transition-all duration-300">Sign In</button>
     </form>
 
-    <p class="text-center font-['Open Sans'] text-[17px] md:text-[18px] font-regular text-[#7A7A7A] py-3">
-        Or
-    </p>
+    <div class="flex items-center gap-4 my-5 md:my-6">
+        <span class="h-px flex-1 bg-[#262626]/10"></span>
+        <span class="text-[10px] tracking-[0.24em] uppercase font-['Montserrat'] font-semibold text-[#9A9A9A]">Or</span>
+        <span class="h-px flex-1 bg-[#262626]/10"></span>
+    </div>
 
-    <a href="<?= $url ?>" class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-        <img src="<?php echo DOMAIN; ?>/assets/global/google.svg" class="w-[20px]" />
-        <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#262626] py-3">
-            Sign In  with Google
-        </p>
+    <a href="<?= $url ?>" class="group w-full flex items-center justify-center gap-3 border border-[#262626]/10 bg-white rounded-full px-6 py-3 cursor-pointer hover:border-[#262626]/25 transition-all duration-200">
+        <img src="<?php echo DOMAIN; ?>/assets/global/google.svg" class="w-[18px]" alt="Google" />
+        <span class="text-[13px] font-['Montserrat'] font-medium text-[#262626]">Sign In with Google</span>
     </a>
 </div>
 
@@ -160,12 +153,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const hidePasswordIcon = document.getElementById('hidePasswordIcon');
     const signinpassword = document.getElementById('signinpassword');
     
-    if(showPasswordIcon && hidePasswordIcon && password) {
+    if(showPasswordIcon && hidePasswordIcon && signinpassword) {
         // Show password (eye icon clicked)
         showPasswordIcon.addEventListener('click', function() {
-            // Debug
-            console.log('Show password clicked');
-            
             // Important: This actually changes the password field to show text
             signinpassword.type = 'text';
             
@@ -176,9 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Hide password (eye-slash icon clicked)
         hidePasswordIcon.addEventListener('click', function() {
-            // Debug
-            console.log('Hide password clicked');
-            
             // Important: This actually changes the password field back to hide text
             signinpassword.type = 'password';
             

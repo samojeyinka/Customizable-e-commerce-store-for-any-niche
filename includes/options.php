@@ -58,27 +58,27 @@ $topCategoriesJson = json_encode($topCategories);
 ?>
 
 <!-- The main category bar -->
-<section class="w-full py-4 border-b-[1px] border-[#E1E1E1]">
-    <div class="w-[90%] mx-auto max-w-[1440px] hidden md:flex items-center justify-between">
-        <div class="w-[70%] flex items-center gap-10">
+<section class="w-full py-3.5 bg-white border-b border-[#262626]/[0.06]">
+    <div class="w-[92%] mx-auto max-w-[1440px] hidden md:flex items-center justify-between">
+        <div class="flex items-center gap-8 lg:gap-11">
             <?php foreach ($topCategories as $category): ?>
-            <div class="custom-dropdown shrink-0">
-                <div class="flex items-center gap-2 dropdown-toggle">
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium pointer-events-none hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors">
+            <div class="custom-dropdown shrink-0 group">
+                <div class="flex items-center gap-2 dropdown-toggle cursor-pointer">
+                    <span class="text-[#262626]/80 group-hover:text-[<?php echo store_color('color_primary'); ?>] text-[11px] lg:text-[12px] font-['Montserrat'] font-semibold tracking-[0.14em] uppercase pointer-events-none transition-colors duration-200">
                         <?php echo htmlspecialchars($category['category_title']); ?>
                     </span>
-                    <i class="fa-solid fa-chevron-down arrow-down text-[12px] text-[#262626] leading-none transition-transform duration-200 pointer-events-none"></i>
+                    <i class="fa-solid fa-chevron-down arrow-down text-[9px] text-[#262626]/40 group-hover:text-[<?php echo store_color('color_primary'); ?>] leading-none transition-all duration-200 pointer-events-none"></i>
                 </div>
-                <div class="dropdown-content top-[30px] z-[50] min-w-[10rem] p-2">
-                    <div class="flex flex-col gap-1">
+                <div class="dropdown-content top-[34px] z-[50] min-w-[13rem] p-1.5 rounded-[14px] border-[#F0E8EC] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.28)]">
+                    <div class="flex flex-col gap-0.5">
                         <?php if (!empty($category['brands'])): ?>
                             <?php foreach ($category['brands'] as $brand): ?>
-                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>&brand=<?php echo $brand['brand_id']; ?>" class="text-nowrap text-[14px] font-['Open Sans'] text-[#262626]">
+                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>&brand=<?php echo $brand['brand_id']; ?>" class="text-nowrap rounded-[8px] px-3 py-2 text-[13px] font-['Open Sans'] text-[#262626] hover:bg-[<?php echo store_color('color_tint'); ?>] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors">
                                 <?php echo htmlspecialchars($brand['brand_title']); ?>
                             </a>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>" class="text-center text-[14px] font-['Open Sans'] text-[#262626]">View All</a>
+                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>" class="text-center rounded-[8px] px-3 py-2 text-[13px] font-['Open Sans'] text-[#262626] hover:bg-[<?php echo store_color('color_tint'); ?>] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors">View All</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -87,38 +87,40 @@ $topCategoriesJson = json_encode($topCategories);
         </div>
 
         <?php if (isAuthenticated()): ?>
-            <div class="flex items-center gap-2 cursor-pointer pt-4">
-                <i class="fa-solid fa-truck-fast text-[24px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>
-                <a href="<?php echo DOMAIN; ?>/user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans"] text-[<?php echo store_color('color_primary'); ?>] font-medium underline'>Track your order</a>
-            </div>
+            <a href="<?php echo DOMAIN; ?>/user/orders.php" class="flex items-center gap-2.5 shrink-0 group">
+                <i class="fa-solid fa-truck-fast text-[16px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>
+                <span class="text-[11px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[#262626]/70 group-hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors">Track your order</span>
+            </a>
         <?php endif; ?>
     </div>
 
-    <div class="w-[90%] mx-auto max-w-[1440px] flex items-center gap-10 md:hidden">
-        <i class="fa-solid fa-bars cursor-pointer text-[24px] text-[#262626]" onclick="openMobileMenu()" alt="menu"></i>
+    <div class="w-[92%] mx-auto max-w-[1440px] flex items-center gap-3 md:hidden">
+        <button onclick="openMobileMenu()" aria-label="Open menu" class="shrink-0 flex items-center justify-center w-10 h-10 rounded-full border border-[#262626]/10 text-[#262626] hover:text-[<?php echo store_color('color_primary'); ?>] hover:border-[<?php echo store_color('color_primary'); ?>] transition-colors cursor-pointer">
+            <i class="fa-solid fa-bars text-[16px] leading-none" alt="menu"></i>
+        </button>
 
         <!-- The mobile nav starts -->
-        <div id="menuNav" class="dropdown-menu border-t-[1px] border-[#E1E1E1] bg-white overflow-y-auto">
-            <div class="w-[92%] mx-auto max-w-[1440px] py-4">
+        <div id="menuNav" class="dropdown-menu border-t-[1px] border-[#F0E8EC] bg-white overflow-y-auto">
+            <div class="w-[92%] mx-auto max-w-[1440px] py-5">
                 <?php foreach ($topCategories as $category): ?>
-                    <button class="menu-accordion cursor-pointer w-full flex items-center justify-between border-b-[1px] border-[#E1E1E1] pb-[1px] text-[15px] md:text-[16px] text-[#262626] font-['Open Sans'] font-medium"><?php echo htmlspecialchars($category['category_title']); ?></button>
-                    <div class="menufaqext text-[16px] font-regular text-[#262626] flex flex-col gap-3">
+                    <button class="menu-accordion cursor-pointer w-full flex items-center justify-between gap-4 border-b-[1px] border-[#262626]/[0.07] py-4 text-[15px] md:text-[16px] text-[#262626] font-['Montserrat'] font-medium"><?php echo htmlspecialchars($category['category_title']); ?></button>
+                    <div class="menufaqext text-[15px] font-regular text-[#262626] flex flex-col gap-3">
                     <?php if (!empty($category['brands'])): ?>
                         <?php foreach ($category['brands'] as $brand): ?>    
-                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>&brand=<?php echo $brand['brand_id']; ?>" class="text-nowrap">
+                            <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>&brand=<?php echo $brand['brand_id']; ?>" class="text-nowrap text-[#262626]/80 hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors">
                             <?php echo htmlspecialchars($brand['brand_title']); ?>
                         </a>
                     <?php endforeach; ?>
                     <?php else: ?>
-                        <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>" class="text-left">View All</a>
+                        <a href="<?php echo DOMAIN; ?>/products/index.php?category=<?php echo $category['category_id']; ?>" class="text-left text-[#262626]/80">View All</a>
                     <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
 
                 <?php if (isAuthenticated()): ?>
-                    <div class="flex items-center gap-2 cursor-pointer pt-4">
-                        <i class="fa-solid fa-truck-fast text-[24px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>
-                        <a href="<?php echo DOMAIN; ?>/user/orders.php" class='text-[13px] md:text-[14px] font-["Open Sans"] text-[<?php echo store_color('color_primary'); ?>] font-medium underline'>Track your order</a>
+                    <div class="flex items-center gap-2.5 cursor-pointer pt-6">
+                        <i class="fa-solid fa-truck-fast text-[18px] text-[<?php echo store_color('color_primary'); ?>] leading-none"></i>
+                        <a href="<?php echo DOMAIN; ?>/user/orders.php" class='text-[13px] font-["Open Sans"] text-[<?php echo store_color('color_primary'); ?>] font-medium'>Track your order</a>
                     </div>
                 <?php endif; ?>
             </div>
@@ -126,22 +128,22 @@ $topCategoriesJson = json_encode($topCategories);
         <!-- The mobile nav ends -->
 
 <!-- Mobile live search (driven by functions/search.js) -->
-<div class="mobile-search-container flex items-center gap-0 relative w-full" data-glor-search data-glor-domain="<?php echo DOMAIN; ?>">
-    <div class="flex items-center gap-2 border-y-[1px] border-l-[1px] border-[<?php echo store_color('color_tint'); ?>] rounded-l-[4px] p-2 w-full bg-white">
-        <i class="fa-solid fa-magnifying-glass text-[24px] text-[#777777] leading-none" alt="Search"></i>
+<div class="mobile-search-container flex items-center gap-0 relative flex-1 min-w-0" data-glor-search data-glor-domain="<?php echo DOMAIN; ?>">
+    <div class="flex items-center gap-2 bg-white rounded-full pl-4 pr-1 py-1 border border-[#262626]/10 focus-within:border-[<?php echo store_color('color_primary'); ?>] transition-colors w-full">
+        <i class="fa-solid fa-magnifying-glass text-[14px] text-[#262626]/35 leading-none" alt="Search"></i>
         <input 
             type="text" 
             id="mobileOnlySearchInput" 
             data-glor-q
             placeholder="<?php echo store_escape(store('search_placeholder')); ?>" 
-            class="w-full text-[14px] border-none outline-none placeholder:text-[#B8BBD7] bg-transparent" 
+            class="flex-1 min-w-0 text-[13px] border-none outline-none placeholder:text-[#B8BBD7] bg-transparent" 
             autocomplete="off"
         />
+        <button type="submit" id="mobileOnlySearchButton" data-glor-btn class="shrink-0 px-4 py-1.5 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[11px] tracking-[0.1em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] transition-colors">Search</button>
     </div>
-    <button type="submit" id="mobileOnlySearchButton" data-glor-btn class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
     
     <!-- Search Results Dropdown - content rendered by search.js -->
-    <div id="mobileOnlySearchResults" data-glor-panel class="absolute top-full left-0 w-full bg-white shadow-md rounded-b-md z-[100] mt-1 hidden"></div>
+    <div id="mobileOnlySearchResults" data-glor-panel class="absolute top-full left-0 w-full bg-white rounded-[14px] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)] z-[100] mt-2 hidden overflow-hidden"></div>
 </div>
     </div>
 </section>

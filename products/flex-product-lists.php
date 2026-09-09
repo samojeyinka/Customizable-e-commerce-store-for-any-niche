@@ -2,22 +2,22 @@
 
 ?>
 
-<div class="w-full flex items-center  gap-4 my-4">
+<div class="flex items-stretch gap-4 md:gap-5 w-max min-w-full py-1">
     <!-- The products cards -->
     <?php if (mysqli_num_rows($result) > 0): ?>
         <?php while ($product = mysqli_fetch_assoc($result)): ?>
             <!-- Product Card -->
-            <div class="w-[18rem] productbox rounded-[8px] overflow-hidden flex flex-col">
-                <a href="<?php echo product_url($product); ?>" class="w-full rounded-[8px] overflow-hidden relative cursor-pointer">
+            <div class="w-[250px] md:w-[290px] shrink-0 productbox group rounded-[16px] overflow-hidden flex flex-col bg-white">
+                <a href="<?php echo product_url($product); ?>" class="w-full rounded-[16px] overflow-hidden relative cursor-pointer block">
                     <?php if ($product['is_featured']): ?>
-                        <button class="w-[fit-content] h-[fit-content] bg-[<?php echo store_color('color_primary'); ?>] absolute top-4 left-4 rounded-[28px] text-white text-[12px] md:text-[13px] font-Onest font-regular py-1 px-2 absolute">Featured</button>
+                        <button class="absolute top-4 left-4 z-10 rounded-full bg-white/95 backdrop-blur-sm text-[10px] tracking-[0.18em] uppercase font-['Montserrat'] font-semibold py-1.5 px-3 text-[<?php echo store_color('color_primary'); ?>] drop-shadow-sm">Featured</button>
                     <?php endif; ?>
                     
-                    <img src="<?php echo !empty($product['main_image']) ? product_image_url($product['main_image']) : DOMAIN .'/assets/products/default.svg'; ?>" class="w-full h-[230px] object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
+                    <img src="<?php echo !empty($product['main_image']) ? product_image_url($product['main_image']) : DOMAIN .'/assets/products/default.svg'; ?>" class="w-full h-[230px] object-cover transition-transform duration-700 group-hover:scale-[1.06]" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
                     
            <!-- Only change the text of the button, keep styling consistent -->
         <button 
-            class="hidden add-to-cart-btn bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] text-[15px] md:text-[16px] font-Onest font-medium cursor-pointer p-2 w-[90%] absolute bottom-0 left-[5%]"
+            class="hidden add-to-cart-btn bg-[<?php echo store_color('color_primary'); ?>] text-white rounded-[8px] text-[15px] md:text-[16px] font-['Montserrat'] font-medium cursor-pointer p-2 w-[90%] absolute bottom-0 left-[5%]"
             data-product-id="<?php echo $product['product_id']; ?>"
             data-in-cart="<?php echo array_key_exists($product['product_id'], $cart_items) ? 'true' : 'false'; ?>"
             data-cart-id="<?php echo array_key_exists($product['product_id'], $cart_items) ? $cart_items[$product['product_id']] : ''; ?>"
@@ -38,8 +38,8 @@
                             </div>
                     </div>
                 </a>
-                <div class="flex items-center justify-between py-2">
-                    <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">
+                <div class="flex items-center justify-between gap-3 py-3 px-1">
+                    <span class="text-[<?php echo store_color('color_heading'); ?>] text-[13px] font-['Montserrat'] font-medium leading-snug">
                         <?php      
                         $product_name = htmlspecialchars($product['product_name']);
                         echo (strlen($product_name) > 20) ? substr($product_name, 0, 23) . '...' : $product_name;
@@ -48,16 +48,16 @@
                     
                     <?php if (!empty($product['min_discount_price'])): ?>
                   
-                        <div class="flex flex-col items-end">
+                        <div class="flex flex-col items-end shrink-0">
     <?php if(empty($product['min_discount_price']) || $product['min_discount_price'] == 0): ?>
-        <span class="text-[#262626] text-[14px] md:text-[15px] font-Onest font-medium">₦<?php echo number_format((float)$product['min_price']); ?></span>
+        <span class="text-[<?php echo store_color('color_heading'); ?>] text-[14px] font-['Montserrat'] font-semibold">₦<?php echo number_format((float)$product['min_price']); ?></span>
     <?php else: ?>
-        <span class="text-[#262626] text-[14px] md:text-[15px] font-Onest font-medium">₦<?php echo number_format((float)$product['min_discount_price']); ?></span>
+        <span class="text-[<?php echo store_color('color_heading'); ?>] text-[14px] font-['Montserrat'] font-semibold">₦<?php echo number_format((float)$product['min_discount_price']); ?></span>
     <?php endif; ?>
 </div>
                     <?php else: ?>
                         <!-- Show regular price -->
-                        <span class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">₦<?php echo number_format((float)$product['min_price']); ?></span>
+                        <span class="text-[<?php echo store_color('color_heading'); ?>] text-[13px] font-['Montserrat'] font-semibold shrink-0">₦<?php echo number_format((float)$product['min_price']); ?></span>
                     <?php endif; ?>
                 </div>
             </div>
@@ -70,4 +70,3 @@
 </div>
     
     
-</script>
