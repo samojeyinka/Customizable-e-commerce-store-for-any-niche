@@ -53,76 +53,92 @@ $contactFooter = store('contact');
 $socialFooter = store('social');
 $newsTitle = store('news_title', 'Get on the List');
 $newsText = store('news_text', '');
+$storeName = store_escape(store('store_name', 'GLOREFY'));
+$footLinks = [
+    ['About Us', DOMAIN . '/details/about-us.php'],
+    ['All Products', DOMAIN . '/products/index.php'],
+    ['Return Policy', DOMAIN . '/details/refund-and-return-policy.php'],
+    ['Contact Us', DOMAIN . '/details/contact-us.php'],
+];
+$contactItems = [
+    ['fa-location-dot', $contactFooter['address'] ?? ''],
+    ['fa-phone', $contactFooter['phone'] ?? ''],
+    ['fa-envelope', $contactFooter['email'] ?? ''],
+];
+$socials = [
+    'facebook' => 'fa-facebook-f', 'instagram' => 'fa-instagram', 'whatsapp' => 'fa-whatsapp',
+    'pinterest' => 'fa-pinterest-p', 'youtube' => 'fa-youtube', 'x' => 'fa-x-twitter',
+];
 ?>
-<footer class="w-full pt-8 mt-10 border-t-[1px] border-[<?php echo store_color('color_tint'); ?>]" style="background-color: var(--glor-tint, #F5EEF2)">
-    <div class="w-[90%] flex gap-6 flex-col md:flex-row justify-between mx-auto pb-8">
-        <div class="flex flex-col gap-3 md:max-w-[20rem]">
-            <a href="<?php echo DOMAIN; ?>/index.php" class="flex items-center gap-2">
-                <img src="<?php echo store_escape(store('logo_url')); ?>" alt="<?php echo store_escape(store('store_name')); ?>" class="w-[46px] h-[46px]" />
-            </a>
-            <p class="text-[14px] md:text-[15px] font-['Open Sans'] text-[#777777] leading-relaxed">
-                <?php echo store_escape(store('foot_blurb', '')); ?>
-            </p>
-            <div class="flex flex-col gap-2">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-location-dot text-[22px] text-[#777777]" alt="location"></i>
-                    <p class="text-[14px] font-['Open Sans'] text-[#777777]"><?php echo store_escape($contactFooter['address'] ?? ''); ?></p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-phone text-[22px] text-[#777777]" alt="phone"></i>
-                    <p class="text-[14px] font-['Open Sans'] text-[#777777]"><?php echo store_escape($contactFooter['phone'] ?? ''); ?></p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-envelope text-[22px] text-[#777777]" alt="email"></i>
-                    <p class="text-[14px] font-['Open Sans'] text-[#777777]"><?php echo store_escape($contactFooter['email'] ?? ''); ?></p>
-                </div>
+<footer class="w-full mt-14 border-t border-[#262626]/[0.05]" style="background-color: var(--glor-tint, #F5EEF2)">
+    <div class="w-[90%] mx-auto max-w-[1440px] pt-14 md:pt-20 pb-10">
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-10 gap-y-12">
+            <!-- Brand / contact -->
+            <div class="lg:col-span-5 lg:pr-10">
+                <a href="<?php echo DOMAIN; ?>/index.php" class="flex items-center gap-2.5 w-fit">
+                    <img src="<?php echo store_escape(store('logo_url')); ?>" alt="<?php echo $storeName; ?>" class="w-[42px] h-[42px]" />
+                    <span class="text-[<?php echo store_color('color_heading'); ?>] text-[18px] tracking-[0.3em] uppercase font-['Montserrat'] font-semibold leading-none pt-[2px]"><?php echo $storeName; ?></span>
+                </a>
+                <p class="text-[14px] md:text-[15px] font-['Open_Sans'] text-[#6B6B6B] leading-relaxed mt-5 max-w-[36ch]">
+                    <?php echo store_escape(store('foot_blurb', '')); ?>
+                </p>
+                <ul class="flex flex-col gap-3.5 mt-7">
+                    <?php foreach ($contactItems as [$icon, $label]): if (empty($label)) continue; ?>
+                    <li class="flex items-start gap-3">
+                        <span class="shrink-0 w-9 h-9 rounded-full bg-white/80 border border-[#262626]/[0.06] flex items-center justify-center">
+                            <i class="fa-solid <?php echo $icon; ?> text-[13px] text-[<?php echo store_color('color_heading'); ?>]/60 leading-none" aria-hidden="true"></i>
+                        </span>
+                        <span class="text-[14px] font-['Open_Sans'] text-[#6B6B6B] leading-relaxed pt-1.5"><?php echo store_escape($label); ?></span>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+
+            <!-- Explore -->
+            <div class="lg:col-span-3">
+                <h4 class="text-[11px] tracking-[0.28em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]">Quick Links</h4>
+                <ul class="flex flex-col gap-3 mt-6">
+                    <?php foreach ($footLinks as [$label, $href]): ?>
+                    <li>
+                        <a href="<?php echo store_escape($href); ?>" class="text-[14px] md:text-[15px] font-['Open_Sans'] text-[#6B6B6B] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200"><?php echo store_escape($label); ?></a>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="lg:col-span-4">
+                <h3 class="text-[<?php echo store_color('color_heading'); ?>] text-[30px] md:text-[34px] leading-[1.15] font-['Cormorant_Garamond'] font-medium"><?php echo store_escape($newsTitle); ?></h3>
+                <p class="text-[#6B6B6B] text-[14px] md:text-[15px] font-['Open_Sans'] leading-relaxed mt-3"><?php echo store_escape($newsText); ?></p>
+                <div id="response-message" class="text-[13px] font-['Open_Sans']"></div>
+                <form id="subscription-form" class="mt-6">
+                    <div class="flex items-center gap-2 bg-white rounded-full pl-5 pr-1.5 py-1.5 border border-[#262626]/[0.07] focus-within:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-300 shadow-[0_2px_14px_-8px_rgba(38,38,38,0.2)]">
+                        <input type="email" placeholder="Your email address" name="email" autocomplete="email" class="flex-1 min-w-0 text-[14px] border-none outline-none placeholder:text-[#B8BBD7] bg-transparent font-['Open_Sans']" />
+                        <button type="submit" class="shrink-0 px-5 py-2 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[11px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] transition-colors duration-300">Subscribe</button>
+                    </div>
+                </form>
             </div>
         </div>
 
-        <div class="flex flex-col gap-3">
-            <h1 class="text-[<?php echo store_color('color_heading'); ?>] text-[18px] md:text-[20px] font-['Montserrat'] font-semibold">Quick Links</h1>
-            <ul class="flex flex-col gap-3">
-                <li><a href="<?php echo DOMAIN; ?>/details/about-us.php" class="text-[14px] md:text-[15px] font-['Open Sans'] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors">About Us</a></li>
-                <li><a href="<?php echo DOMAIN; ?>/user/orders.php" class="text-[14px] md:text-[15px] font-['Open Sans'] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors">Track Your Order</a></li>
-                <li><a href="<?php echo DOMAIN; ?>/details/refund-and-return-policy.php" class="text-[14px] md:text-[15px] font-['Open Sans'] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors">Return Policy</a></li>
-                <li><a href="<?php echo DOMAIN; ?>/details/contact-us.php" class="text-[14px] md:text-[15px] font-['Open Sans'] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors">Contact Us</a></li>
-            </ul>
-        </div>
-
-        <div class="flex flex-col gap-3 md:max-w-[22rem]">
-            <h1 class="text-[<?php echo store_color('color_heading'); ?>] text-[18px] md:text-[20px] font-['Montserrat'] font-semibold"><?php echo store_escape($newsTitle); ?></h1>
-            <p class="text-[#777777] text-[14px] md:text-[15px] font-['Open Sans']"><?php echo store_escape($newsText); ?></p>
-            <div id="response-message"></div>
-            <form id="subscription-form" class="flex items-center gap-2 mt-1">
-                <div class="flex items-center gap-2 border-[1px] border-[<?php echo store_color('color_tint'); ?>] rounded-[6px] px-3 py-2 bg-white flex-1">
-                    <input type="email" placeholder="Enter your email address" name="email" class="w-full text-[14px] border-none outline-none placeholder:text-[#B8BBD7] bg-transparent" autocomplete="email" />
+        <!-- Socials + legal -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 mt-14 pt-7 border-t border-[#262626]/[0.06]">
+            <div class="flex flex-col items-center md:items-start gap-3">
+                <span class="text-[11px] tracking-[0.28em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]">Connect with us</span>
+                <div class="flex items-center gap-2.5">
+                <?php foreach ($socials as $key => $icon): if (empty($socialFooter[$key])) continue; ?>
+                <a href="<?php echo store_escape($socialFooter[$key]); ?>" target="_blank" aria-label="<?php echo ucfirst($key === 'x' ? 'X' : $key); ?>" class="w-9 h-9 rounded-full bg-white/70 border border-[#262626]/[0.06] flex items-center justify-center text-[#262626]/60 hover:text-white hover:bg-[<?php echo store_color('color_primary'); ?>] hover:border-[<?php echo store_color('color_primary'); ?>] transition-all duration-200">
+                    <i class="fa-brands <?php echo $icon; ?> text-[14px] leading-none"></i>
+                </a>
+                <?php endforeach; ?>
                 </div>
-                <button type="submit" class="py-2 px-5 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[15px] font-['Open Sans'] font-medium cursor-pointer rounded-[6px] hover:bg-[<?php echo store_color('color_primary_dark'); ?>] transition-colors whitespace-nowrap">
-                    Subscribe
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <div class="w-[90%] mx-auto max-w-[1440px] border-t-[1px] border-[<?php echo store_color('color_tint'); ?>] py-5">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-            <h1 class="text-[<?php echo store_color('color_heading'); ?>] text-[16px] md:text-[18px] font-['Montserrat'] font-semibold">Connect with us:</h1>
+            </div>
             <div class="flex items-center gap-6">
-                <?php if (!empty($socialFooter['facebook'])): ?><a href="<?php echo store_escape($socialFooter['facebook']); ?>" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook-f text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a><?php endif; ?>
-                <?php if (!empty($socialFooter['instagram'])): ?><a href="<?php echo store_escape($socialFooter['instagram']); ?>" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a><?php endif; ?>
-                <?php if (!empty($socialFooter['whatsapp'])): ?><a href="<?php echo store_escape($socialFooter['whatsapp']); ?>" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a><?php endif; ?>
-                <?php if (!empty($socialFooter['pinterest'])): ?><a href="<?php echo store_escape($socialFooter['pinterest']); ?>" target="_blank" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a><?php endif; ?>
-                <?php if (!empty($socialFooter['youtube'])): ?><a href="<?php echo store_escape($socialFooter['youtube']); ?>" target="_blank" aria-label="YouTube"><i class="fa-brands fa-youtube text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a><?php endif; ?>
-                <?php if (!empty($socialFooter['x'])): ?><a href="<?php echo store_escape($socialFooter['x']); ?>" target="_blank" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter text-[20px] text-[#777777] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors"></i></a><?php endif; ?>
+                <span class="text-[13px] font-['Open_Sans'] text-[#6B6B6B] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors cursor-pointer">Terms &amp; Conditions</span>
+                <span class="text-[13px] font-['Open_Sans'] text-[#6B6B6B] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors cursor-pointer">Privacy Policy</span>
             </div>
         </div>
-        <div class="flex flex-col md:flex-row items-center justify-between gap-3 mt-5">
-            <div class="flex items-center gap-6">
-                <span class="text-[14px] font-['Open Sans'] text-[#777777] cursor-pointer hover:text-[<?php echo store_color('color_primary'); ?>]">Terms &amp; Conditions</span>
-                <span class="text-[14px] font-['Open Sans'] text-[#777777] cursor-pointer hover:text-[<?php echo store_color('color_primary'); ?>]">Privacy Policy</span>
-            </div>
-            <p class="text-[14px] font-['Open Sans'] font-medium text-[#777777]">© <?php echo date('Y'); ?> <?php echo store_escape(store('copyright_name', store('store_name'))); ?> | All Rights Reserved</p>
-        </div>
+        <p class="text-center text-[12px] md:text-[13px] font-['Open_Sans'] text-[#8A8A8A] mt-8 tracking-[0.04em]">© <?php echo date('Y'); ?> <?php echo store_escape(store('copyright_name', $storeName)); ?> &middot; All Rights Reserved</p>
     </div>
 
     <?php $waNumber = store('whatsapp_number', '08004567339'); if (!empty($waNumber)): ?>

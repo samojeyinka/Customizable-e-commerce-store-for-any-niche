@@ -1,6 +1,7 @@
-<nav class="w-[90%] flex items-center justify-between">
-    <a href="<?php echo DOMAIN; ?>/index.php" class="flex items-center gap-1 md:gap-2">
-        <img src="<?php echo store_escape(store('logo_url')); ?>" alt="<?php echo store_escape(store('store_name')); ?>" class="w-[31.35px] md:w-[41.35px]" />
+<nav class="w-[92%] max-w-[1440px] flex items-center justify-between gap-6">
+    <a href="<?php echo DOMAIN; ?>/index.php" class="flex items-center gap-2.5 shrink-0">
+        <img src="<?php echo store_escape(store('logo_url')); ?>" alt="<?php echo store_escape(store('store_name')); ?>" class="w-[34px] md:w-[40px]" />
+        <span class="hidden lg:block text-[<?php echo store_color('color_heading'); ?>] text-[17px] md:text-[19px] tracking-[0.32em] uppercase font-['Montserrat'] font-semibold leading-none pt-[2px]"><?php echo store_escape(store('store_name', 'GLOREFY')); ?></span>
     </a>
     <?php
 // Hardcoded categories and brands data for direct implementation
@@ -32,40 +33,40 @@ $brands = [
 ?>
 
 <!-- Desktop live search (driven by functions/search.js) -->
-<div class="hidden md:flex items-center gap-0 relative" data-glor-search data-glor-domain="<?php echo DOMAIN; ?>">
-    <div class="flex items-center gap-2 border-y-[1px] border-l-[1px] border-[#B8BBD7] rounded-l-[4px] p-2">
-        <i class="fa-solid fa-magnifying-glass text-[24px] text-[#777777] leading-none" alt="Search"></i>
+<div class="hidden md:flex flex-1 justify-center relative" data-glor-search data-glor-domain="<?php echo DOMAIN; ?>">
+    <div class="flex items-center gap-2 w-full max-w-[440px] bg-white rounded-full pl-5 pr-1.5 py-1.5 border border-[#262626]/10 focus-within:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-300 shadow-[0_2px_12px_-6px_rgba(38,38,38,0.18)]">
+        <i class="fa-solid fa-magnifying-glass text-[15px] text-[#262626]/35 leading-none" alt="Search"></i>
         <input 
             type="text" 
             id="searchInput" 
             data-glor-q
             placeholder="<?php echo store_escape(store('search_placeholder')); ?>" 
-            class="lg:w-[18rem] text-[14px] border-none outline-none placeholder:text-[#B8BBD7] bg-transparent" 
+            class="flex-1 min-w-0 text-[13px] border-none outline-none placeholder:text-[#262626]/30 bg-transparent py-0.5" 
             autocomplete="off"
         />
+        <button type="submit" id="searchButton" data-glor-btn class="shrink-0 px-4 py-1.5 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[11px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] transition-colors">Search</button>
     </div>
-    <button type="submit" id="searchButton" data-glor-btn class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-[#FBFBFB] text-[16px] font-['Open Sans'] cursor-pointer rounded-r-[4px]">Search</button>
     
     <!-- Search Results Dropdown (content rendered by search.js) -->
-    <div id="searchResults" data-glor-panel class="absolute top-full left-0 w-full bg-white shadow-md rounded-b-md z-50 mt-1 hidden"></div>
+    <div id="searchResults" data-glor-panel class="absolute top-full left-1/2 -translate-x-1/2 w-full max-w-[440px] bg-white rounded-[14px] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)] z-50 mt-2 hidden overflow-hidden"></div>
 </div>
 
 
-    <div class="flex items-center gap-6">
-        <a href="#" data-open-cart class="relative">
-            <i class="fa-solid fa-bag-shopping text-[22px] md:text-[24px] text-[#262626] leading-none" alt="bag"></i>
+    <div class="flex items-center gap-5 md:gap-6 shrink-0">
+        <a href="#" data-open-cart class="relative p-1.5 -m-1.5 text-[#262626] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors" aria-label="Shopping bag">
+            <i class="fa-solid fa-bag-shopping text-[19px] md:text-[20px] leading-none" alt="bag"></i>
             
-            <div id="cart-badge" class="hidden absolute top-[-8px] right-[-8px] flex items-center justify-center">
-    <span id="cart-count" class="inline-flex items-center justify-center bg-[<?php echo store_color('color_primary'); ?>] text-white text-[10px] font-['Open_Sans'] font-medium rounded-full w-[15px] h-[15px]">0</span>
-</div>
+            <div id="cart-badge" class="hidden absolute top-[-1px] right-[-1px] items-center justify-center">
+                <span id="cart-count" class="inline-flex items-center justify-center bg-[<?php echo store_color('color_primary'); ?>] text-white text-[9px] font-['Montserrat'] font-semibold leading-none rounded-full min-w-[15px] h-[15px] px-[4px] border-[2px] border-white">0</span>
+            </div>
         </a>
-        <a href="<?php echo DOMAIN; ?>/products/favourites.php">
-            <i class="fa-solid fa-heart text-[22px] md:text-[24px] text-[#262626] leading-none" alt="bag"></i>
+        <a href="<?php echo DOMAIN; ?>/products/favourites.php" class="p-1.5 -m-1.5 text-[#262626] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors" aria-label="Favourites">
+            <i class="fa-solid fa-heart text-[19px] md:text-[20px] leading-none" alt="favourites"></i>
         </a>
 
-        <a onclick="openSidemenu()" class="flex items-center gap-1 cursor-pointer">
-            <i class="fa-solid fa-user text-[22px] md:text-[24px] text-[#262626] leading-none" alt="bag"></i>
-            <i class="fa-solid fa-chevron-down text-[12px] text-[#262626] leading-none" alt="bag"></i>
+        <a onclick="openSidemenu()" class="flex items-center gap-1.5 cursor-pointer p-1.5 -m-1.5 text-[#262626] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors" aria-label="Account">
+            <i class="fa-solid fa-user text-[19px] md:text-[20px] leading-none" alt="account"></i>
+            <i class="fa-solid fa-chevron-down text-[9px] text-[#262626]/50 leading-none" alt="chevron"></i>
         </a>
 
     </div>

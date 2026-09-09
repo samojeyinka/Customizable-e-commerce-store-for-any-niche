@@ -248,16 +248,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
     <div id="mySidenav" class="sidenav p-2 hidden md:flex flex-col justify-between gap-2">
         <div class="flex flex-col gap-2">
-            <a href="#" class="nav-link flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-layer-group activeicon text-[#FBFBFB]"></i> <i class="fa-solid fa-layer-group nonactiveicon text-[#ADAFCF]"></i><span>Overview</span></a>
-            <a href="./products.php" class="nav-link active flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-box activeicon text-[#FBFBFB] text-[20px]"></i> <i class="fa-solid fa-box nonactiveicon text-[#ADAFCF] text-[20px]"></i><span>Products</span></a>
-            <a href="./orders.php" class="nav-link flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-bag-shopping activeicon text-[#FBFBFB] text-[20px]"></i> <i class="fa-solid fa-bag-shopping nonactiveicon text-[#ADAFCF] text-[20px]"></i><span>Orders</span></a>
-            <a href="./users.php" class="nav-link flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-user activeicon text-[#FBFBFB] text-[20px]"></i> <i class="fa-solid fa-user nonactiveicon text-[#ADAFCF] text-[20px]"></i><span>Users</span></a>
-            <a href="./transactions.php" class="nav-link flex items-center gap-3" onclick="setActive(this)"><img src="../assets/dash/receipt-minus (1).svg" class="activeicon w-[20px] h-[20px]" /> <img src="../assets/dash/receipt-minus.svg" class="nonactiveicon w-[20px] h-[20px]" /><span>Transactions</span></a>
+            <a href="#" class="nav-link" onclick="setActive(this)"><i class="fa-solid fa-layer-group"></i><span>Overview</span></a>
+            <a href="./products.php" class="nav-link active" onclick="setActive(this)"><i class="fa-solid fa-box"></i><span>Products</span></a>
+            <a href="./orders.php" class="nav-link" onclick="setActive(this)"><i class="fa-solid fa-bag-shopping"></i><span>Orders</span></a>
+            <a href="./users.php" class="nav-link" onclick="setActive(this)"><i class="fa-solid fa-user"></i><span>Users</span></a>
+            <a href="./transactions.php" class="nav-link" onclick="setActive(this)"><i class="fa-solid fa-receipt"></i><span>Transactions</span></a>
         </div>
 
         <div class="flex flex-col gap-2 mb-7">
-            <a href="./settings.php" class="nav-link flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-gear activeicon text-[#FBFBFB] text-[20px]"></i> <i class="fa-solid fa-gear nonactiveicon text-[#ADAFCF] text-[20px]"></i><span>Settings</span></a>
-            <span class="cursor-pointer logout-text flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-right-from-bracket activeicon text-[20px] text-[#D93939]"></i> <i class="fa-solid fa-right-from-bracket nonactiveicon text-[20px] text-[#D93939]"></i><span class="text-[#D93939]">Logout</span></span>
+            <a href="./settings.php" class="nav-link" onclick="setActive(this)"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+            <span class="cursor-pointer logout-text flex items-center gap-3" onclick="setActive(this)"><i class="fa-solid fa-right-from-bracket text-[#D93939]"></i><span class="text-[#D93939]">Logout</span></span>
         </div>
     </div>
 
@@ -384,7 +384,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                 <!-- Rich Text Editor Fields -->
                                 <div class="space-y-6">
                                     <!-- Details -->
-                                    <div class="hidden">
+                                    <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             Details
                                         </label>
@@ -421,13 +421,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                     </div>
 
                                     <!-- Sizes details -->
-                                    <div class="hidden">
+                                    <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             Sizes
                                         </label>
                                         <div class="border border-gray-300 rounded-md">
                                             <div class="bg-gray-50 p-2 border-b border-gray-300">
-                                                <div class="flex gap-2 editor-toolbar" data-target="details-editor">
+                                                <div class="flex gap-2 editor-toolbar" data-target="sizes-details-editor">
                                                     <button type="button" data-command="bold" class="p-1 hover:bg-gray-200 rounded">
                                                         <strong>B</strong>
                                                     </button>
@@ -450,7 +450,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                                 </div>
                                             </div>
                                             <div
-                                                id="details-editor"
+                                                id="sizes-details-editor"
                                                 class="w-full px-3 py-2 min-h-[100px] focus:outline-none"
                                                 contenteditable="true"></div>
                                             <input type="hidden" name="sizes_details">
@@ -458,7 +458,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                     </div>
 
                                     <!-- Warranty -->
-                                    <div class="hidden">
+                                    <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             Warranty
                                         </label>
@@ -492,7 +492,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                     </div>
 
                                     <!-- Care -->
-                                    <div class="hidden">
+                                    <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             Care
                                         </label>

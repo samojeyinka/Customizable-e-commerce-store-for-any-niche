@@ -139,7 +139,7 @@ require_once "../includes/auth/google.php";
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 <?php include '../includes/tailwind-components.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -149,28 +149,37 @@ require_once "../includes/auth/google.php";
     include(__DIR__ . '/../includes/header.php');
     include(__DIR__ . '/../includes/options.php');
         ?>
-    <main class="bg-[#FEFEFE]">
-        <section class="w-full bg-[#FFFFFFF] py-1">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
+        <section class="w-full pt-7 pb-3 border-b border-[#262626]/[0.05]">
             <div class="w-[90%] mx-auto max-w-[1440px]">
-                <div class="flex items-center gap-1 cursor-pointer">
-                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">My Profile</span>
+                <div class="flex items-center gap-2 text-[12px] font-['Montserrat'] font-medium tracking-[0.03em]">
+                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#5F5F5F] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">Home</a>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-[#262626]/20 leading-none"></i>
+                    <span class="text-[<?php echo store_color('color_heading'); ?>] font-semibold">My Profile</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[95%] md:w-[90%] mx-auto max-w-[1440px] flex flex-col gap-3 py-5">
+        <div class="w-[95%] md:w-[90%] mx-auto max-w-[1440px] flex flex-col gap-6 lg:gap-8 py-8 md:py-12">
+            <div>
+                <h1 class="text-[<?php echo store_color('color_heading'); ?>] text-[32px] md:text-[40px] leading-[1.12] font-['Cormorant_Garamond'] font-medium mb-1">My Profile</h1>
+                <p class="text-[#777777] text-[14px] font-['Open_Sans']">Manage your account details and delivery addresses.</p>
+            </div>
+
             <?php if(!empty($successMessage)): ?>
-                <div class="alert alert-success"><?php echo $successMessage; ?></div>
+                <div class="bg-[#E7F6EC] border-l-[3px] border-[#1B7A3D] text-[#1B7A3D] px-4 py-3 rounded-[10px] font-['Open_Sans'] text-[13px] md:text-[14px]">
+                    <?php echo $successMessage; ?>
+                </div>
             <?php endif; ?>
             
             <?php if(!empty($errorMessage)): ?>
-                <div class="alert alert-danger"><?php echo $errorMessage; ?></div>
+                <div class="bg-[#FDECEC] border-l-[3px] border-[#EE3F3F] text-[#B00020] px-4 py-3 rounded-[10px] font-['Open_Sans'] text-[13px] md:text-[14px]">
+                    <?php echo $errorMessage; ?>
+                </div>
             <?php endif; ?>
 
-            <div class="flex items-center gap-2 relative">
-    <div class="w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-[50%] relative group">
+            <div class="flex items-center gap-4 relative">
+    <div class="w-[60px] h-[60px] md:w-[80px] md:h-[80px] rounded-full relative group shrink-0 border-[2px] border-white shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
         <?php 
         // Get current profile image or use default
         $profileImage = $profileManager->getProfileImage($userId);
@@ -180,10 +189,10 @@ require_once "../includes/auth/google.php";
             <label for="profile_image_upload" class="cursor-pointer">
                 <img src="<?php echo htmlspecialchars($imageSrc); ?>" 
                      alt="Profile Picture" 
-                     class="w-full h-full object-cover rounded-[50%] transition-opacity group-hover:opacity-70" 
+                     class="w-full h-full object-cover rounded-full transition-opacity group-hover:opacity-70" 
                      id="current-profile-image" />
                 
-                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 rounded-[50%]">
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-full backdrop-blur-[2px]">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -202,34 +211,34 @@ require_once "../includes/auth/google.php";
         </form>
     </div>
 
-    <h1 class="text-[15px] md:text-[16px] font-Onest font-medium"><?php echo htmlspecialchars($user['email']); ?></h1>
+    <h2 class="text-[16px] md:text-[18px] font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>] mt-2"><?php echo htmlspecialchars($user['email']); ?></h2>
 </div>
 
-            <section class="flex flex-col items-center w-full bg-[#EEE7FF] py-3 px-4 rounded">
-                <div class="flex items-center gap-2 mr-auto">
-                    <i class="fa-solid fa-circle-user text-[24px] text-[#777777] leading-none" alt="Profile Picture"></i>
-                    <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
+            <section class="flex flex-col items-start w-full bg-[<?php echo store_color('color_tint'); ?>]/40 border-l-[3px] border-[<?php echo store_color('color_primary'); ?>] rounded-[10px] py-4 px-5 mb-2 relative overflow-hidden">
+                <div class="flex items-center gap-2.5 w-full">
+                    <i class="fa-solid fa-circle-user text-[20px] text-[<?php echo store_color('color_primary'); ?>] leading-none" aria-hidden="true"></i>
+                    <p class="text-[15px] text-[#2C2C2C] font-['Montserrat'] font-semibold">
                         Need for your information
                     </p>
                 </div>
-                <p class="text-[14px] md:text-[16px] text-start w-full font-Satoshi font-regular text-[#7F7F7F] mt-2 ml-[4rem] pr-3 md:pr-0">
-                    For a smoother checkout experience, your billing and contact address will be automatically filled based on your saved details. You can update or change them if needed during checkout
+                <p class="text-[13px] md:text-[14px] text-start w-full font-['Open_Sans'] text-[#6B6B6B] mt-2 pl-[30px] pr-2 leading-relaxed">
+                    For a smoother checkout experience, your billing and contact address will be automatically filled based on your saved details. You can update or change them if needed during checkout.
                 </p>
             </section>
 
             <form method="POST" action="">
-                <div class="w-full md:w-[95%] lg:w-[70%] border-[1px] border-[#E1E1E1] rounded-[8px] p-4 flex flex-col gap-2 mb-4">
+                <div class="w-full md:w-[95%] lg:w-[70%] bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] p-6 md:p-8 flex flex-col gap-2 mb-4">
                     <div class="flex flex-col gap-2">
                         <div class="flex md:items-center gap-2 md:gap-0 flex-col-reverse md:flex-row justify-between">
                             <div class="flex flex-col items-center">
-                                <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
+                                <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-['Montserrat'] font-semibold">
                                     Contact Info
                                 </p>
-                                <p class="text-[14px] md:text-[16px] text-start w-full font-Satoshi font-regular text-[#7F7F7F] mt-1 md:pr-0">
+                                <p class="text-[14px] md:text-[16px] text-start w-full font-['Open_Sans'] text-[#7F7F7F] mt-1 md:pr-0">
                                     We'll use this email to send you details and updates about your order
                                 </p>
                             </div>
-                            <button type="submit" class="w-[fit-content] py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] flex items-center gap-2 cursor-pointer rounded-[4px]">
+                            <button type="submit" class="w-[fit-content] py-3 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[12px] md:text-[13px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] hover:shadow-[0_14px_30px_-12px_rgba(0,0,0,0.3)] transition-all duration-300">
                                 Save Changes
                             </button>
                         </div>
@@ -237,7 +246,7 @@ require_once "../includes/auth/google.php";
                         <div class="flex flex-col gap-2">
                             <label
                                 for="email"
-                                class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                 Email address*
                             </label>
                             <input
@@ -247,24 +256,24 @@ require_once "../includes/auth/google.php";
                                 value="<?php echo htmlspecialchars($user['email']); ?>"
                                 placeholder="Enter your email address"
                                 readonly
-                                class="w-full md:w-[65%] font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#DCDCDC] font-regular text-[#2C2C2C] placeholder:text-[#CCCCCC] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
+                                class="w-full md:w-[65%] font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                         </div>
                     </div>
                 </div>
 
-                <div class="w-full md:w-[90%] border-[1px] border-[#E1E1E1] rounded-[8px] p-4 flex flex-col gap-2">
-                    <button type="submit" class="w-[fit-content] py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] flex items-center gap-2 cursor-pointer rounded-[4px]">
+                <div class="w-full md:w-[90%] bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] p-6 md:p-8 flex flex-col gap-2">
+                    <button type="submit" class="w-[fit-content] py-3 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[12px] md:text-[13px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] hover:shadow-[0_14px_30px_-12px_rgba(0,0,0,0.3)] transition-all duration-300">
                         Save Changes
                     </button>
 
                     <div class="flex items-center flex-col md:flex-row gap-4">
                         <!-- DELIVERY ADDRESS SECTION -->
-                        <div class="w-full md:w-[50%] border-[1px] border-[#E1E1E1] rounded-[8px] p-4 flex flex-col gap-2">
+                        <div class="w-full md:w-[50%] bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] p-6 md:p-8 flex flex-col gap-2">
                             <div class="flex flex-col items-center">
-                                <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
+                                <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-['Montserrat'] font-semibold">
                                     Delivery
                                 </p>
-                                <p class="text-[14px] md:text-[16px] text-start w-full font-Satoshi font-regular text-[#7F7F7F] mt-1 md:pr-0">
+                                <p class="text-[14px] md:text-[16px] text-start w-full font-['Open_Sans'] text-[#7F7F7F] mt-1 md:pr-0">
                                     Enter the address where you want your order delivered
                                 </p>
                             </div>
@@ -273,7 +282,7 @@ require_once "../includes/auth/google.php";
                                 <div class="flex flex-col gap-1">
                                     <label
                                         for="country"
-                                        class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                        class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                         Country
                                     </label>
                                     <input
@@ -282,14 +291,14 @@ require_once "../includes/auth/google.php";
                                         id="country"
                                         value="<?php echo htmlspecialchars($profile['country'] ?? 'Nigeria'); ?>"
                                         placeholder="Nigeria"
-                                        class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
+                                        class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                 </div>
 
                                 <div class="w-full flex items-center gap-3">
                                     <div class="w-full flex flex-col gap-1">
                                         <label
                                             for="first_name"
-                                            class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                            class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                             First Name
                                         </label>
                                         <input
@@ -298,13 +307,13 @@ require_once "../includes/auth/google.php";
                                             id="first_name"
                                             value="<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>"
                                             placeholder="Enter first name"
-                                            class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
+                                            class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                     </div>
 
                                     <div class="w-full flex flex-col gap-1">
                                         <label
                                             for="last_name"
-                                            class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                            class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                             Last Name
                                         </label>
                                         <input
@@ -313,12 +322,12 @@ require_once "../includes/auth/google.php";
                                             id="last_name"
                                             value="<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>"
                                             placeholder="Enter last name"
-                                            class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
+                                            class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                     </div>
                                 </div>
 
-                                <div class="flex items-center gap-0 md:gap-1 w-full font-Satoshi bg-transparent outline-none border-[1px] border-[#E1E1E1] rounded-[8px]">
-                                    <div class="w-[210p ml-[1px] md:ml-1 pr-2 border-r-[2px] border-[#E1E1E1]">
+                                <div class="flex items-center gap-0 w-full bg-white outline-none border border-[#262626]/10 rounded-[10px] focus-within:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200 overflow-hidden">
+                                    <div class="w-14 shrink-0 flex items-center justify-center border-r border-[#262626]/10 text-[#2C2C2C] text-[14px] md:text-[15px] font-['Open_Sans'] h-full">
                                         +234
                                     </div>
                                     <input
@@ -327,13 +336,13 @@ require_once "../includes/auth/google.php";
                                         id="phone"
                                         value="<?php echo htmlspecialchars($profile['phone'] ?? ''); ?>"
                                         placeholder="Enter phone number"
-                                        class="w-full font-regular outline-none text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] text-[14px] md:text-[16px] rounded-[8px]" />
+                                        class="flex-1 font-['Open_Sans'] outline-none bg-transparent text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-3 text-[14px] md:text-[15px]" />
                                 </div>
 
                                 <div class="flex flex-col gap-1">
                                     <label
                                         for="address"
-                                        class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                        class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                         Address
                                     </label>
                                     <input
@@ -342,7 +351,7 @@ require_once "../includes/auth/google.php";
                                         id="address"
                                         value="<?php echo htmlspecialchars($profile['address'] ?? ''); ?>"
                                         placeholder="Enter the address for us to deliver too"
-                                        class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
+                                        class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                 </div>
 
                                 <div class="w-full flex flex-col md:flex-row items-center gap-2">
@@ -350,7 +359,7 @@ require_once "../includes/auth/google.php";
                                         <div class="w-full flex flex-col gap-1">
                                             <label
                                                 for="state"
-                                                class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                                class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                                 State
                                             </label>
                                             <input
@@ -359,13 +368,13 @@ require_once "../includes/auth/google.php";
                                                 id="state"
                                                 value="<?php echo htmlspecialchars($profile['state'] ?? ''); ?>"
                                                 placeholder=""
-                                                class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[4px] px-2 text-[14px] md:text-[16px] rounded-[4px]" />
+                                                class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-2.5 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                         </div>
 
                                         <div class="w-full flex flex-col gap-1">
                                             <label
                                                 for="city"
-                                                class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                                class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                                 City
                                             </label>
                                             <input
@@ -374,14 +383,14 @@ require_once "../includes/auth/google.php";
                                                 id="city"
                                                 value="<?php echo htmlspecialchars($profile['city'] ?? ''); ?>"
                                                 placeholder=""
-                                                class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[4px] px-2 text-[14px] md:text-[16px] rounded-[4px]" />
+                                                class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-2.5 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                         </div>
                                     </div>
 
                                     <div class="w-full md:w-[40%] flex flex-col gap-1">
                                         <label
                                             for="zip_code"
-                                            class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                            class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                             Zip Code
                                         </label>
                                         <input
@@ -390,18 +399,19 @@ require_once "../includes/auth/google.php";
                                             id="zip_code"
                                             value="<?php echo htmlspecialchars($profile['zip_code'] ?? ''); ?>"
                                             placeholder=""
-                                            class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[4px] px-2 text-[14px] md:text-[16px] rounded-[4px]" />
+                                            class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-2.5 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                     </div>
                                 </div>
 
-                                <div class="flex items-center gap-1">
+                                <div class="flex items-center gap-2.5 mt-2">
                                     <input 
                                         type="checkbox" 
                                         name="billing_same_as_delivery" 
                                         id="billing_same_as_delivery"
+                                        class="w-4 h-4 accent-[<?php echo store_color('color_primary'); ?>]"
                                         <?php echo (isset($profile['billing_same_as_delivery']) && $profile['billing_same_as_delivery']) ? 'checked' : ''; ?> />
                                     <label for="billing_same_as_delivery" 
-                                        class="font-['Open Sans'] text-[13px] md:text-[15px] font-regular text-[#5B5B5B] cursor-pointer">
+                                        class="font-['Open_Sans'] text-[13px] md:text-[14px] font-medium text-[#2C2C2C] cursor-pointer pt-0.5">
                                         Use same address for billing
                                     </label>
                                 </div>
@@ -409,12 +419,12 @@ require_once "../includes/auth/google.php";
                         </div>
 
                         <!-- BILLING ADDRESS SECTION -->
-                        <div id="billing-section" class="w-full md:w-[50%] border-[1px] border-[#E1E1E1] rounded-[8px] p-4 flex flex-col gap-2">
+                        <div id="billing-section" class="w-full md:w-[50%] bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] p-6 md:p-8 flex flex-col gap-2">
                             <div class="flex flex-col items-center">
-                                <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
+                                <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-['Montserrat'] font-semibold">
                                     Billing Address
                                 </p>
-                                <p class="text-[14px] md:text-[16px] text-start w-full font-Satoshi font-regular text-[#7F7F7F] mt-1 md:pr-0">
+                                <p class="text-[14px] md:text-[16px] text-start w-full font-['Open_Sans'] text-[#7F7F7F] mt-1 md:pr-0">
                                     We use your billing address to verify your payment, and ensure a secure and seamless checkout experience
                                 </p>
                             </div>
@@ -423,7 +433,7 @@ require_once "../includes/auth/google.php";
                                 <div class="flex flex-col gap-1">
                                     <label
                                         for="billing_country"
-                                        class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                        class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                         Country
                                     </label>
                                     <input
@@ -432,14 +442,14 @@ require_once "../includes/auth/google.php";
                                         id="billing_country"
                                         value="<?php echo htmlspecialchars($profile['billing_country'] ?? 'Nigeria'); ?>"
                                         placeholder="Nigeria"
-                                        class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
+                                        class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                 </div>
 
                                 <div class="w-full flex items-center gap-3">
                                     <div class="w-full flex flex-col gap-1">
                                         <label
                                             for="billing_first_name"
-                                            class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                            class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                             First Name
                                         </label>
                                         <input
@@ -448,13 +458,13 @@ require_once "../includes/auth/google.php";
                                             id="billing_first_name"
                                             value="<?php echo htmlspecialchars($profile['billing_first_name'] ?? ''); ?>"
                                             placeholder="Enter first name"
-                                            class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
+                                            class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                     </div>
 
                                     <div class="w-full flex flex-col gap-1">
                                         <label
                                             for="billing_last_name"
-                                            class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                            class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                             Last Name
                                         </label>
                                         <input
@@ -463,14 +473,14 @@ require_once "../includes/auth/google.php";
                                             id="billing_last_name"
                                             value="<?php echo htmlspecialchars($profile['billing_last_name'] ?? ''); ?>"
                                             placeholder="Enter last name"
-                                            class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
+                                            class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                     </div>
                                 </div>
 
                                 <div class="flex flex-col gap-1">
                                     <label
                                         for="billing_address"
-                                        class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                        class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                         Address
                                     </label>
                                     <input
@@ -479,7 +489,7 @@ require_once "../includes/auth/google.php";
                                         id="billing_address"
                                         value="<?php echo htmlspecialchars($profile['billing_address'] ?? ''); ?>"
                                         placeholder="Enter billing address"
-                                        class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
+                                        class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                 </div>
 
                                 <div class="w-full flex flex-col md:flex-row items-center gap-2">
@@ -487,7 +497,7 @@ require_once "../includes/auth/google.php";
                                         <div class="w-full flex flex-col gap-1">
                                             <label
                                                 for="billing_state"
-                                                class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                                class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                                 State
                                             </label>
                                             <input
@@ -496,13 +506,13 @@ require_once "../includes/auth/google.php";
                                                 id="billing_state"
                                                 value="<?php echo htmlspecialchars($profile['billing_state'] ?? ''); ?>"
                                                 placeholder=""
-                                                class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[4px] px-2 text-[14px] md:text-[16px] rounded-[4px]" />
+                                                class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-2.5 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                         </div>
 
                                         <div class="w-full flex flex-col gap-1">
                                             <label
                                                 for="billing_city"
-                                                class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                                class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                                 City
                                             </label>
                                             <input
@@ -511,14 +521,14 @@ require_once "../includes/auth/google.php";
                                                 id="billing_city"
                                                 value="<?php echo htmlspecialchars($profile['billing_city'] ?? ''); ?>"
                                                 placeholder=""
-                                                class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[4px] px-2 text-[14px] md:text-[16px] rounded-[4px]" />
+                                                class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-2.5 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                         </div>
                                     </div>
 
                                     <div class="w-full md:w-[40%] flex flex-col gap-1">
                                         <label
                                             for="billing_zip_code"
-                                            class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
+                                            class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[#262626]/80">
                                             Zip Code
                                         </label>
                                         <input
@@ -527,7 +537,7 @@ require_once "../includes/auth/google.php";
                                             id="billing_zip_code"
                                             value="<?php echo htmlspecialchars($profile['billing_zip_code'] ?? ''); ?>"
                                             placeholder=""
-                                            class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[4px] px-2 text-[14px] md:text-[16px] rounded-[4px]" />
+                                            class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-2.5 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                                     </div>
                                 </div>
                             </div>

@@ -1,4 +1,4 @@
-<a href="<?php echo DOMAIN; ?>/products/index.php" class="w-fit mt-4 border-[1px] border-[<?php echo store_color('color_primary'); ?>] bg-transparent rounded-full text-[<?php echo store_color('color_primary'); ?>] text-[15px] md:text-[16px] text-center font-Onest font-medium cursor-pointer px-6 py-2.5 mx-auto flex items-center gap-2 justify-center hover:bg-[<?php echo store_color('color_primary'); ?>] hover:text-white transition-colors">
+<a href="<?php echo DOMAIN; ?>/products/index.php" class="group w-fit mx-auto mt-10 flex items-center gap-3 text-[12px] tracking-[0.24em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>] border-b border-[<?php echo store_color('color_heading'); ?>] pb-1.5 hover:text-[<?php echo store_color('color_primary'); ?>] hover:border-[<?php echo store_color('color_primary'); ?>] transition-colors">
     <span><?php echo store_escape(store('featured_cta', 'See More Products')); ?></span>
-    <img src="<?php echo DOMAIN; ?>/assets/home/arrow-right.svg" class="w-[18px]" />
+    <i class="fa-solid fa-arrow-right text-[11px] transition-transform duration-300 group-hover:translate-x-1.5"></i>
 </a>

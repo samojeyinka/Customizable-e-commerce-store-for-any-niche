@@ -99,7 +99,7 @@ require_once "../includes/auth/google.php";
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
 <?php include '../includes/tailwind-components.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -123,23 +123,26 @@ require_once "../includes/auth/google.php";
         </div>
 
 
-        <section class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-1">
+        <section class="w-full pt-7 pb-3 border-b border-[#262626]/[0.05]">
             <div class="w-[90%] mx-auto max-w-[1440px]">
-                <div class="flex items-center gap-1 cursor-pointer">
-                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">My Favourites</span>
+                <div class="flex items-center gap-2 text-[12px] font-['Montserrat'] font-medium tracking-[0.03em]">
+                    <a href="<?php echo DOMAIN; ?>/index.php" class="text-[#5F5F5F] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">Home</a>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-[#262626]/20 leading-none"></i>
+                    <span class="text-[<?php echo store_color('color_heading'); ?>] font-semibold">My Favourites</span>
                 </div>
             </div>
         </section>
 
         <?php if (count($favorite_products) > 0): ?>
-        <div class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-5">
-            <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block">
+        <div class="w-full bg-[<?php echo store_color('color_bg'); ?>] py-6 md:py-10">
+            <div class="w-[90%] mx-auto max-w-[1440px]">
+                <h1 class="text-[<?php echo store_color('color_heading'); ?>] text-[30px] md:text-[38px] leading-[1.12] font-['Cormorant_Garamond'] font-medium mb-6 md:mb-8">My Favourites</h1>
+            </div>
+            <div class="w-[90%] mx-auto max-w-[1440px] hidden md:block bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)] overflow-x-auto">
 
 
-                <table cols="" class="w-full">
-                    <thead class="text-[#262626] text-[15px] md:text-[16px] font-['Open Sans'] font-regular text-left border-b-1 border-[#E1E1E1]">
+                <table class="w-full [&_th]:px-5 [&_th]:py-4 [&_td]:px-5 [&_td]:py-4 [&_td]:border-b [&_td]:border-[#262626]/[0.05] [&_td]:align-middle">
+                    <thead class="text-[#6B6B6B] text-[11px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-left bg-[#FBF9FA] border-b border-[#262626]/10">
                         <th>Product</th>
                         <th>Amount</th>
                         <th>Status</th>
@@ -151,19 +154,19 @@ require_once "../includes/auth/google.php";
                     <tbody class="">
                     <?php foreach ($favorite_products as $product): ?>
                         <tr class="favorite-item" data-favorite-id="<?php echo $product['favorite_id']; ?>" data-product-id="<?php echo $product['product_id']; ?>">
-                            <td class="py-3 flex gap-2">
+                            <td class="flex items-center gap-4 align-middle">
 
-                                <div class="w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden">
+                                <div class="w-[96px] h-[96px] shrink-0 rounded-[12px] overflow-hidden">
                                 <a href="<?php echo product_url($product); ?>">
                                     <img src="<?php echo !empty($product['main_image']) ? product_image_url($product['main_image']) : DOMAIN . '/assets/products/default.svg'; ?>" 
-                                        class="w-full h-[280px] object-cover" 
+                                        class="w-full h-full object-cover" 
                                         alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
                                 </a>
                                 </div>
                                 <div class="flex flex-col gap-[2px]">
-                                    <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">       <?php echo htmlspecialchars($product['product_name']); ?></p>
+                                    <p class="text-[#5F5F5F] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">       <?php echo htmlspecialchars($product['product_name']); ?></p>
                                     <?php if (!empty($product['first_size'])): ?>
-                                        <p  class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">
+                                        <p  class="text-[#5F5F5F] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">
                                             Size: <?php echo htmlspecialchars($product['first_size']); ?>
                                     </p>
                                     <?php endif; ?>
@@ -173,7 +176,7 @@ require_once "../includes/auth/google.php";
                                     $firstColor = trim($colors[0]);
                                     if (!empty($firstColor)): 
                                     ?>
-                                        <p  class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">
+                                        <p  class="text-[#5F5F5F] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">
                                             Color: <?php echo htmlspecialchars($firstColor); ?>
                                     </p>
                                     <?php endif; ?>
@@ -204,7 +207,7 @@ require_once "../includes/auth/google.php";
 
                             <td>
 
-                                <button type="submit" class="py-1 px-4  text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[28px] <?php echo $product['first_quantity'] > 0 ? 'bg-[#39D959] text-white' : 'text-white bg-[#262626]'; ?> px-2 py-1 rounded">
+                                <button type="submit" class="inline-block px-3.5 py-1.5 text-white text-[10px] tracking-[0.1em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full whitespace-nowrap <?php echo $product['first_quantity'] > 0 ? 'bg-[#39D959]' : 'bg-[#262626]'; ?>">
                                             <?php echo $product['first_quantity'] > 0 ? 'In Stock' : 'Out of Stock'; ?>
                                             </button>
                             </td>
@@ -213,7 +216,7 @@ require_once "../includes/auth/google.php";
 
                                 <?php if (array_key_exists($product['product_id'], $cart_items)): ?>
                                         <button 
-                                            class="cart-toggle-button py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]"
+                                            class="cart-toggle-button py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-full tracking-[0.1em] uppercase"
                                             data-product-id="<?php echo $product['product_id']; ?>"
                                             data-cart-id="<?php echo $cart_items[$product['product_id']]; ?>"
                                             data-in-cart="true">
@@ -221,7 +224,7 @@ require_once "../includes/auth/google.php";
                                         </button>
                                     <?php else: ?>
                                         <button 
-                                                                                       class="cart-toggle-button py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[4px]"
+                                                                                       class="cart-toggle-button py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-full tracking-[0.1em] uppercase"
                                             data-product-id="<?php echo $product['product_id']; ?>"
                                             data-in-cart="false">
                                             Add to Cart
@@ -232,7 +235,7 @@ require_once "../includes/auth/google.php";
 
                             <td>
                             <button 
-                                    class="remove-favorite-btn text-[15px] md:text-[16px] font-['Open Sans] text-[#EE3F3F] font-regular underline cursor-pointer"
+                                    class="remove-favorite-btn text-[15px] md:text-[16px] font-['Open Sans] text-[#EE3F3F] font-['Montserrat'] font-semibold underline underline-offset-4 cursor-pointer hover:opacity-70 transition-opacity"
                                     data-favorite-id="<?php echo $product['favorite_id']; ?>"
                                     data-product-id="<?php echo $product['product_id']; ?>">
                                  Remove from favorite
@@ -253,44 +256,44 @@ require_once "../includes/auth/google.php";
 
 
 
-            <div class="w-[90%] mx-auto max-w-[1440px]  md:hidden">
+            <div class="w-[90%] mx-auto max-w-[1440px] mt-6 md:hidden">
                 <div class="w-full flex flex-col gap-4">
                     <?php foreach ($favorite_products as $product): ?>
-                    <div class="favorite-item border-[1px] border-[#E1E1E1] rounded-[8px] p-2 flex flex-col gap-2" data-favorite-id="<?php echo $product['favorite_id']; ?>" data-product-id="<?php echo $product['product_id']; ?>">
+                    <div class="favorite-item border border-[#262626]/10 rounded-[16px] p-4 flex flex-col gap-3 bg-white shadow-[0_2px_14px_-8px_rgba(0,0,0,0.12)]" data-favorite-id="<?php echo $product['favorite_id']; ?>" data-product-id="<?php echo $product['product_id']; ?>">
 
                         <div class="flex items-center justify-between">
-                            <button type="submit" class="max-w-[87px] py-[6px] px-3 <?php echo $product['first_quantity'] > 0 ? 'bg-[#39D959]' : 'bg-[#262626]'; ?> text-white text-[14px] font-['Open Sans'] cursor-pointer rounded-[28px]"><?php echo $product['first_quantity'] > 0 ? 'In Stock' : 'Out of Stock'; ?></button>
-                            <button class="remove-favorite-btn text-[14px] font-['Open Sans'] text-[#EE3F3F] font-regular underline cursor-pointer" data-favorite-id="<?php echo $product['favorite_id']; ?>" data-product-id="<?php echo $product['product_id']; ?>">Remove from favorite</button>
+                            <button type="submit" class="px-3 py-1.5 <?php echo $product['first_quantity'] > 0 ? 'bg-[#39D959]' : 'bg-[#262626]'; ?> text-white text-[10px] tracking-[0.1em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full whitespace-nowrap"><?php echo $product['first_quantity'] > 0 ? 'In Stock' : 'Out of Stock'; ?></button>
+                            <button class="remove-favorite-btn text-[14px] font-['Open Sans'] text-[#EE3F3F] font-['Montserrat'] font-semibold underline underline-offset-4 cursor-pointer hover:opacity-70 transition-opacity" data-favorite-id="<?php echo $product['favorite_id']; ?>" data-product-id="<?php echo $product['product_id']; ?>">Remove from favorite</button>
                         </div>
 
-                        <div class="w-full h-[1px] bg-[#E1E1E1]"></div>
+                        <div class="w-full h-px bg-[#262626]/[0.06]"></div>
 
                         <div class="flex justify-between">
                             <div class="flex flex-col gap-2">
 
                                 <div class="flex gap-2">
 
-                                    <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
+                                    <div class="w-[88px] h-[88px] rounded-[12px] overflow-hidden shrink-0">
                                         <img src="<?php echo !empty($product['main_image']) ? product_image_url($product['main_image']) : DOMAIN . '/assets/products/default.svg'; ?>" class="w-full h-full object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
                                     </div>
                                     <div class="flex flex-col gap-[2px]">
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> <?php echo htmlspecialchars($product['product_name']); ?></p>
+                                        <p class="text-[#5F5F5F] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> <?php echo htmlspecialchars($product['product_name']); ?></p>
                                         <?php $firstColor = trim(explode(',', $product['colors'])[0]); ?>
                                         <?php if (!empty($firstColor)): ?>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> <?php echo htmlspecialchars($firstColor); ?></p>
+                                        <p class="text-[#5F5F5F] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Color:</b> <?php echo htmlspecialchars($firstColor); ?></p>
                                         <?php endif; ?>
                                         <?php if (!empty($product['first_size'])): ?>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> <?php echo htmlspecialchars($product['first_size']); ?></p>
+                                        <p class="text-[#5F5F5F] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Size:</b> <?php echo htmlspecialchars($product['first_size']); ?></p>
                                         <?php endif; ?>
-                                        <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Quantity:</b> 1</p>
+                                        <p class="text-[#5F5F5F] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Quantity:</b> 1</p>
                                     </div>
 
                                 </div>
 
                                 <?php if (array_key_exists($product['product_id'], $cart_items)): ?>
-                                <button class="cart-toggle-button w-[fit-content] rounded-[4px] py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer" data-product-id="<?php echo $product['product_id']; ?>" data-cart-id="<?php echo $cart_items[$product['product_id']]; ?>" data-in-cart="true">Added to Cart</button>
+                                <button class="cart-toggle-button w-[fit-content] rounded-full py-1.5 px-4 tracking-[0.1em] uppercase bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer" data-product-id="<?php echo $product['product_id']; ?>" data-cart-id="<?php echo $cart_items[$product['product_id']]; ?>" data-in-cart="true">Added to Cart</button>
                                 <?php else: ?>
-                                <button class="cart-toggle-button w-[fit-content] rounded-[4px] py-1 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer" data-product-id="<?php echo $product['product_id']; ?>" data-in-cart="false">Add to Cart</button>
+                                <button class="cart-toggle-button w-[fit-content] rounded-full py-1.5 px-4 tracking-[0.1em] uppercase bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer" data-product-id="<?php echo $product['product_id']; ?>" data-in-cart="false">Add to Cart</button>
                                 <?php endif; ?>
                             </div>
 
@@ -310,11 +313,13 @@ require_once "../includes/auth/google.php";
             </div>
         </div>
         <?php else: ?> 
-                <div class="text-center py-16">
-                    <i class="fa-regular fa-heart text-[80px] text-[<?php echo store_color('color_tint'); ?>] mx-auto leading-none" alt="No favorite"></i>
-                    <h3 class="mt-2 md:text-[20px]  font-medium text-gray-900 font-[Open Sans]">You have not add any item to favorite</h3>
-           
-                   
+                <div class="w-[90%] mx-auto max-w-[1440px] py-16">
+                    <div class="flex flex-col items-center gap-5 text-center bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)] px-6 py-16">
+                        <div class="w-20 h-20 rounded-full flex items-center justify-center" style="background-color:var(--glor-tint)">
+                            <i class="fa-regular fa-heart text-[30px] leading-none" style="color:var(--glor-primary)" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-[20px] md:text-[22px] font-['Montserrat'] font-semibold text-[#262626]">You have not add any item to favorite</h3>
+                    </div>
                 </div>
             <?php endif; ?>
 

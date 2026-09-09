@@ -19,8 +19,9 @@ require_once "../google.php"
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="<?php echo DOMAIN; ?>/assets/global/logo.png">
     <title>Create an Account - Glorefy</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 <?php include '../../../includes/tailwind-components.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -29,77 +30,69 @@ require_once "../google.php"
     include(__DIR__ . '/../../header.php');
     include(__DIR__ . '/../../options.php');
 ?>
-     <div class="md:w-[50%] mx-auto p-4 bg-white border border-[1px] border-[#EFEFEF] my-5 rounded-md">
-        <div class="text-center mb-6">
-            <h2 class="text-[#262626] text-[24px] font-['Open Sans'] font-medium">Welcome to Glorefy</h2>
-            <p class="text-[#7A7A7A] text-[16px] mt-2">Create your account to get started</p>
-        </div>
-
-        <form action="./send.php" method="POST" class="flex flex-col gap-4" id="userCreationForm">
-            <div class="flex flex-col gap-1">
-                <label for="email" class="font-['Open Sans'] text-[16px] font-medium text-[#262626]">
-                    Email
-                </label>
-                <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    placeholder="Enter your email address"
-                    class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[16px] rounded-[8px]"
-                    required
-                />
+    <div class="w-[92%] max-w-[480px] mx-auto py-10 md:py-16">
+        <div class="bg-white rounded-[20px] border border-[#262626]/[0.07] shadow-[0_30px_70px_-45px_rgba(0,0,0,0.3)] p-6 md:p-10">
+            <div class="text-center mb-7">
+                <h2 class="text-[<?php echo store_color('color_heading'); ?>] text-[30px] md:text-[34px] leading-[1.15] font-['Cormorant_Garamond'] font-medium">Welcome to Glorefy</h2>
+                <p class="text-[#7A7A7A] text-[14px] md:text-[15px] font-['Open_Sans'] mt-2">Create your account to get started</p>
             </div>
 
-            <div class="flex flex-col gap-1">
-                <label for="password" class="font-['Open Sans'] text-[16px] font-medium text-[#262626]">
-                    Password
-                </label>
+            <form action="./send.php" method="POST" class="flex flex-col gap-4 md:gap-5" id="userCreationForm">
+                <div class="flex flex-col gap-1.5">
+                    <label for="email" class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]/80">Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        placeholder="Enter your email address"
+                        class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200"
+                        required
+                    />
+                </div>
 
-                <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-    <input
-        type="password"
-        name="password"
-        id="passwordcpp"
-        placeholder="Enter your password"
-        class="w-full font-['Open Sans'] bg-transparent outline-none font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[16px]"
-        required
-    />
-    <img src="<?php echo DOMAIN; ?>/assets/global/eye-slash.svg" class="w-[24px] cursor-pointer toggle-password" id="password-toggle" />
-</div>
+                <div class="flex flex-col gap-1.5">
+                    <label for="password" class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]/80">Password</label>
 
+                    <div class="flex items-center gap-1 bg-white border border-[#262626]/10 rounded-[10px] pl-4 pr-2 focus-within:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">
+                        <input
+                            type="password"
+                            name="password"
+                            id="passwordcpp"
+                            placeholder="Enter your password"
+                            class="w-full font-['Open_Sans'] bg-transparent outline-none text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 text-[14px] md:text-[15px]"
+                            required
+                        />
+                        <img src="<?php echo DOMAIN; ?>/assets/global/eye-slash.svg" class="w-[18px] cursor-pointer toggle-password opacity-50 hover:opacity-100 transition-opacity" id="password-toggle" alt="Show password" />
+                    </div>
+                </div>
+
+                <input type="hidden" name="otp" id="otp" />
+                <input type="hidden" name="send" value="1">
+                <input type="hidden" name="subject" value="Receive OTP">
+
+                <p id="passwordError" class="hidden text-[13px] font-['Open_Sans'] text-[#EE3F3F] leading-snug">Password must have at least 6 characters, 2 uppercase letters, 2 lowercase letters, 1 number, and 1 special character.</p>
+
+                <button type="submit" class="w-full py-3.5 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[12px] md:text-[13px] tracking-[0.18em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] hover:shadow-[0_14px_30px_-12px_rgba(0,0,0,0.3)] transition-all duration-300">
+                    Create an account
+                </button>
+            </form>
+
+            <div class="flex items-center gap-4 my-6">
+                <span class="h-px flex-1 bg-[#262626]/10"></span>
+                <span class="text-[10px] tracking-[0.24em] uppercase font-['Montserrat'] font-semibold text-[#9A9A9A]">Or</span>
+                <span class="h-px flex-1 bg-[#262626]/10"></span>
             </div>
 
-            <input type="hidden" name="otp" id="otp" />
-            <input type="hidden" name="send" value="1">
-            <input type="hidden" name="subject" value="Receive OTP">
+            <a href="<?= $url ?>" class="group w-full flex items-center justify-center gap-3 border border-[#262626]/10 bg-white rounded-full px-6 py-3 cursor-pointer hover:border-[#262626]/25 transition-all duration-200">
+                <img src="<?php echo DOMAIN; ?>/assets/global/google.svg" class="w-[18px]" alt="Google" />
+                <span class="text-[13px] font-['Montserrat'] font-medium text-[#262626]">
+                    Create an account with Google
+                </span>
+            </a>
 
-            <p id="passwordError" class='text-[14px] font-["Open Sans"] text-[#EE3F3F] font-regular underline cursor-pointer' style="display: none;"></p>
-            
-            <button type="submit" class="w-full py-[10px] px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center hover:bg-[<?php echo store_color('color_primary'); ?>]/90 transition-colors duration-300">
-                Create an account
-            </button>
-        </form>
-
-        <div class="relative my-6">
-            <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-[#E1E1E1]"></div>
-            </div>
-            <div class="relative flex justify-center">
-                <span class="bg-white px-4 text-[#7A7A7A] text-[16px]">Or</span>
-            </div>
-        </div>
-
-        <a href="<?= $url ?>" class="cursor-pointer flex items-center justify-center gap-3 border-[1px] border-[#E1E1E1] rounded-[8px] py-3 hover:bg-gray-50 transition-colors duration-300">
-            <img src="<?php echo DOMAIN; ?>/assets/global/google.svg" class="w-[20px]" />
-            <p class="font-['Open Sans'] text-[16px] font-regular text-[#262626]">
-                Create an account with Google
-            </p>
-</a>
-
-        <div class="text-center mt-6">
-            <p class="text-[#7A7A7A] text-[14px]">
-                Already have an account? 
-                <a href="../login/signin.php" class="text-[<?php echo store_color('color_primary'); ?>] font-medium hover:underline">Log in</a>
+            <p class="text-center font-['Open_Sans'] text-[14px] text-[#7A7A7A] mt-6">
+                Already have an account?
+                <a href="../login/signin.php" class="font-['Montserrat'] font-semibold text-[<?php echo store_color('color_primary'); ?>] hover:underline">Log in</a>
             </p>
         </div>
     </div>
@@ -166,10 +159,10 @@ require_once "../google.php"
         
         if (!validationResult.isValid) {
             // Show detailed error messages
-            passwordError.className = 'text-[14px] font-["Open Sans"] text-[#EE3F3F] font-regular';
+            passwordError.className = 'text-[13px] font-["Open Sans"] text-[#EE3F3F] font-regular leading-snug';
             passwordError.textContent = validationResult.errors.join('. ');
         } else {
-            passwordError.className = 'text-[14px] font-["Open Sans"] text-[#22C55E] font-regular';
+            passwordError.className = 'text-[13px] font-["Open Sans"] text-[#22C55E] font-regular leading-snug';
             passwordError.textContent = 'Password meets all requirements!';
         }
     }

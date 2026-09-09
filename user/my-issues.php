@@ -81,95 +81,97 @@ require_once "../includes/auth/google.php";
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 <?php include '../includes/tailwind-components.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
-    <main class="bg-[#FEFEFE]">
+    <main class="bg-[<?php echo store_color('color_bg'); ?>]">
         <?php
         include(__DIR__ . '/../includes/header.php');
         include(__DIR__ . '/../includes/options.php');
         ?>
 
-        <section class="w-full bg-[#FFFFFFF] py-1">
+        <section class="w-full pt-7 pb-3 border-b border-[#262626]/[0.05]">
             <div class="w-[90%] mx-auto max-w-[1440px]">
-                <div class="flex items-center gap-1 cursor-pointer">
-                    <a href="../index.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">Home</a>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <a href="./orders.php" class="text-[#262626] text-[13px] md:text-[14px] font-Onest font-medium">My Orders</a>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-[#C5C5C5] leading-none"></i>
-                    <span class="text-[<?php echo store_color('color_primary'); ?>] text-[13px] md:text-[14px] font-Onest font-medium">My Reported Issues</span>
+                <div class="flex items-center gap-2 text-[12px] font-['Montserrat'] font-medium tracking-[0.03em]">
+                    <a href="../index.php" class="text-[#5F5F5F] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">Home</a>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-[#262626]/20 leading-none"></i>
+                    <a href="./orders.php" class="text-[#5F5F5F] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">My Orders</a>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-[#262626]/20 leading-none"></i>
+                    <span class="text-[<?php echo store_color('color_heading'); ?>] font-semibold">My Reported Issues</span>
                 </div>
             </div>
         </section>
 
-        <div class="w-[90%] mx-auto max-w-[1440px] bg-[#FFFFFF] py-5">
-            <div class="w-full md:w-[80%] lg:w-[70%] mx-auto">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-[24px] md:text-[28px] font-['Open Sans'] font-bold">My Reported Issues</h1>
-                    <a href="./orders.php" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">Back to Orders</a>
+        <div class="w-[90%] mx-auto max-w-[1440px] py-8 md:py-12">
+            <div class="w-full max-w-[820px] mx-auto">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7 md:mb-10">
+                    <h1 class="text-[<?php echo store_color('color_heading'); ?>] text-[30px] md:text-[38px] leading-[1.12] font-['Cormorant_Garamond'] font-medium">My Reported Issues</h1>
+                    <a href="./orders.php" class="w-fit inline-flex items-center gap-2 py-3 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[12px] md:text-[13px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] transition-all duration-300">Back to Orders</a>
                 </div>
                 
                 <?php if (empty($issues)): ?>
-                <div class="text-center py-10 border-[1px] border-[#E1E1E1] rounded-[8px]">
-                    <p class="text-[16px] text-gray-600 mb-4">You haven't reported any issues yet.</p>
-                    <a href="./orders.php" class="py-2 px-4 bg-[<?php echo store_color('color_primary'); ?>] text-white text-center text-[16px] font-['Open Sans'] rounded-[4px]">View My Orders</a>
+                <div class="flex flex-col items-center gap-5 text-center bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)] px-6 py-14">
+                    <p class="text-[#6B6B6B] text-[15px] font-['Open_Sans']">You haven't reported any issues yet.</p>
+                    <a href="./orders.php" class="inline-flex items-center gap-2 py-3 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] transition-all duration-300">View My Orders</a>
                 </div>
                 <?php else: ?>
-                <div class="space-y-6">
+                <div class="space-y-5">
                     <?php foreach ($issues as $issue): 
                         $status_class = getStatusBadgeClass($issue['status']);
                         $order_status_class = getOrderStatusBadgeClass($issue['order_status']);
                     ?>
-                    <div class="border-[1px] border-[#E1E1E1] rounded-[8px] p-4 md:p-6">
-                        <div class="flex flex-col md:flex-row justify-between mb-4">
+                    <div class="bg-white rounded-[20px] border border-[#262626]/10 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.08)] p-5 md:p-7">
+                        <div class="flex flex-col md:flex-row justify-between gap-4 mb-5">
                             <div>
-                                <h2 class="text-[18px] font-medium mb-1"><?php echo htmlspecialchars($issue['issue_type']); ?></h2>
-                                <div class="flex flex-wrap gap-2 mb-2">
-                                    <span class="inline-block px-2 py-1 text-sm rounded-full <?php echo $status_class; ?>">
+                                <h2 class="text-[19px] md:text-[21px] font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>] mb-2.5"><?php echo htmlspecialchars($issue['issue_type']); ?></h2>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="inline-block px-3 py-1 text-[11px] tracking-[0.06em] uppercase font-['Montserrat'] font-semibold rounded-full <?php echo $status_class; ?>">
                                         <?php echo ucfirst($issue['status']); ?>
                                     </span>
-                                    <span class="inline-block px-2 py-1 text-sm rounded-full <?php echo $order_status_class; ?>">
+                                    <span class="inline-block px-3 py-1 text-[11px] tracking-[0.06em] uppercase font-['Montserrat'] font-semibold rounded-full <?php echo $order_status_class; ?>">
                                         Order: <?php echo $issue['order_status']; ?>
                                     </span>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <p class="text-[14px] text-gray-600">Issue ID: #<?php echo $issue['issue_id']; ?></p>
-                                <p class="text-[14px] text-gray-600">Order ID: #<?php echo $issue['order_id']; ?></p>
-                                <p class="text-[14px] text-gray-600">Reported: <?php echo date('M d, Y', strtotime($issue['created_at'])); ?></p>
+                            <div class="text-left md:text-right md:shrink-0">
+                                <p class="text-[13px] text-[#6B6B6B] font-['Open_Sans']">Issue ID: <span class="font-medium text-[#262626]">#<?php echo $issue['issue_id']; ?></span></p>
+                                <p class="text-[13px] text-[#6B6B6B] font-['Open_Sans']">Order ID: <span class="font-medium text-[#262626]">#<?php echo $issue['order_id']; ?></span></p>
+                                <p class="text-[13px] text-[#6B6B6B] font-['Open_Sans']">Reported: <span class="font-medium text-[#262626]"><?php echo date('M d, Y', strtotime($issue['created_at'])); ?></span></p>
                             </div>
                         </div>
                         
-                        <div class="mb-4">
-                            <h3 class="text-[16px] font-medium mb-2">Issue Description</h3>
-                            <div class="p-3 bg-gray-50 rounded-md">
-                                <p class="text-[14px] text-gray-800 whitespace-pre-line"><?php echo htmlspecialchars($issue['issue_description']); ?></p>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="text-[12px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]/60 mb-2">Issue Description</h3>
+                                <div class="p-4 bg-[#FBF9FA] rounded-[12px] border border-[#262626]/5">
+                                    <p class="text-[14px] md:text-[15px] text-[#4A4A4A] font-['Open_Sans'] leading-relaxed whitespace-pre-line"><?php echo htmlspecialchars($issue['issue_description']); ?></p>
+                                </div>
                             </div>
+                            
+                            <?php if (!empty($issue['admin_notes'])): ?>
+                            <div>
+                                <h3 class="text-[12px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_primary'); ?>] mb-2">Support Note</h3>
+                                <div class="p-4 bg-[#EEF5FB] rounded-[12px] border border-[#262626]/5">
+                                    <p class="text-[14px] md:text-[15px] text-[#4A4A4A] font-['Open_Sans'] leading-relaxed whitespace-pre-line"><?php echo htmlspecialchars($issue['admin_notes']); ?></p>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            
+                            <?php if (!empty($issue['resolution'])): ?>
+                            <div>
+                                <h3 class="text-[12px] tracking-[0.16em] uppercase font-['Montserrat'] font-semibold text-[#1B7A3D] mb-2">Resolution</h3>
+                                <div class="p-4 bg-[#ECF8F0] rounded-[12px] border border-[#262626]/5">
+                                    <p class="text-[14px] md:text-[15px] text-[#4A4A4A] font-['Open_Sans'] leading-relaxed"><?php echo htmlspecialchars($issue['resolution']); ?></p>
+                                </div>
+                            </div>
+                            <?php endif; ?>
                         </div>
                         
-                        <?php if (!empty($issue['admin_notes'])): ?>
-                        <div class="mb-4">
-                            <h3 class="text-[16px] font-medium mb-2">Support Note</h3>
-                            <div class="p-3 bg-blue-50 rounded-md">
-                                <p class="text-[14px] text-gray-800 whitespace-pre-line"><?php echo htmlspecialchars($issue['admin_notes']); ?></p>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <?php if (!empty($issue['resolution'])): ?>
-                        <div class="mb-4">
-                            <h3 class="text-[16px] font-medium mb-2">Resolution</h3>
-                            <div class="p-3 bg-green-50 rounded-md">
-                                <p class="text-[14px] text-gray-800"><?php echo htmlspecialchars($issue['resolution']); ?></p>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <div class="flex justify-end">
-                            <a href="./track-order.php?id=<?php echo $issue['order_id']; ?>" class="py-2 px-4 bg-[#E8E9F2] text-[#262626] text-center text-[16px] font-['Open Sans'] rounded-[4px]">View Order</a>
+                        <div class="flex justify-end mt-5 pt-5 border-t border-[#262626]/[0.06]">
+                            <a href="./track-order.php?id=<?php echo $issue['order_id']; ?>" class="inline-flex items-center gap-2 py-2.5 px-6 border border-[#262626]/15 text-[#262626] rounded-full text-[11px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold hover:border-[<?php echo store_color('color_primary'); ?>] hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">View Order</a>
                         </div>
                     </div>
                     <?php endforeach; ?>

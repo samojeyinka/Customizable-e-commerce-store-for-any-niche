@@ -24,7 +24,7 @@ if (!defined('ABSPATH') && !function_exists('glorefy_tailwind_components_guard')
         @apply flex w-[400%] transition-transform duration-500 ease-in-out;
     }
     .carousel-item {
-        @apply flex w-screen h-[510px] items-center justify-center bg-center bg-cover;
+        @apply flex w-screen h-[560px] md:h-[640px] lg:h-[680px] items-center justify-center bg-center bg-cover;
     }
     .slide1 {
         background-image: url('https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1600&q=80');
@@ -41,7 +41,7 @@ if (!defined('ABSPATH') && !function_exists('glorefy_tailwind_components_guard')
 
     @media screen and (max-width: 765px) {
         .carousel-item {
-            @apply h-[500px];
+            @apply h-[560px];
         }
     }
 
@@ -52,13 +52,13 @@ if (!defined('ABSPATH') && !function_exists('glorefy_tailwind_components_guard')
         @apply bg-black/50 text-white p-[10px] cursor-pointer hidden;
     }
     .indicators {
-        @apply absolute bottom-[25px] left-1/2 -translate-x-1/2 flex items-center;
+        @apply absolute bottom-[30px] left-1/2 -translate-x-1/2 flex items-center;
     }
     .indicators div {
-        @apply w-[16px] h-[16px] bg-white rounded-full mx-[5px] cursor-pointer;
+        @apply w-[24px] h-[2px] bg-white/60 rounded-full mx-[6px] cursor-pointer;
     }
     .indicators .active {
-        @apply w-[61px] h-[12px] rounded-[12px];
+        @apply w-[44px] h-[2px] rounded-full;
         background-color: var(--glor-primary, #C2185B);
     }
 

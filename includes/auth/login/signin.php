@@ -87,7 +87,7 @@ require_once "../google.php";
     <title>GLOREFY - Sign In</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 <?php include '../../../includes/tailwind-components.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -98,86 +98,83 @@ require_once "../google.php";
    ?>
 
 <div class="w-full bg-[<?php echo store_color('color_bg'); ?>]">
-    <div class="md:w-[50%] mx-auto p-4 bg-white border border-[1px] border-[#EFEFEF] my-5 rounded-md">
-        <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Welcome Back!</h3>
-        
-        <?php if(!empty($error)): ?>
-        <section id="dangeralert" class="flex flex-col items-center w-full bg-[#FDECEC] shadow-lg mt-2 py-3 px-4 rounded relative overflow-hidden">
-            <div class="h-[100%] w-[5px] bg-[#EE3F3F] absolute left-0 top-0"></div>
-            <div class="flex items-center gap-2 mr-auto">
-                <img src="<?php echo DOMAIN; ?>/assets/global/canceldanger.svg" id="closedangeralert" alt="Cancel danger alert" class="w-[24px] cursor-pointer" />
-                <p class="text-[16px] md:text-[17px] text-[#2C2C2C] w-full font-Satoshi font-medium">
-                    Login Error
+    <div class="w-[92%] max-w-[480px] mx-auto py-10 md:py-16">
+        <div class="bg-white rounded-[20px] border border-[#262626]/[0.07] shadow-[0_30px_70px_-45px_rgba(0,0,0,0.3)] p-6 md:p-10">
+            <div class="text-center">
+                <h3 class="text-[<?php echo store_color('color_heading'); ?>] text-[30px] md:text-[34px] leading-[1.15] font-['Cormorant_Garamond'] font-medium">Welcome Back!</h3>
+            </div>
+
+            <?php if(!empty($error)): ?>
+            <section id="dangeralert" class="flex flex-col items-start w-full bg-[#FDECEC] border-l-[3px] border-[#EE3F3F] rounded-[10px] py-3 px-4 mt-5 relative overflow-hidden">
+                <div class="flex items-center gap-2 w-full">
+                    <img src="<?php echo DOMAIN; ?>/assets/global/canceldanger.svg" id="closedangeralert" alt="Cancel danger alert" class="w-[18px] cursor-pointer" />
+                    <p class="text-[15px] text-[#2C2C2C] font-['Open_Sans'] font-semibold">
+                        Login Error
+                    </p>
+                </div>
+                <p class="text-[13px] text-start w-full font-['Open_Sans'] text-[#7F7F7F] mt-1.5 pl-7 pr-2">
+                    <?php echo $error; ?>
                 </p>
-            </div>
-            <p class="text-[13px] md:text-[14px] text-start w-full font-Satoshi font-regular text-[#7F7F7F] mt-2 ml-[3rem] pr-3">
-                <?php echo $error; ?>
-            </p>
-        </section>
-        <?php endif; ?>
-        
-        <form action="" method="POST" class="flex flex-col gap-4 pt-4">
-            <div class="flex flex-col gap-1">
-                <label
-                    for="email"
-                    class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                    Email
-                </label>
-                <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    placeholder="Enter your email address"
-                    require
-                    class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]" />
-            </div>
-            
-            <div class="flex flex-col gap-1">
-                <label
-                    for="password"
-                    class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                    Password
-                </label>
-                
-                <div class="flex items-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
+            </section>
+            <?php endif; ?>
+
+            <form action="" method="POST" class="flex flex-col gap-4 md:gap-5 pt-6">
+                <div class="flex flex-col gap-1.5">
+                    <label for="email" class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]/80">Email</label>
                     <input
-                        type="password"
-                        name="password"
-                        id="mspassword"
-                        placeholder="Enter your password"
-                        required
-                        class="w-full font-['Open Sans'] bg-transparent outline-none font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px]" />
-                    <img src="<?php echo DOMAIN; ?>/assets/global/eye-slash.svg" id="togglePassword" class="w-[24px] cursor-pointer" />
+                        type="email"
+                        name="email"
+                        id="email"
+                        placeholder="Enter your email address"
+                        require
+                        class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200" />
                 </div>
-            </div>
-            
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" name="remember" id="remember" class="w-4 h-4" />
-                    <label for="remember" class="font-['Open Sans'] text-[14px] text-[#2C2C2C]">Remember me</label>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="password" class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]/80">Password</label>
+
+                    <div class="flex items-center gap-1 bg-white border border-[#262626]/10 rounded-[10px] pl-4 pr-2 focus-within:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200">
+                        <input
+                            type="password"
+                            name="password"
+                            id="mspassword"
+                            placeholder="Enter your password"
+                            required
+                            class="w-full font-['Open_Sans'] bg-transparent outline-none text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 text-[14px] md:text-[15px]" />
+                        <img src="<?php echo DOMAIN; ?>/assets/global/eye-slash.svg" id="togglePassword" class="w-[18px] cursor-pointer opacity-50 hover:opacity-100 transition-opacity" alt="Show password" />
+                    </div>
                 </div>
-                <a href="<?php echo DOMAIN; ?>/includes/auth/password-reset/mail.php" class="font-['Open Sans'] text-[14px] text-[<?php echo store_color('color_primary'); ?>]">Forgot password?</a>
+
+                <div class="flex justify-between items-center gap-3 pt-1">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" name="remember" id="remember" class="w-4 h-4 accent-[<?php echo store_color('color_primary'); ?>]" />
+                        <label for="remember" class="font-['Open_Sans'] text-[13px] text-[#2C2C2C]">Remember me</label>
+                    </div>
+                    <a href="<?php echo DOMAIN; ?>/includes/auth/password-reset/mail.php" class="font-['Montserrat'] text-[11px] tracking-[0.06em] uppercase font-semibold text-[<?php echo store_color('color_primary'); ?>] hover:underline">Forgot password?</a>
+                </div>
+
+                <button type="submit" name="login" value="1" class="w-full py-3.5 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[12px] md:text-[13px] tracking-[0.18em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] hover:shadow-[0_14px_30px_-12px_rgba(0,0,0,0.3)] transition-all duration-300">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="flex items-center gap-4 my-6">
+                <span class="h-px flex-1 bg-[#262626]/10"></span>
+                <span class="text-[10px] tracking-[0.24em] uppercase font-['Montserrat'] font-semibold text-[#9A9A9A]">Or</span>
+                <span class="h-px flex-1 bg-[#262626]/10"></span>
             </div>
-            
-            <button type="submit" name="login" value="1" class="w-full py-[8px] px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">
-                Sign In
-            </button>
-        </form>
-        
-        <p class="text-center font-['Open Sans'] text-[17px] md:text-[18px] font-regular text-[#7A7A7A] py-3">
-            Or
-        </p>
-        
-        <a href="<?= $url ?>" class="cursor-pointer flex items-center justify-center gap-2 border-[1px] border-[#E1E1E1] rounded-[8px] pr-3">
-            <img src="<?php echo DOMAIN; ?>/assets/global/google.svg" class="w-[20px]" />
-            <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#262626] py-3">
-                Sign in with Google
+
+            <a href="<?= $url ?>" class="group w-full flex items-center justify-center gap-3 border border-[#262626]/10 bg-white rounded-full px-6 py-3 cursor-pointer hover:border-[#262626]/25 transition-all duration-200">
+                <img src="<?php echo DOMAIN; ?>/assets/global/google.svg" class="w-[18px]" alt="Google" />
+                <span class="text-[13px] font-['Montserrat'] font-medium text-[#262626]">
+                    Sign in with Google
+                </span>
+            </a>
+
+            <p class="text-center font-['Open_Sans'] text-[14px] text-[#7A7A7A] mt-6">
+                Don't have an account? <a href="../create-account/sign-up.php" class="font-['Montserrat'] font-semibold text-[<?php echo store_color('color_primary'); ?>]">Create an account</a>
             </p>
-        </a>
-        
-        <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#7A7A7A] mt-4">
-            Don't have an account? <a href="../create-account/sign-up.php" class="text-[<?php echo store_color('color_primary'); ?>]">Create an account</a>
-        </p>
+        </div>
     </div>
 </div>
 

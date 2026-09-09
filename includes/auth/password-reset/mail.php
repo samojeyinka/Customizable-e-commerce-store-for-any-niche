@@ -10,8 +10,7 @@ use PHPMailer\PHPMailer\Exception;
 
 require_once "../../../config/config.php";
 
-// Start session
-session_start();
+
 
 // If user is already logged in, redirect to dashboard
 if(isset($_SESSION['user_id'])) {
@@ -135,7 +134,7 @@ require_once "../../../config/servername.php";
     <title>GLOREFY - Password Reset</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=League+Gothic&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 <?php include '../../../includes/tailwind-components.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -146,50 +145,51 @@ require_once "../../../config/servername.php";
     include(__DIR__ . '/../../options.php');
 ?>
 
-<div class="w-full">
-    <div class="w-[95%] md:w-[50%] mx-auto p-4 bg-white border border-[1px] border-[#EFEFEF] my-5 rounded-md relative">
-    <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php">
-            <img src="<?php echo DOMAIN; ?>/assets/global/back.svg" alt="back" class="w-[26px] md:w-[32px] absolute left-4 cursor-pointer" />
-        </a>
-        <h3 class="text-[#262626] text-center text-[20x] md:text-[24px] font-['Open Sans'] font-medium">Reset Your Password</h3>
-        
-        <?php if(!empty($error_message)): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4" role="alert">
-                <span class="block sm:inline"><?php echo $error_message; ?></span>
-            </div>
-        <?php endif; ?>
-        
-        <?php if(!empty($success_message)): ?>
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4" role="alert">
-                <span class="block sm:inline"><?php echo $success_message; ?></span>
-            </div>
-        <?php endif; ?>
+<div class="w-full bg-[<?php echo store_color('color_bg'); ?>]">
+    <div class="w-[92%] max-w-[480px] mx-auto py-10 md:py-16">
+        <div class="bg-white rounded-[20px] border border-[#262626]/[0.07] shadow-[0_30px_70px_-45px_rgba(0,0,0,0.3)] p-6 md:p-10 relative">
+            <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" aria-label="Back to sign in">
+                <i class="fa-solid fa-arrow-left text-[16px] text-[#262626]/50 hover:text-[<?php echo store_color('color_primary'); ?>] transition-colors absolute left-5 top-6 md:left-7 md:top-7 cursor-pointer"></i>
+            </a>
 
-        <form action="<?php echo DOMAIN; ?>/includes/auth/password-reset/mail.php" method="POST" class="flex flex-col gap-4 pt-4">
-            <div class="flex flex-col gap-1">
-                <label
-                    for="email"
-                    class="font-['Open Sans'] text-[15px] md:text-[16px] font-medium text-[#262626]">
-                    Email
-                </label>
-                <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    placeholder="Enter your registered email address"
-                    class="w-full font-['Open Sans'] bg-transparent outline-none border-[1px] border-[#E1E1E1] font-regular text-[#2C2C2C] placeholder:text-[#D9D9D9] py-[10px] px-2 text-[14px] md:text-[16px] rounded-[8px]"
-                    required
-                />
+            <div class="text-center">
+                <h3 class="text-[<?php echo store_color('color_heading'); ?>] text-[30px] md:text-[34px] leading-[1.15] font-['Cormorant_Garamond'] font-medium">Reset Your Password</h3>
             </div>
-            
-            <input type="hidden" name="send" value="1">
-            
-            <button type="submit" class="w-full py-[8px] px-3 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[16px] font-['Open Sans'] cursor-pointer rounded-[8px] text-center">Send Reset Code</button>
-        </form>
 
-        <p class="text-center font-['Open Sans'] text-[15px] md:text-[16px] font-regular text-[#7A7A7A] py-3">
-            Remember your password? <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="text-[<?php echo store_color('color_primary'); ?>] font-medium">Sign in</a>
-        </p>
+            <?php if(!empty($error_message)): ?>
+                <div class="bg-[#FDECEC] border-l-[3px] border-[#EE3F3F] text-[#B00020] px-4 py-3 rounded-[10px] mt-5 font-['Open_Sans'] text-[13px] md:text-[14px]" role="alert">
+                    <span class="block sm:inline"><?php echo $error_message; ?></span>
+                </div>
+            <?php endif; ?>
+
+            <?php if(!empty($success_message)): ?>
+                <div class="bg-[#E7F6EC] border-l-[3px] border-[#1B7A3D] text-[#1B7A3D] px-4 py-3 rounded-[10px] mt-5 font-['Open_Sans'] text-[13px] md:text-[14px]" role="alert">
+                    <span class="block sm:inline"><?php echo $success_message; ?></span>
+                </div>
+            <?php endif; ?>
+
+            <form action="<?php echo DOMAIN; ?>/includes/auth/password-reset/mail.php" method="POST" class="flex flex-col gap-4 md:gap-5 pt-6">
+                <div class="flex flex-col gap-1.5">
+                    <label for="email" class="text-[12px] tracking-[0.14em] uppercase font-['Montserrat'] font-semibold text-[<?php echo store_color('color_heading'); ?>]/80">Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        placeholder="Enter your registered email address"
+                        class="w-full font-['Open_Sans'] bg-white outline-none border border-[#262626]/10 text-[#2C2C2C] placeholder:text-[#B8BBD7] py-3 px-4 text-[14px] md:text-[15px] rounded-[10px] focus:border-[<?php echo store_color('color_primary'); ?>] transition-colors duration-200"
+                        required
+                    />
+                </div>
+
+                <input type="hidden" name="send" value="1">
+
+                <button type="submit" class="w-full py-3.5 px-6 bg-[<?php echo store_color('color_primary'); ?>] text-white text-[12px] md:text-[13px] tracking-[0.18em] uppercase font-['Montserrat'] font-semibold cursor-pointer rounded-full hover:bg-[<?php echo store_color('color_primary_dark'); ?>] hover:shadow-[0_14px_30px_-12px_rgba(0,0,0,0.3)] transition-all duration-300">Send Reset Code</button>
+            </form>
+
+            <p class="text-center font-['Open_Sans'] text-[14px] text-[#7A7A7A] mt-6">
+                Remember your password? <a href="<?php echo DOMAIN; ?>/includes/auth/login/signin.php" class="font-['Montserrat'] font-semibold text-[<?php echo store_color('color_primary'); ?>] hover:underline">Sign in</a>
+            </p>
+        </div>
     </div>
 </div>
 

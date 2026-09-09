@@ -340,7 +340,7 @@ function seed_brand_id(mysqli $conn, array $b): int {
     return (int) $conn->insert_id;
 }
 
-function seed_product_id(mysqli $conn, array $p, int $categoryId, int $brandId): int {
+function seed_product_id(mysqli $conn, array $p, int $categoryId, int $brandId, string $care = '', string $warranty = ''): int {
     $name     = $p['name'];
     $slug     = $p['slug'];
     $colors   = $p['colors'];
@@ -357,19 +357,19 @@ function seed_product_id(mysqli $conn, array $p, int $categoryId, int $brandId):
     if ($row) {
         $pid = (int) $row['product_id'];
         $up = $conn->prepare(
-            "UPDATE products SET product_name = ?, sku = ?, category_id = ?, brand_id = ?, colors = ?, details = ?, is_featured = ?, product_status = ? WHERE product_id = ?"
+            "UPDATE products SET product_name = ?, sku = ?, category_id = ?, brand_id = ?, colors = ?, details = ?, warranty = ?, care = ?, is_featured = ?, product_status = ? WHERE product_id = ?"
         );
-        $up->bind_param('ssiissisi', $name, $sku, $categoryId, $brandId, $colors, $details, $featured, $status, $pid);
+        $up->bind_param('ssisssssisi', $name, $sku, $categoryId, $brandId, $colors, $details, $warranty, $care, $featured, $status, $pid);
         $up->execute();
         seed_line("  product '{$name}' already exists (id {$pid}) - updated");
         return $pid;
     }
 
     $ins = $conn->prepare(
-        "INSERT INTO products (product_name, sku, product_slug, category_id, brand_id, colors, details, is_featured, product_status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO products (product_name, sku, product_slug, category_id, brand_id, colors, details, warranty, care, is_featured, product_status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
-    $ins->bind_param('sssiissis', $name, $sku, $slug, $categoryId, $brandId, $colors, $details, $featured, $status);
+    $ins->bind_param('sssisssssis', $name, $sku, $slug, $categoryId, $brandId, $colors, $details, $warranty, $care, $featured, $status);
     $ins->execute();
     seed_line("  + product '{$name}' (id {$conn->insert_id})");
     return (int) $conn->insert_id;
@@ -440,6 +440,41 @@ $seedImages = [
     'https://live.staticflickr.com/7305/9301305426_d960989a8e.jpg', // 24 Vitamin E Collagen Sleeping Mask
 ];
 
+/**
+ * One care/usage note per seeded product (same order as $products).
+ */
+$seedCare = [
+    'Pump a small amount into damp palms, massage over face and rinse with warm water. Use morning and night.',
+    'Massage onto damp skin, leave for up to 60 seconds, then rinse thoroughly. Avoid the eye area.',
+    'Apply with fingertips or a cotton pad, massage gently, then rinse or wipe off with warm water.',
+    'Apply to clean skin after cleansing, morning and night. Follow with SPF during the day.',
+    'Warm a pea-size amount between fingers and press into skin. Reapply on very dry areas.',
+    'Use in the morning on clean skin before sunscreen. Store away from direct sunlight.',
+    'Apply generously to irritated or dry skin as often as needed. Gentle enough for sensitive skin.',
+    'Press a few drops into damp skin after cleansing, then seal with a moisturizer.',
+    'Apply sparingly in the morning onto dry skin. Always follow with SPF 50.',
+    'Use morning or night daily. Begin every other day if your skin is new to actives.',
+    'Warm 2-3 drops in palms and press into damp skin before your moisturizer.',
+    'Apply a pea-size amount to clean, dry skin at night, avoiding eyes and lips. Start 2-3 nights a week.',
+    'Swipe over clean skin with a cotton pad at night. Avoid the eye contour and rinse if stinging.',
+    'Apply generously 15 minutes before sun exposure and reapply every two hours.',
+    'Apply as the last step of your morning routine and blend evenly. Reapply midday for full protection.',
+    'Shake well, spray generously over skin and rub in. Reapply after swimming, sweat or towelling.',
+    'Massage onto clean, dry skin after a shower, focusing on elbows, knees and heels.',
+    'Lather over wet skin and rinse. Suitable for daily use on sensitive skin.',
+    'Massage in circular motions on damp skin, rinse and follow with moisturizer. Use 2-3 times a week.',
+    'Apply an even layer to clean skin, leave for 10 minutes, then rinse with warm water.',
+    'Apply a thin layer as the last step of your night routine. No rinsing needed.',
+    'Apply to clean skin, leave for 10-15 minutes, then rinse off with lukewarm water.',
+    'Apply a smooth, even layer to clean dry skin, let dry completely, then peel off gently from the edges.',
+    'Apply before bed over your night cream. Rinse in the morning for a fresh, plump look.',
+];
+
+/**
+ * Default warranty shown on every seeded product.
+ */
+$seedWarranty = 'Shop with confidence and try it for 30 days; return opened or unopened items for a full refund within 30 days of delivery.';
+
 // ---------------------------------------------------------------------------
 // Run
 // ---------------------------------------------------------------------------
@@ -463,7 +498,9 @@ seed_line("Products:");
 foreach ($products as $i => $p) {
     $catId  = $categoryIds[$p['category']];
     $brandId = $brandIds[$p['brand']];
-    $pid    = seed_product_id($conn, $p, $catId, $brandId);
+    $care     = $seedCare[$i] ?? '';
+    $warranty = $seedWarranty;
+    $pid    = seed_product_id($conn, $p, $catId, $brandId, $care, $warranty);
     seed_variants($conn, $pid, $p['variants']);
 
     $imageUrl = $seedImages[$i] ?? '';
