@@ -285,7 +285,7 @@ require_once "../includes/auth/google.php";
                     <h3 class="text-[16px] font-['Open Sans'] font-medium mb-2">Order Items</h3>
                     <div class="space-y-3 mb-4">
                         <?php foreach ($order_items as $item): 
-                            $image_path = isset($item['image_path']) ? "../assets/products/" . $item['image_path'] : "../assets/products/img1.svg";
+                            $image_path = isset($item['image_path']) && $item['image_path'] !== '' ? product_image_url($item['image_path'], '../assets/products/') : "../assets/products/img1.svg";
                         ?>
                         <div class="flex items-center gap-3 p-2 border border-gray-200 rounded-md">
                             <div class="w-[60px] h-[60px] rounded overflow-hidden">

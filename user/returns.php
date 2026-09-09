@@ -139,7 +139,7 @@ require_once "../includes/auth/google.php";
                         </thead>
                         <tbody>
                             <?php foreach ($return_requests as $request): 
-                                $image_path = isset($request['image_path']) ? "../assets/products/" . $request['image_path'] : "../assets/products/img1.svg";
+                                $image_path = isset($request['image_path']) && $request['image_path'] !== '' ? product_image_url($request['image_path'], '../assets/products/') : "../assets/products/img1.svg";
                                 $status_color = isset($status_colors[$request['status']]) ? $status_colors[$request['status']] : 'bg-[#E8B006]';
                             ?>
                             <tr class="border-b-[1px] border-[#E1E1E1]">
@@ -159,14 +159,17 @@ require_once "../includes/auth/google.php";
                                     <p class="text-[14px] font-['Open Sans'] font-medium">Reason: <?php echo $request['return_reason']; ?></p>
                                     <p class="text-[13px] text-[#777777] font-['Open Sans'] mt-1"><?php echo formatDate($request['created_at']); ?></p>
                                     <p class="text-[13px] text-[#262626] font-['Open Sans'] mt-1">Order #<?php echo $request['order_id']; ?></p>
+
+                                    <?php if (!empty($request['admin_message'])): ?>
+                                    <div class="mt-3 rounded-[4px] border-l-[3px] p-3 bg-[<?php echo store_color('color_tint'); ?>]" style="border-color:<?php echo store_color('color_primary'); ?>">
+                                        <p class="text-[12px] font-['Open Sans'] font-semibold text-[<?php echo store_color('color_primary'); ?>]">Update on your return</p>
+                                        <p class="text-[13px] text-[#262626] font-['Open Sans'] mt-1"><?php echo nl2br(htmlspecialchars($request['admin_message'])); ?></p>
+                                    </div>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="p-3 text-center">
                                     <div class="flex flex-col items-center">
                                         <span class="inline-block py-1 px-3 <?php echo $status_color; ?> text-white text-[13px] font-['Open Sans'] rounded-[15px]"><?php echo $request['status']; ?></span>
-                                        
-                                        <?php if (!empty($request['admin_message'])): ?>
-                                        <button class="view-message-btn mt-2 text-[13px] text-[<?php echo store_color('color_primary'); ?>] underline" data-message="<?php echo htmlspecialchars($request['admin_message']); ?>">View Message</button>
-                                        <?php endif; ?>
                                     </div>
                                 </td>
                                 <td class="p-3 text-center">
@@ -178,29 +181,6 @@ require_once "../includes/auth/google.php";
                     </table>
                 </div>
                 <?php endif; ?>
-            </div>
-        </div>
-        
-        <!-- Message Modal -->
-        <div id="messageModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-            <div class="modal-overlay absolute inset-0 bg-black opacity-50"></div>
-            <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded-lg shadow-lg z-50 overflow-y-auto">
-                <div class="modal-content py-4 text-left px-6">
-                    <div class="flex justify-between items-center pb-3">
-                        <p class="text-[16px] md:text-[18px] font-['Open Sans'] font-semibold">Admin Message</p>
-                        <div class="modal-close cursor-pointer z-50">
-                            <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
-                                <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="my-5">
-                        <p id="modalMessage" class="text-[14px] text-[#262626] font-['Open Sans']"></p>
-                    </div>
-                    <div class="flex justify-end pt-2">
-                        <button class="modal-close px-4 bg-[<?php echo store_color('color_primary'); ?>] p-3 rounded-lg text-white hover:bg-blue-800">Close</button>
-                    </div>
-                </div>
             </div>
         </div>
         
@@ -217,36 +197,5 @@ require_once "../includes/auth/google.php";
     <script src="<?php echo DOMAIN; ?>/functions/faq.js"></script>
     <script src="<?php echo DOMAIN; ?>/functions/dropdown.js"></script>
     <script src="<?php echo DOMAIN; ?>/functions/openoptions.js"></script>
-    
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Message Modal functionality
-        const messageModal = document.getElementById('messageModal');
-        const messageButtons = document.querySelectorAll('.view-message-btn');
-        const modalMessage = document.getElementById('modalMessage');
-        const modalCloseButtons = document.querySelectorAll('.modal-close');
-        
-        messageButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const message = this.getAttribute('data-message');
-                modalMessage.textContent = message;
-                messageModal.classList.remove('hidden');
-            });
-        });
-        
-        modalCloseButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                messageModal.classList.add('hidden');
-            });
-        });
-        
-        // Close modal when clicking outside
-        messageModal.addEventListener('click', function(e) {
-            if (e.target === messageModal || e.target.classList.contains('modal-overlay')) {
-                messageModal.classList.add('hidden');
-            }
-        });
-    });
-    </script>
 </body>
 </html>

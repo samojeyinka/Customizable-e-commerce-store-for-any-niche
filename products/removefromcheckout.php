@@ -116,7 +116,7 @@ $total = $subtotal;
     <div class="cart-item flex items-center justify-between" data-cart-id="<?php echo $item['cart_id']; ?>">
         <div class="py-3 flex gap-2">
             <div class="w-[80.64px] h-[48.73px] rounded-[4px] overflow-hidden">
-                <img src="<?php echo !empty($item['main_image']) ? '../assets/products/' . $item['main_image'] : '../assets/products/default.jpg'; ?>" class="w-full h-full object-cover" />
+                <img src="<?php echo !empty($item['main_image']) ? product_image_url($item['main_image'], '../assets/products/') : '../assets/products/default.jpg'; ?>" class="w-full h-full object-cover" />
             </div>
             <div class="flex flex-col gap-[2px]">
                 <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular">Name: <?php echo htmlspecialchars($item['product_name']); ?></p>

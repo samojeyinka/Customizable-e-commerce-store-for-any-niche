@@ -155,7 +155,7 @@ require_once "../includes/auth/google.php";
 
                                 <div class="w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden">
                                 <a href="<?php echo product_url($product); ?>">
-                                    <img src="<?php echo !empty($product['main_image']) ? DOMAIN . '/assets/products/' . $product['main_image'] : DOMAIN . '/assets/products/default.svg'; ?>" 
+                                    <img src="<?php echo !empty($product['main_image']) ? product_image_url($product['main_image']) : DOMAIN . '/assets/products/default.svg'; ?>" 
                                         class="w-full h-[280px] object-cover" 
                                         alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
                                 </a>
@@ -271,7 +271,7 @@ require_once "../includes/auth/google.php";
                                 <div class="flex gap-2">
 
                                     <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
-                                        <img src="<?php echo !empty($product['main_image']) ? DOMAIN . '/assets/products/' . $product['main_image'] : DOMAIN . '/assets/products/default.svg'; ?>" class="w-full h-full object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
+                                        <img src="<?php echo !empty($product['main_image']) ? product_image_url($product['main_image']) : DOMAIN . '/assets/products/default.svg'; ?>" class="w-full h-full object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
                                     </div>
                                     <div class="flex flex-col gap-[2px]">
                                         <p class="text-[#262626] text-[13px] md:text-[14px] font-['Open Sans'] font-regular"><b>Name:</b> <?php echo htmlspecialchars($product['product_name']); ?></p>
@@ -380,6 +380,7 @@ include(__DIR__ . '/../includes/footer.php');
                     alert('An error occurred. Please try again.');
                 });
             });
+        });
         });
         
     </script>

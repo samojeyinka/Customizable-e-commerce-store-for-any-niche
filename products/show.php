@@ -88,7 +88,7 @@ while ($row = mysqli_fetch_assoc($images_result)) {
 $main_image = DOMAIN . "/assets/products/default.jpg"; // Default image if none found
 foreach ($images as $image) {
     if ($image['is_main'] == 1) {
-        $main_image = DOMAIN . "/assets/products/" . $image['image_path'];
+        $main_image = product_image_url($image['image_path']);
         break;
     }
 }
@@ -249,9 +249,9 @@ require_once "../includes/auth/google.php";
     <div class="flex items-center gap-2">
         <?php foreach ($images as $index => $image): ?>
             <div class="w-[127.4px] h-[80px] rounded-[4px] overflow-hidden flex-shrink-0 cursor-pointer thumbnail-image"
-                data-img="<?php echo DOMAIN; ?>/assets/products/<?php echo $image['image_path']; ?>" 
-                onclick="changeMainImage('<?php echo DOMAIN; ?>/assets/products/<?php echo $image['image_path']; ?>')">
-                <img src="<?php echo DOMAIN; ?>/assets/products/<?php echo $image['image_path']; ?>" class="w-full h-full object-cover" alt="Product image <?php echo $index + 1; ?>" />
+                data-img="<?php echo htmlspecialchars(product_image_url($image['image_path'])); ?>" 
+                onclick="changeMainImage('<?php echo htmlspecialchars(product_image_url($image['image_path'])); ?>')">
+                <img src="<?php echo htmlspecialchars(product_image_url($image['image_path'])); ?>" class="w-full h-full object-cover" alt="Product image <?php echo $index + 1; ?>" />
             </div>
         <?php endforeach; ?>
     </div>

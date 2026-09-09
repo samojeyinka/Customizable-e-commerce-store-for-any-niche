@@ -13,7 +13,7 @@
                         <button class="w-[fit-content] h-[fit-content] bg-[<?php echo store_color('color_primary'); ?>] absolute top-4 left-4 rounded-[28px] text-white text-[12px] md:text-[13px] font-Onest font-regular py-1 px-2 absolute">Featured</button>
                     <?php endif; ?>
                     
-                    <img src="<?php echo !empty($product['main_image']) ? DOMAIN . '/assets/products/' . $product['main_image'] : DOMAIN .'/assets/products/default.svg'; ?>" class="w-[100%] h-[230px] object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
+                    <img src="<?php echo !empty($product['main_image']) ? product_image_url($product['main_image']) : DOMAIN .'/assets/products/default.svg'; ?>" class="w-[100%] h-[230px] object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
                     
            <!-- Only change the text of the button, keep styling consistent -->
         <button 

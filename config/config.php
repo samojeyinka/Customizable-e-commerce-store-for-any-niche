@@ -113,6 +113,49 @@ function generate_product_slug($name, $exclude_id = 0) {
     }
 }
 
+// Detect if a stored image path is an external URL
+function is_external_image_url($path) {
+    return is_string($path) && preg_match('#^https?://#i', trim($path)) === 1;
+}
+
+// Build a renderable URL for a product image path (external URL or local file)
+function product_image_url($path, $base = null) {
+    if ($base === null) {
+        $base = DOMAIN . '/assets/products/';
+    }
+    $path = is_string($path) ? trim($path) : '';
+    if ($path === '') {
+        return '';
+    }
+    if (is_external_image_url($path)) {
+        return $path;
+    }
+    return $base . $path;
+}
+
+// Insert a list of external image URLs (comma/new-line separated) as gallery images
+function product_image_urls_to_rows($con, $product_id, $urls_string) {
+    $urls = preg_split('/[\r\n,]+/', (string) $urls_string);
+    $order_query = "SELECT MAX(display_order) as max_order FROM product_images WHERE product_id = ?";
+    $stmt_order = mysqli_prepare($con, $order_query);
+    mysqli_stmt_bind_param($stmt_order, "i", $product_id);
+    mysqli_stmt_execute($stmt_order);
+    $order_result = mysqli_stmt_get_result($stmt_order);
+    $order_row = mysqli_fetch_assoc($order_result);
+    $last_order = ($order_row['max_order'] ? (int) $order_row['max_order'] + 1 : 2);
+    foreach ($urls as $url) {
+        $url = trim($url);
+        if ($url === '' || !is_external_image_url($url)) {
+            continue;
+        }
+        $insert_image = "INSERT INTO product_images (product_id, image_path, is_main, display_order) VALUES (?, ?, 0, ?)";
+        $stmt_image = mysqli_prepare($con, $insert_image);
+        mysqli_stmt_bind_param($stmt_image, "isi", $product_id, $url, $last_order);
+        mysqli_stmt_execute($stmt_image);
+        $last_order++;
+    }
+}
+
 // Build a friendly slug-based URL for a product row
 function product_url($product) {
     $slug = isset($product['product_slug']) ? trim($product['product_slug']) : '';

@@ -404,7 +404,7 @@ include("./sidebar.php");
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <?php foreach ($return_requests as $request): 
-                                $image_path = isset($request['image_path']) ? "../../assets/products/" . $request['image_path'] : "../assets/admin/img/product-placeholder.jpg";
+                                $image_path = isset($request['image_path']) && $request['image_path'] !== '' ? product_image_url($request['image_path'], "../../assets/products/") : "../assets/admin/img/product-placeholder.jpg";
                                 $status_color = isset($status_colors[$request['status']]) ? $status_colors[$request['status']] : 'bg-[#E8B006]';
                             ?>
                             <tr>

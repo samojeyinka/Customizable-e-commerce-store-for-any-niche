@@ -313,9 +313,11 @@ if (isset($_GET['delete_product']) && is_numeric($_GET['delete_product'])) {
         
         // Delete actual image files
         while ($image = mysqli_fetch_assoc($image_result)) {
-            $image_path = "../../assets/products/" . $image['image_path'];
-            if (file_exists($image_path)) {
-                unlink($image_path);
+            if (!is_external_image_url($image['image_path'])) {
+                $image_path = "../../assets/products/" . $image['image_path'];
+                if (file_exists($image_path)) {
+                    unlink($image_path);
+                }
             }
         }
         
@@ -474,7 +476,7 @@ $result = mysqli_query($con, $query);
 include(__DIR__ . "/sidebar.php");
 ?>
 
-    <div id="main" class="md:p-4 flex flex-col gap-3 bg-[#FAFAFA]">
+    <div id="main" class="md:p-4 flex flex-col gap-3 bg-[#FAFAFA] mt-20">
 
         <div class="w-full flex flex-col md:flex-row justify-between md:items-center">
             <div class="w-full md:w-[fit-content] rounded-[16px] bg-white mx-auto md:mx-0 p-2">
@@ -654,8 +656,12 @@ include(__DIR__ . "/sidebar.php");
         <td class="flex items-center gap-[10px] p-3">
             <div class="flex items-center gap-2">
                 <div class="w-[68px] h-[46px] rounded-[4px] overflow-hidden">
-                    <?php if (!empty($product['main_image']) && file_exists("../../assets/products/" . $product['main_image'])): ?>
-                        <img src="../../assets/products/<?php echo $product['main_image']; ?>" class="w-full h-full object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
+                    <?php if (!empty($product['main_image'])): ?>
+                        <?php if (is_external_image_url($product['main_image']) || file_exists("../../assets/products/" . $product['main_image'])): ?>
+                            <img src="<?php echo htmlspecialchars(product_image_url($product['main_image'], '../../assets/products/')); ?>" class="w-full h-full object-cover" alt="<?php echo htmlspecialchars($product['product_name']); ?>" />
+                        <?php else: ?>
+                            <img src="../assets/dash/product.svg" class="w-full h-full" alt="Default Product" />
+                        <?php endif; ?>
                     <?php else: ?>
                         <img src="../assets/dash/product.svg" class="w-full h-full" alt="Default Product" />
                     <?php endif; ?>

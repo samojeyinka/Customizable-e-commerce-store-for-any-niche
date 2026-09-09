@@ -80,8 +80,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             }
         }
 
-        // Process main image
-        if (isset($_FILES['mainImage']) && $_FILES['mainImage']['error'] == 0) {
+        // Process main image - use URL if provided, otherwise upload file
+        $main_image_url = isset($_POST['mainImageUrl']) ? trim($_POST['mainImageUrl']) : '';
+        if ($main_image_url !== '' && is_external_image_url($main_image_url)) {
+            $insert_image = "INSERT INTO product_images (product_id, image_path, is_main, display_order) VALUES (?, ?, 1, 1)";
+            $stmt_image = mysqli_prepare($con, $insert_image);
+            mysqli_stmt_bind_param($stmt_image, "is", $product_id, $main_image_url);
+            mysqli_stmt_execute($stmt_image);
+        } elseif (isset($_FILES['mainImage']) && $_FILES['mainImage']['error'] == 0) {
             $upload_dir = "../../assets/products/";
 
             // Create directory if it doesn't exist
@@ -155,6 +161,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                     error_log("Failed to move uploaded file #$i, error code: " . $_FILES['otherImages']['error'][$i]);
                 }
             }
+
+            }
+
+        // Process other image URLs (independent of file upload)
+        if (!empty($_POST['otherImagesUrl'])) {
+            product_image_urls_to_rows($con, $product_id, $_POST['otherImagesUrl']);
         }
 
 
@@ -682,6 +694,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
                     </div>
                                 </div>
+
+                                <!-- Or use a URL for the main image -->
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">or Use Image URL</label>
+                                    <input type="url" name="mainImageUrl" placeholder="Paste image URL (https://...)" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <p class="text-[13px] text-[#9A9A9A] font-['Open Sans'] font-regular mt-1">Provide a URL instead of uploading a file. If both are provided, the URL takes priority.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -711,6 +730,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                     </button>
 
                     </div>
+                                </div>
+
+                                <!-- Or use URLs for other images -->
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">or Paste Image URLs</label>
+                                    <input type="text" name="otherImagesUrl" placeholder="Paste image URLs, separated by commas or new lines" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <p class="text-[13px] text-[#9A9A9A] font-['Open Sans'] font-regular mt-1">Provide external image URLs. You can paste several separated by commas or new lines.</p>
                                 </div>
                             </div>
                         </div>
@@ -975,10 +1001,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                         const previewArea = container.querySelector('.mainImagePreview');
                         const uploadArea = container.querySelector('.mainImageUpload');
                         const input = uploadArea.querySelector('input[type="file"]');
+                        const urlInput = container.querySelector('input[name="mainImageUrl"]');
 
                         previewArea.classList.add('hidden');
                         uploadArea.classList.remove('hidden');
                         input.value = '';
+                        if (urlInput) urlInput.value = '';
+                        const previewImg = previewArea.querySelector('img');
+                        if (previewImg) previewImg.src = '';
                     } else {
                         // Other images handling - only remove the specific item
                         if (previewElement.closest('.preview-item')) {
@@ -993,6 +1023,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             // Initialize both uploaders
             initializeUploader('mainImageContainer', false);
             initializeUploader('otherImagesContainer', true);
+
+            // URL input preview for the main image
+            const mainImageUrlInput = document.querySelector('input[name="mainImageUrl"]');
+            if (mainImageUrlInput) {
+                mainImageUrlInput.addEventListener('input', function() {
+                    const val = this.value.trim();
+                    const container = document.getElementById('mainImageContainer');
+                    const previewArea = container.querySelector('.mainImagePreview');
+                    const uploadArea = container.querySelector('.mainImageUpload');
+                    if (/^https?:\/\//i.test(val)) {
+                        previewArea.innerHTML = '<div class="relative inline-block"><img src="' + val + '" alt="Preview" class="w-[199px] h-[150px] object-cover rounded-lg"><button type="button" class="removeImage absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-lg hover:bg-gray-100" data-container="mainImageContainer" data-type="main"><svg class="w-4 h-4 text-gray-500 hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>';
+                        previewArea.classList.remove('hidden');
+                        uploadArea.classList.add('hidden');
+                    }
+                });
+            }
 
             // Form Submission
             document.getElementById('productForm').addEventListener('submit', function(e) {
@@ -1044,8 +1090,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
                 // Validate main image
                 const mainImageInput = document.querySelector('input[name="mainImage"]');
-                if (!mainImageInput.files || mainImageInput.files.length === 0) {
-                    alert('Please upload a main product image');
+                const mainImageUrlInput = document.querySelector('input[name="mainImageUrl"]');
+                const hasMainFile = mainImageInput.files && mainImageInput.files.length > 0;
+                const hasMainUrl = /^https?:\/\//i.test((mainImageUrlInput && mainImageUrlInput.value || '').trim());
+                if (!hasMainFile && !hasMainUrl) {
+                    alert('Please upload a main product image or provide its URL');
                     isValid = false;
                     e.preventDefault();
                     return;

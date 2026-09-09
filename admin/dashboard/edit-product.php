@@ -174,11 +174,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             
             if ($row = mysqli_fetch_assoc($main_image_result)) {
                 $upload_dir = "../../assets/products/";
-                $file_path = $upload_dir . $row['image_path'];
-                
-                // Delete physical file
-                if (file_exists($file_path)) {
-                    unlink($file_path);
+
+                // Delete physical file (only for locally stored images)
+                if (!is_external_image_url($row['image_path'])) {
+                    $file_path = $upload_dir . $row['image_path'];
+                    if (file_exists($file_path)) {
+                        unlink($file_path);
+                    }
                 }
                 
                 // Delete database record
@@ -189,8 +191,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             }
         }
 
-        // Process main image - only if a new one was uploaded
-        if (isset($_FILES['mainImage']) && $_FILES['mainImage']['error'] == 0) {
+        // Process main image - URL takes priority over file upload
+        $main_image_url = isset($_POST['mainImageUrl']) ? trim($_POST['mainImageUrl']) : '';
+        if (!empty($main_image_url) && is_external_image_url($main_image_url)) {
+            // Check if there's an existing main image
+            $check_main = "SELECT image_id, image_path FROM product_images WHERE product_id = ? AND is_main = 1";
+            $stmt_check = mysqli_prepare($con, $check_main);
+            mysqli_stmt_bind_param($stmt_check, "i", $product_id);
+            mysqli_stmt_execute($stmt_check);
+            $result_check = mysqli_stmt_get_result($stmt_check);
+
+            if (mysqli_num_rows($result_check) > 0) {
+                // Update existing main image
+                $old_image = mysqli_fetch_assoc($result_check);
+                if (!is_external_image_url($old_image['image_path'])) {
+                    $old_path = "../../assets/products/" . $old_image['image_path'];
+                    if (file_exists($old_path)) {
+                        unlink($old_path); // Delete old image file
+                    }
+                }
+
+                $update_image = "UPDATE product_images SET image_path = ? WHERE image_id = ?";
+                $stmt_update = mysqli_prepare($con, $update_image);
+                mysqli_stmt_bind_param($stmt_update, "si", $main_image_url, $old_image['image_id']);
+                mysqli_stmt_execute($stmt_update);
+            } else {
+                // Insert new main image
+                $insert_image = "INSERT INTO product_images (product_id, image_path, is_main, display_order) VALUES (?, ?, 1, 1)";
+                $stmt_image = mysqli_prepare($con, $insert_image);
+                mysqli_stmt_bind_param($stmt_image, "is", $product_id, $main_image_url);
+                mysqli_stmt_execute($stmt_image);
+            }
+        } elseif (isset($_FILES['mainImage']) && $_FILES['mainImage']['error'] == 0) {
             $upload_dir = "../../assets/products/";
 
             // Create directory if it doesn't exist
@@ -214,9 +246,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 if (mysqli_num_rows($result_check) > 0) {
                     // Update existing main image
                     $old_image = mysqli_fetch_assoc($result_check);
-                    $old_path = $upload_dir . $old_image['image_path'];
-                    if (file_exists($old_path)) {
-                        unlink($old_path); // Delete old image file
+                    if (!is_external_image_url($old_image['image_path'])) {
+                        $old_path = $upload_dir . $old_image['image_path'];
+                        if (file_exists($old_path)) {
+                            unlink($old_path); // Delete old image file
+                        }
                     }
 
                     $update_image = "UPDATE product_images SET image_path = ? WHERE image_id = ?";
@@ -234,19 +268,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         }
 
         // Process other images
-        if (isset($_FILES['otherImages']) && is_array($_FILES['otherImages']['name'])) {
-            $upload_dir = "../../assets/products/";
+        $upload_dir = "../../assets/products/";
 
-            // Create directory if it doesn't exist
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
+        // Create directory if it doesn't exist
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
 
-            // Count files
-            $fileCount = count($_FILES['otherImages']['name']);
-
-            // Process image deletions first
-            if (isset($_POST['delete_images']) && is_array($_POST['delete_images'])) {
+        // Process image deletions first (independent of file upload)
+        if (isset($_POST['delete_images']) && is_array($_POST['delete_images'])) {
                 // Delete selected images
                 foreach ($_POST['delete_images'] as $img_id) {
                     $get_image = "SELECT image_path FROM product_images WHERE image_id = ? AND product_id = ? AND is_main = 0";
@@ -256,10 +286,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                     $get_result = mysqli_stmt_get_result($stmt_get);
 
                     if ($row = mysqli_fetch_assoc($get_result)) {
-                        // Delete physical file
-                        $file_path = $upload_dir . $row['image_path'];
-                        if (file_exists($file_path)) {
-                            unlink($file_path);
+                        // Delete physical file (only for locally stored images)
+                        if (!is_external_image_url($row['image_path'])) {
+                            $file_path = $upload_dir . $row['image_path'];
+                            if (file_exists($file_path)) {
+                                unlink($file_path);
+                            }
                         }
 
                         // Delete database record
@@ -270,6 +302,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                     }
                 }
             }
+
+        if (isset($_FILES['otherImages']) && is_array($_FILES['otherImages']['name'])) {
+            // Count files
+            $fileCount = count($_FILES['otherImages']['name']);
 
             // Loop through each file to add new ones
             for ($i = 0; $i < $fileCount; $i++) {
@@ -306,6 +342,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                     mysqli_stmt_execute($stmt_image);
                 }
             }
+        }
+
+        // Process other image URLs
+        if (!empty($_POST['otherImagesUrl'])) {
+            product_image_urls_to_rows($con, $product_id, $_POST['otherImagesUrl']);
         }
 
         echo "<script>alert('Product updated successfully!'); window.location.href='products.php';</script>";
@@ -828,7 +869,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 <?php if ($main_image): ?>
                 <div class="mainImagePreview mb-4">
                     <div class="relative inline-block">
-                        <img src="../../assets/products/<?php echo htmlspecialchars($main_image['image_path']); ?>" alt="Main Image" class="w-full h-48 object-cover rounded-lg">
+                        <img src="<?php echo htmlspecialchars(product_image_url($main_image['image_path'], '../../assets/products/')); ?>" alt="Main Image" class="w-full h-48 object-cover rounded-lg">
                         <button type="button" class="removeImage absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-lg hover:bg-gray-100">
                             <svg class="w-4 h-4 text-gray-500 hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -866,6 +907,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
                     </div>
                 </div>
+
+                <!-- Or use a URL for the main image -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">or Use Image URL</label>
+                    <input type="url" name="mainImageUrl" placeholder="Paste image URL (https://...) to set the main image" value="<?php echo ($main_image && is_external_image_url($main_image['image_path'])) ? htmlspecialchars($main_image['image_path']) : ''; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-[13px] text-[#9A9A9A] font-['Open Sans'] font-regular mt-1">Provide a URL instead of uploading a file. If both are provided, the URL takes priority.</p>
+                </div>
             </div>
         </div>
 
@@ -878,7 +926,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                     <?php if(!empty($images)): ?>
                         <?php foreach ($images as $image): ?>
                         <div class="image-preview-item relative">
-                            <img src="../../assets/products/<?php echo htmlspecialchars($image['image_path']); ?>" alt="Product Image" class="w-full h-36 object-cover rounded-lg">
+                            <img src="<?php echo htmlspecialchars(product_image_url($image['image_path'], '../../assets/products/')); ?>" alt="Product Image" class="w-full h-36 object-cover rounded-lg">
                             <button type="button" class="removeExistingImage absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-lg hover:bg-gray-100" data-image-id="<?php echo $image['image_id']; ?>">
                                 <svg class="w-4 h-4 text-gray-500 hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -907,6 +955,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                     </button>
 
                     </div>
+                </div>
+
+                <!-- Or use URLs for other images -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">or Paste Image URLs</label>
+                    <input type="text" name="otherImagesUrl" placeholder="Paste image URLs, separated by commas or new lines" value="<?php
+                $saved_other_urls = [];
+                foreach ($images as $img_row) {
+                    if (is_external_image_url($img_row['image_path'])) {
+                        $saved_other_urls[] = $img_row['image_path'];
+                    }
+                }
+                echo htmlspecialchars(implode(', ', $saved_other_urls));
+                ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-[13px] text-[#9A9A9A] font-['Open Sans'] font-regular mt-1">Provide external image URLs. You can paste several separated by commas or new lines.</p>
                 </div>
                 
                 <!-- Hidden inputs for deleted images -->
@@ -1057,6 +1120,32 @@ document.addEventListener('DOMContentLoaded', function() {
     setupImageUpload('mainImage', 'mainImageContainer');
     setupImageUpload('otherImages', 'otherImagesContainer', true);
 
+    // Allow removing the current main image right on page load (no need to pick a new file first)
+    const mainContainerBox = document.getElementById('mainImageContainer');
+    const mainRemoveBtn = mainContainerBox.querySelector('.mainImagePreview .removeImage');
+    if (mainRemoveBtn) {
+        mainRemoveBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Mark the current main image for deletion
+            const deleteInput = document.createElement('input');
+            deleteInput.type = 'hidden';
+            deleteInput.name = 'delete_main_image';
+            deleteInput.value = '1';
+            document.getElementById('deleteImagesContainer').appendChild(deleteInput);
+
+            // Hide preview and show upload area again
+            mainContainerBox.querySelector('.mainImagePreview').style.display = 'none';
+            mainContainerBox.querySelector('.mainImageUpload').style.display = 'block';
+
+            // Clear any pending file or URL so it doesn't override the deletion
+            const mainFile = mainContainerBox.querySelector('input[name="mainImage"]');
+            if (mainFile) mainFile.value = '';
+            const mainUrl = mainContainerBox.querySelector('input[name="mainImageUrl"]');
+            if (mainUrl) mainUrl.value = '';
+        });
+    }
+
     function setupImageUpload(inputName, containerId, multiple = false) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -1109,31 +1198,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     reader.readAsDataURL(input.files[0]);
                 }
-                
-                // FIX: Properly handle main image removal
-                const removeButton = container.querySelector('.removeImage, .removeMainImage');
-                if (removeButton) {
-                    removeButton.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        
-                        // Create a hidden input to mark the main image for deletion
-                        if (inputName === 'mainImage') {
-                            const mainImageDeleteInput = document.createElement('input');
-                            mainImageDeleteInput.type = 'hidden';
-                            mainImageDeleteInput.name = 'delete_main_image';
-                            mainImageDeleteInput.value = '1';
-                            document.getElementById('deleteImagesContainer').appendChild(mainImageDeleteInput);
-                        }
-                        
-                        // Hide preview and show upload area
-                        const previewDiv = container.querySelector(`.${inputName}Preview`);
-                        previewDiv.style.display = 'none';
-                        uploadArea.style.display = 'block';
-                        
-                        // Clear the file input
-                        fileInput.value = '';
-                    });
-                }
+
+                // Clear the file input so the load-time remove handler stays the single source of truth
+                fileInput.value = '';
             } else {
                 // Multiple files (other images)
                 if (input.files && input.files.length > 0) {

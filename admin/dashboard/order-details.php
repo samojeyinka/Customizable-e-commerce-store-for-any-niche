@@ -224,7 +224,7 @@ foreach ($order_items as &$item) {
     // Handle product image path - adjust based on admin dashboard location
     if (!empty($item['main_image'])) {
         // For admin/dashboard location, need to go up two levels
-        $item['image_url'] = "../../assets/products/" . basename($item['main_image']);
+        $item['image_url'] = product_image_url($item['main_image'], "../../assets/products/");
     } else {
         // Default image if none found
         $item['image_url'] = "../../assets/products/default.svg";
@@ -488,7 +488,7 @@ include "./sidebar.php"
                     <div class="p-4 border rounded-md">
                         <div class="flex items-center">
                             <div class="w-16 h-16 mr-4 rounded overflow-hidden">
-                                <img src="<?php echo !empty($item['main_image']) ? '../../assets/products/' . basename($item['main_image']) : '../../assets/products/default.svg'; ?>" 
+                                <img src="<?php echo !empty($item['main_image']) ? product_image_url($item['main_image'], '../../assets/products/') : '../../assets/products/default.svg'; ?>" 
                                     alt="<?php echo htmlspecialchars($item['product_name'] ?? 'Product'); ?>" 
                                     class="w-full h-full object-cover" />
                             </div>

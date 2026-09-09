@@ -119,7 +119,7 @@
                 if (prodList) {
                     data.products.forEach(function (p) {
                         var name = p.product_name || 'Product';
-                        var img = p.image ? domain + '/assets/products/' + p.image : domain + '/assets/products/default.svg';
+                        var img = /^https?:\/\//i.test(p.image || '') ? p.image : domain + '/assets/products/' + (p.image || 'default.svg');
                         var url = p.slug ? domain + '/products/show.php?slug=' + encodeURIComponent(p.slug) : domain + '/products/show.php?id=' + p.product_id;
                         var meta = [];
                         if (p.category_title) meta.push(p.category_title);

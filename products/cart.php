@@ -218,7 +218,7 @@ require_once "../includes/auth/google.php";
                             <td class="py-3 flex gap-2">
 
                                 <div class="w-[131.64px] h-[88.73px] rounded-[4px] overflow-hidden">
-                                <img src="<?php echo !empty($item['main_image']) ? DOMAIN . '/assets/products/' . $item['main_image'] : DOMAIN . '/assets/products/default.svg'; ?>" 
+<img src="<?php echo !empty($item['main_image']) ? product_image_url($item['main_image']) : DOMAIN . '/assets/products/default.svg'; ?>" 
                                                 alt="<?php echo htmlspecialchars($item['product_name']); ?>" 
                                                 class="h-full w-full object-cover object-center">
                                 </div>
@@ -331,7 +331,7 @@ require_once "../includes/auth/google.php";
                         <div class="flex gap-2">
                         
                             <div class="w-[80px] h-[80px] rounded-[4px] overflow-hidden">
-                            <img src="<?php echo !empty($item['main_image']) ? DOMAIN . '/assets/products/' . $item['main_image'] : DOMAIN . '/assets/products/default.svg'; ?>" 
+                            <img src="<?php echo !empty($item['main_image']) ? product_image_url($item['main_image']) : DOMAIN . '/assets/products/default.svg'; ?>" 
                                                 alt="<?php echo htmlspecialchars($item['product_name']); ?>" 
                                                 class="h-full w-full object-cover object-center">
                             </div>

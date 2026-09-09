@@ -405,82 +405,40 @@ function seed_variants(mysqli $conn, int $productId, array $variants): void {
 }
 
 // ---------------------------------------------------------------------------
-// Placeholder product images (SVG, generated once per product)
+// Product images (external, category-appropriate links)
 // ---------------------------------------------------------------------------
 
-function seed_accent(string $colors): string {
-    static $palette = [
-        'clear'  => '#C9A7EB',
-        'white'  => '#F1D9E3',
-        'black'  => '#8C8C94',
-        'gray'   => '#B8B8C0',
-        'blue'   => '#9CC9EA',
-        'orange' => '#F0A575',
-        'yellow' => '#E9C46A',
-        'gold'   => '#D9B36A',
-        'beige'  => '#D9B899',
-        'cream'  => '#EFD9C0',
-        'natural'=> '#C7B299',
-        'brown'  => '#A67B5B',
-        'amber'  => '#E0A15F',
-        'honey'  => '#D9A441',
-    ];
-    $first = strtolower(trim(explode(',', $colors)[0]));
-    return $palette[$first] ?? '#C9A7EB';
-}
-
-function seed_svg_lines(string $text, int $maxChars = 24): array {
-    $words  = preg_split('/\s+/', trim($text));
-    $lines  = [];
-    $line   = '';
-    foreach ($words as $word) {
-        if ($line !== '' && (strlen($line) + 1 + strlen($word)) > $maxChars) {
-            $lines[] = $line;
-            $line = $word;
-        } else {
-            $line = $line === '' ? $word : $line . ' ' . $word;
-        }
-    }
-    if ($line !== '') {
-        $lines[] = $line;
-    }
-    return array_slice($lines, 0, 3);
-}
-
-function seed_build_svg(string $name, string $colors): string {
-    $accent = seed_accent($colors);
-    $lines  = seed_svg_lines($name);
-    $tpls   = '';
-    $y = 400;
-    foreach ($lines as $line) {
-        $esc = htmlspecialchars($line, ENT_QUOTES | ENT_XML1, 'UTF-8');
-        $tpls .= "  <text x=\"300\" y=\"{$y}\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"32\" font-weight=\"bold\" fill=\"#262626\">{$esc}</text>\n";
-        $y += 44;
-    }
-    return <<<SVG
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
-  <rect width="600" height="600" fill="#FAF6F1"/>
-  <circle cx="300" cy="230" r="130" fill="{$accent}" opacity="0.22"/>
-  <circle cx="300" cy="230" r="80"  fill="{$accent}" opacity="0.35"/>
-{$tpls}  <text x="300" y="545" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#8A8A90">GlowHaus</text>
-</svg>
-
-SVG;
-}
-
-function seed_ensure_images(string $absDir, array $products): void {
-    if (!is_dir($absDir)) {
-        mkdir($absDir, 0777, true);
-    }
-    foreach ($products as $i => $p) {
-        $file = $absDir . DIRECTORY_SEPARATOR . 'p' . ($i + 1) . '.svg';
-        if (file_exists($file)) {
-            continue;
-        }
-        file_put_contents($file, seed_build_svg($p['name'], $p['colors']));
-    }
-    seed_line("  placeholder images ready in " . str_replace(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..', '', $absDir));
-}
+/**
+ * One product shot per seeded product (same order as $products).
+ * These are live.staticflickr.com URLs (CC-licensed, hotlink-friendly),
+ * replacing the old generated SVG placeholders.
+ */
+$seedImages = [
+    'https://live.staticflickr.com/65535/53411227377_23d1096bfe_b.jpg', // 01 Gentle Foaming Cleanser
+    'https://live.staticflickr.com/2108/4508402635_5250ba26c5_b.jpg', // 02 Charcoal Deep Clean Wash
+    'https://live.staticflickr.com/7367/26759665070_b425929da1_b.jpg', // 03 Creamy Milk Cleanser
+    'https://live.staticflickr.com/4194/33804961643_66da87dc32_b.jpg', // 04 Hydra-Burst Gel Moisturizer
+    'https://live.staticflickr.com/231/489358541_b787ae3334_b.jpg', // 05 Shea Butter Rich Cream
+    'https://live.staticflickr.com/7857/32376537837_90848a42c1.jpg', // 06 Vitamin C Brightening Lotion
+    'https://live.staticflickr.com/5004/5288157218_3b86302095_b.jpg', // 07 Oatmeal Soothing Moisturizer
+    'https://live.staticflickr.com/7237/7170588668_523cf7cc1a.jpg', // 08 Hyaluronic Acid Serum
+    'https://live.staticflickr.com/7436/16446972155_3dc7a34169.jpg', // 09 Vitamin C 15% Serum
+    'https://live.staticflickr.com/7342/27056463026_d91a30a1ff_b.jpg', // 10 Niacinamide 10% Serum
+    'https://live.staticflickr.com/8238/8498507108_8283bf99e7.jpg', // 11 Rosehip Facial Oil
+    'https://live.staticflickr.com/7834/46595535894_f01bc44d85.jpg', // 12 Retinol Night Treatment
+    'https://live.staticflickr.com/8068/8276058717_3b59768e0d.jpg', // 13 Glycolic Acid Toner
+    'https://live.staticflickr.com/65535/50096701346_837a3369b3_b.jpg', // 14 SPF 50 Invisible Sunscreen
+    'https://live.staticflickr.com/7463/26724312321_9eb818e00b.jpg', // 15 Tinted Sunscreen SPF 30
+    'https://live.staticflickr.com/601/20656331680_662c87344e_b.jpg', // 16 Sport Sunscreen Spray SPF 50
+    'https://live.staticflickr.com/5534/11003252485_432168850c_b.jpg', // 17 Cocoa Butter Whipped Body Butter
+    'https://live.staticflickr.com/7851/32376445287_066d30990f_b.jpg', // 18 Oatmeal & Honey Body Wash
+    'https://live.staticflickr.com/2056/2108522824_17e5358b32_b.jpg', // 19 Exfoliating Coffee Body Scrub
+    'https://live.staticflickr.com/3134/3233712044_a7a51b5d25_b.jpg', // 20 Clay Detox Face Mask
+    'https://live.staticflickr.com/3445/3781260629_ed9594c211.jpg', // 21 Hydrating Jelly Sleep Mask
+    'https://live.staticflickr.com/4075/4766033156_30768e878c_b.jpg', // 22 Brightening Turmeric Mask
+    'https://live.staticflickr.com/65535/50370337926_6c2a2620ae_b.jpg', // 23 Charcoal Peel-Off Mask
+    'https://live.staticflickr.com/7305/9301305426_d960989a8e.jpg', // 24 Vitamin E Collagen Sleeping Mask
+];
 
 // ---------------------------------------------------------------------------
 // Run
@@ -501,8 +459,6 @@ foreach ($brands as $b) {
     $brandIds[$b['title']] = seed_brand_id($conn, $b);
 }
 
-$seedDir = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'products' . DIRECTORY_SEPARATOR . 'seed';
-
 seed_line("Products:");
 foreach ($products as $i => $p) {
     $catId  = $categoryIds[$p['category']];
@@ -510,14 +466,14 @@ foreach ($products as $i => $p) {
     $pid    = seed_product_id($conn, $p, $catId, $brandId);
     seed_variants($conn, $pid, $p['variants']);
 
-    $imagePath = 'seed/p' . ($i + 1) . '.svg';
+    $imageUrl = $seedImages[$i] ?? '';
     $conn->query("DELETE FROM product_images WHERE product_id = " . (int) $pid);
-    $img = $conn->prepare("INSERT INTO product_images (product_id, image_path, is_main, display_order) VALUES (?, ?, 1, 1)");
-    $img->bind_param('ss', $pid, $imagePath);
-    $img->execute();
+    if (!empty($imageUrl)) {
+        $img = $conn->prepare("INSERT INTO product_images (product_id, image_path, is_main, display_order) VALUES (?, ?, 1, 1)");
+        $img->bind_param('ss', $pid, $imageUrl);
+        $img->execute();
+    }
 }
-
-seed_ensure_images($seedDir, $products);
 
 $catCount  = (int) $conn->query("SELECT COUNT(*) c FROM categories")->fetch_assoc()['c'];
 $brandCount = (int) $conn->query("SELECT COUNT(*) c FROM brands")->fetch_assoc()['c'];

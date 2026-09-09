@@ -51,7 +51,7 @@ if ($result->num_rows == 0) {
 }
 
 $item = $result->fetch_assoc();
-$image_path = isset($item['image_path']) ? "../assets/products/" . $item['image_path'] : "../assets/products/img1.svg";
+$image_path = isset($item['image_path']) && $item['image_path'] !== '' ? product_image_url($item['image_path'], '../assets/products/') : "../assets/products/img1.svg";
 
 // Get user's email from users table
 $sql = "SELECT email FROM users WHERE id = ?";

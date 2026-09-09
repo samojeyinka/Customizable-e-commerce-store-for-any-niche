@@ -197,7 +197,7 @@ require_once "../includes/auth/google.php";
                                     $order_date = date('M d, Y', strtotime($order['order_date']));
                                     
                                     // Get image path or use placeholder
-                                    $image_path = isset($item['image_path']) ? "../assets/products/" . $item['image_path'] : "../assets/products/img1.svg";
+                                    $image_path = isset($item['image_path']) && $item['image_path'] !== '' ? product_image_url($item['image_path'], '../assets/products/') : "../assets/products/img1.svg";
                                     $reorder_url = product_url($item);
                                     
                                   echo "
@@ -316,7 +316,7 @@ echo "
                                 $order_date = date('M d, Y', strtotime($order['order_date']));
                                 
 // Get image path or use placeholder
-                                $image_path = isset($item['image_path']) ? "../assets/products/" . $item['image_path'] : "../assets/products/img1.svg";
+                                $image_path = isset($item['image_path']) && $item['image_path'] !== '' ? product_image_url($item['image_path'], '../assets/products/') : "../assets/products/img1.svg";
                                 $reorder_url = product_url($item);
                                 
                                 echo "

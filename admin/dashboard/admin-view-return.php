@@ -46,7 +46,7 @@ if ($result->num_rows === 0) {
 }
 
 $return = $result->fetch_assoc();
-$image_path = isset($return['image_path']) ? "../../assets/products/" . $return['image_path'] : "../assets/admin/img/product-placeholder.jpg";
+$image_path = isset($return['image_path']) && $return['image_path'] !== '' ? product_image_url($return['image_path'], "../../assets/products/") : "../assets/admin/img/product-placeholder.jpg";
 
 // Process status updates
 $message = '';

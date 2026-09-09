@@ -403,7 +403,7 @@ require_once "../includes/auth/google.php";
                     <div class="flex flex-col gap-4">
                         <?php foreach ($order_items as $item): 
                             $color = getProductColor($conn, $item['product_id']);
-                            $image_path = isset($item['image_path']) ? "../assets/products/" . $item['image_path'] : "../assets/products/img1.svg";
+                            $image_path = isset($item['image_path']) && $item['image_path'] !== '' ? product_image_url($item['image_path'], '../assets/products/') : "../assets/products/img1.svg";
                         ?>
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-3 border-[1px] border-[#E1E1E1] rounded-[4px]">
                             <div class="flex items-center gap-3">
@@ -439,7 +439,7 @@ require_once "../includes/auth/google.php";
     <div class="flex flex-col gap-4">
         <?php foreach ($order_items as $item): 
             $color = getProductColor($conn, $item['product_id']);
-            $image_path = isset($item['image_path']) ? "../assets/products/" . $item['image_path'] : "../assets/products/img1.svg";
+            $image_path = isset($item['image_path']) && $item['image_path'] !== '' ? product_image_url($item['image_path'], '../assets/products/') : "../assets/products/img1.svg";
             
             // Check if return is possible for this order and item
             $can_request_return = ($current_status == 'Delivered' || $current_status == 'Shipped');
